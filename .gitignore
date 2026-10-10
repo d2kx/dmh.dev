@@ -42,3 +42,12 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Environment & Secrets (NEVER commit to public repo)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+railway-plan.json

@@ -57,3 +57,9 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Use the `providedIn: 'root'` option for singleton services
 - Prefer the `@Service` decorator over `@Injectable({providedIn: 'root'})` for new singleton services (Angular v22+)
 - Use the `inject()` function instead of constructor injection
+
+---
+
+# Project Context & Architecture (`dmh.dev`)
+
+See `AGENTS.md` in the repository root for the full, authoritative documentation of the `dmh.dev` monorepo structure, Angular 22 Hybrid Rendering (Prerender + SSR) setup, Railway project/service IDs (`4df1008f-af41-461c-8af2-313e8e1b04b0` / service `web`), cost optimization settings, DNS setup, and guide for adding mini-apps under `apps/`. Always keep `AGENTS.md` updated as the project evolves.

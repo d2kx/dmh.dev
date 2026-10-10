@@ -1,59 +1,29 @@
-# DmhDev
+# dmh.dev
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.2.
+Personal website, blog, and mini-apps monorepo for **Dennis Martin Herbers** ([dmh.dev](https://dmh.dev)).
 
-## Development server
+## Tech Stack & Architecture
 
-To start a local development server, run:
+- **Framework**: [Angular 22](https://angular.dev) with Hybrid Rendering (`@angular/ssr`):
+  - **Build-Time Prerendering (SSG)** (`RenderMode.Prerender`) for static content routes (`/`, `/projects`, `/blog`, `/about`).
+  - **Server-Side Rendering (SSR)** (`RenderMode.Server`) via Express 5 & `AngularNodeAppEngine` (`src/server.ts`) for dynamic routes and server endpoints (`/healthz`).
+- **Hosting & Deployment**: [Railway](https://railway.com) (`dmh.dev` project) with Railpack build caching, Edge CDN, and Serverless (App Sleep) enabled for low-cost operation.
+- **Mini-Apps (`apps/`)**: Subdirectory reserved for standalone mini-apps deployed to subdomains (`app1.dmh.dev`, `app2.dmh.dev`, etc.).
 
-```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Development
 
 ```bash
-ng generate component component-name
+# Start local development server (http://localhost:4200)
+npm run dev
+
+# Build production browser + SSR bundles and prerender static routes
+npm run build
+
+# Run the compiled production SSR server locally (http://localhost:4000)
+npm start
+
+# Run unit tests (Vitest)
+npm test
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+For full architectural details, deployment configuration, and AI agent guidelines, see [`AGENTS.md`](./AGENTS.md).

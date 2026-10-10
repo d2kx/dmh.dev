@@ -1,1 +1,116 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  --surface-bg-light: #f8fafc;
+  --surface-bg-dark: #0b0f19;
+  --surface-card-light: #ffffff;
+  --surface-card-dark: #111827;
+  --text-primary-light: #0f172a;
+  --text-primary-dark: #f1f5f9;
+  --text-muted-light: #475569;
+  --text-muted-dark: #94a3b8;
+  --border-subtle-light: #e2e8f0;
+  --border-subtle-dark: #1e293b;
+  --accent-light: #2563eb;
+  --accent-dark: #60a5fa;
+  --accent-subtle-light: #eff6ff;
+  --accent-subtle-dark: #172554;
+
+  /* Fallbacks for browsers without light-dark() support */
+  --surface-bg: var(--surface-bg-light);
+  --surface-card: var(--surface-card-light);
+  --text-primary: var(--text-primary-light);
+  --text-muted: var(--text-muted-light);
+  --border-subtle: var(--border-subtle-light);
+  --accent: var(--accent-light);
+  --accent-subtle: var(--accent-subtle-light);
+
+  @media (prefers-color-scheme: dark) {
+    --surface-bg: var(--surface-bg-dark);
+    --surface-card: var(--surface-card-dark);
+    --text-primary: var(--text-primary-dark);
+    --text-muted: var(--text-muted-dark);
+    --border-subtle: var(--border-subtle-dark);
+    --accent: var(--accent-dark);
+    --accent-subtle: var(--accent-subtle-dark);
+  }
+
+  color-scheme: light dark;
+  --surface-bg: light-dark(var(--surface-bg-light), var(--surface-bg-dark));
+  --surface-card: light-dark(var(--surface-card-light), var(--surface-card-dark));
+  --text-primary: light-dark(var(--text-primary-light), var(--text-primary-dark));
+  --text-muted: light-dark(var(--text-muted-light), var(--text-muted-dark));
+  --border-subtle: light-dark(var(--border-subtle-light), var(--border-subtle-dark));
+  --accent: light-dark(var(--accent-light), var(--accent-dark));
+  --accent-subtle: light-dark(var(--accent-subtle-light), var(--accent-subtle-dark));
+
+  accent-color: var(--accent);
+  scrollbar-width: thin;
+  scrollbar-color: var(--text-muted) var(--surface-bg);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--surface-bg);
+  color: var(--text-primary);
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.skip-link {
+  position: absolute;
+  top: -3rem;
+  left: 1rem;
+  background: var(--surface-card);
+  color: var(--text-primary);
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--accent);
+  border-radius: 0.375rem;
+  z-index: 100;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  top: 1rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
