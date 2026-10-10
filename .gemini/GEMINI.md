@@ -90,12 +90,12 @@ Everything for `dmh.dev`—both the main personal website/blog and future standa
 dmh.dev/
 ├── src/                        # Main dmh.dev Angular 22 application source
 │   ├── app/
-│   │   ├── core/               # Singleton services (theme.ts, legal-info.ts)
+│   │   ├── core/               # Singleton services (theme.ts, legal-info.ts, seo.ts)
 │   │   ├── shared/             # Reusable UI components (social-links.ts)
 │   │   ├── features/           # Lazy-loaded route feature components (home, projects, blog, about, impressum, privacy)
 │   │   ├── app.config.ts       # Client providers (Router + ViewTransitions, HttpClient + Fetch, Hydration + EventReplay)
 │   │   ├── app.config.server.ts# Server providers (provideServerRendering with serverRoutes)
-│   │   ├── app.routes.ts       # Client route definitions
+│   │   ├── app.routes.ts       # Client route definitions & route SEO/Open Graph metadata
 │   │   ├── app.routes.server.ts# Hybrid rendering config (RenderMode.Prerender + RenderMode.Server)
 │   │   ├── app.ts              # Root shell component (Material Toolbar, Sakura logo, nav, theme toggle, legal footer)
 │   │   ├── app.html            # Accessible site shell template
@@ -105,8 +105,8 @@ dmh.dev/
 │   ├── main.server.ts          # Server bootstrap
 │   ├── theme.scss              # Angular Material 3 mat.theme() config (rose/sakura + Google Sans Flex Variable)
 │   ├── styles.css              # Global CSS (Sakura light-dark() tokens, color-scheme overrides, focus styles)
-│   └── index.html              # Root HTML document (color-scheme meta + FOUC script)
-├── public/                     # Static public assets (favicon.ico, robots.txt, llms.txt)
+│   └── index.html              # Root HTML document (color-scheme meta, FOUC script, default Open Graph tags)
+├── public/                     # Static public assets (favicon.svg, favicon.ico, og-image.png, robots.txt, llms.txt)
 ├── apps/                       # Directory for future standalone mini-apps (app1.dmh.dev, etc.)
 │   └── README.md               # Guide for adding and deploying new mini-apps
 ├── angular.json                # Angular CLI build/serve/SSR/lint configuration & SSRF allowedHosts
@@ -125,7 +125,7 @@ dmh.dev/
   - UI & Helpers: `@angular/material` ^22.2.0 and `@angular/cdk` ^22.2.0 (`MediaMatcher`, `Platform`, `LiveAnnouncer`, `Clipboard`). Prefer official Angular Material components and CDK utilities before reaching for third-party UI libraries.
 - **Design System, Theme, Brand Mark & Social Links**:
   - **Theme**: Clean neutral light/dark surfaces with playful **Sakura / Cherry-Blossom Pink** accents (`--accent-light: #b81d5c`, `--accent-dark: #ff8ab5`, soft sakura containers `#fde8f0` / `#3b1225`). All color pairings exceed WCAG AA (4.5:1) contrast requirements.
-  - **Brand Logo**: Custom 5-petal notched Sakura cherry blossom SVG mark paired with `dmh.dev` in `src/app/app.html`.
+  - **Brand Logo & Favicon**: Custom 5-petal notched Sakura cherry blossom SVG mark paired with `dmh.dev` in `src/app/app.html` and adaptive SVG favicon in `public/favicon.svg`.
   - **Social & Contact Links (`src/app/shared/social-links.ts`)**: Reusable `<app-social-links />` component displayed on `Home` and `About` with official inline SVG icons and light/dark brand color schemes for:
     - GitHub: `https://github.com/d2kx`
     - LinkedIn: `https://www.linkedin.com/in/dennis-martin-herbers-085058156`
@@ -133,6 +133,9 @@ dmh.dev/
     - Email: `mailto:dennis@dmh.dev`
   - **Light/Dark Mode Toggle**: Implemented via `src/app/core/theme.ts` (`ThemeService`), `<meta name="color-scheme" content="light dark">` in `src/index.html`, and `:root:has(> head > meta[name="color-scheme"])` rules in `src/styles.css` so `light-dark()` and Angular Material M3 `--mat-sys-*` tokens adapt seamlessly with zero FOUC.
   - **Self-Hosted Font (`Google Sans Flex`)**: Uses `@fontsource-variable/google-sans-flex` (SIL Open Font License 1.1) bundled locally at build time via `angular.json`. **Never load fonts from `fonts.googleapis.com` or `fonts.gstatic.com`**—dynamic requests to Google Fonts CDN without prior consent violate German GDPR/DSGVO case law (LG München I, Az. 3 O 17493/20).
+- **SEO, Open Graph & Social Link Previews (`src/app/core/seo.ts`)**:
+  - `SeoService` (`src/app/core/seo.ts`) listens to router `NavigationEnd` events (during build-time prerendering, SSR, and client-side navigation) and reads `data['seo']` (`RouteSeoData`) from `src/app/app.routes.ts` to update `<meta name="description">`, Open Graph (`og:title`, `og:description`, `og:url`, `og:type`, `og:site_name`, `og:locale`, `og:image`), X/Twitter (`twitter:card`, `twitter:creator`), and `<link rel="canonical">`.
+  - Default social preview card image (`1200x630` PNG) is served at `public/og-image.png` (`https://www.dmh.dev/og-image.png`).
 - **German Legal Compliance (`Impressum` & `Datenschutzerklärung`)**:
   - Routes `/impressum` (`src/app/features/impressum/impressum.ts`) and `/privacy` (`src/app/features/privacy/privacy.ts`) are linked in the global footer (1 click from every page) and offer an instant **Deutsch (`de`) | English (`en`)** switcher via `LegalInfoService` (`src/app/core/legal-info.ts`).
   - `/impressum` covers **§ 5 DDG** (Digitale-Dienste-Gesetz) and **§ 18 Abs. 2 MStV** (Medienstaatsvertrag). In English mode it uses the clean heading `Legal Notice`.

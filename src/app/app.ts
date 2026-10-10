@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatToolbar } from '@angular/material/toolbar';
+import { SeoService } from './core/seo';
 import { ThemeService } from './core/theme';
 
 interface NavItem {
@@ -18,6 +19,8 @@ interface NavItem {
 })
 export class App {
   protected readonly theme = inject(ThemeService);
+  private readonly seo = inject(SeoService);
+
   protected readonly title = signal('dmh.dev');
   protected readonly navItems = signal<readonly NavItem[]>([
     { path: '/', label: 'Home', exact: true },
@@ -25,4 +28,8 @@ export class App {
     { path: '/blog', label: 'Blog', exact: false },
     { path: '/about', label: 'About', exact: false },
   ]);
+
+  constructor() {
+    this.seo.init();
+  }
 }
