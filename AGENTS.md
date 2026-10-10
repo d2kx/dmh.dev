@@ -96,7 +96,7 @@ dmh.dev/
 │   ├── main.server.ts          # Server bootstrap
 │   ├── styles.css              # Global CSS (light-dark() theme, view transitions, a11y focus styles)
 │   └── index.html              # Root HTML document
-├── public/                     # Static public assets (favicon, etc.)
+├── public/                     # Static public assets (favicon.ico, robots.txt, llms.txt)
 ├── apps/                       # Directory for future standalone mini-apps (app1.dmh.dev, etc.)
 │   └── README.md               # Guide for adding and deploying new mini-apps
 ├── angular.json                # Angular CLI build/serve/SSR/lint configuration & SSRF allowedHosts
@@ -122,9 +122,10 @@ dmh.dev/
   - Authorized hosts are configured in `angular.json` under `projects.dmh-dev.architect.build.options.security.allowedHosts`:
     `["dmh.dev", "*.dmh.dev", "*.up.railway.app", "localhost"]`.
   - Can also be overridden at runtime via the `NG_ALLOWED_HOSTS` environment variable.
-- **Code Quality & Linting (`angular-eslint`)**:
+- **Code Quality, Linting (`angular-eslint`), & Lighthouse Audits**:
   - Configured in `eslint.config.js` with `tseslint.configs.recommended`, `tseslint.configs.stylistic`, `angular.configs.tsRecommended`, `angular.configs.templateRecommended`, and `angular.configs.templateAccessibility`.
   - Always run `npm run lint` (or `ng lint`) alongside `npm run build` and `npm test` after making code changes to ensure zero lint or accessibility rule violations.
+  - **Lighthouse Habit**: Whenever relevant content, UI, or routing changes take place on any web app in the repository, run a Lighthouse audit (e.g., via the `chrome-devtools` MCP `lighthouse_audit` tool or Lighthouse CLI) and act upon its findings before wrapping up. Keep `public/robots.txt` and `public/llms.txt` up to date so SEO and Agentic Browsing audits continue to score 100.
 - **Local Development & Scripts**:
   - `npm run dev` (or `ng serve`): Starts local dev server with HMR at `http://localhost:4200`.
   - `npm run build` (or `ng build`): Builds browser and server bundles + prerenders static routes into `dist/dmh-dev/`.
