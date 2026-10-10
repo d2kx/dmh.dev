@@ -3,10 +3,11 @@ import { Clipboard } from '@angular/cdk/clipboard';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { MatButton } from '@angular/material/button';
 import { MatCard, MatCardContent } from '@angular/material/card';
+import { SocialLinks } from '../../shared/social-links';
 
 @Component({
   selector: 'app-about',
-  imports: [MatCard, MatCardContent, MatButton],
+  imports: [MatCard, MatCardContent, MatButton, SocialLinks],
   template: `
     <section aria-labelledby="about-heading" class="about-section">
       <p class="eyebrow">Profile</p>
@@ -20,21 +21,24 @@ import { MatCard, MatCardContent } from '@angular/material/card';
             and tinkering with side projects.
           </p>
           <p>
-            <code>dmh.dev</code> is my personal corner of the internet — a place to share what I am
+            <code>dmh.dev</code> is my personal corner of the internet, a place to share what I am
             working on, publish occasional articles, and host small interactive projects.
           </p>
 
           <div class="contact-box">
-            <div>
-              <h2>Get in Touch</h2>
-              <p class="contact-sub">
-                Feel free to reach out via email at
-                <a href="mailto:dennis@dmh.dev">dennis&#64;dmh.dev</a>.
-              </p>
+            <div class="contact-header">
+              <div>
+                <h2>Connect &amp; Get in Touch</h2>
+                <p class="contact-sub">
+                  Find me on GitHub, LinkedIn, or X, or reach out directly via email at
+                  <a href="mailto:dennis@dmh.dev">dennis&#64;dmh.dev</a>.
+                </p>
+              </div>
+              <button mat-stroked-button type="button" (click)="copyEmail()">
+                {{ copied() ? 'Copied dennis@dmh.dev ✓' : 'Copy Email Address' }}
+              </button>
             </div>
-            <button mat-stroked-button type="button" (click)="copyEmail()">
-              {{ copied() ? 'Copied dennis@dmh.dev ✓' : 'Copy Email Address' }}
-            </button>
+            <app-social-links />
           </div>
         </mat-card-content>
       </mat-card>
@@ -88,6 +92,12 @@ import { MatCard, MatCardContent } from '@angular/material/card';
       border-radius: 0.75rem;
       background-color: var(--surface-subtle);
       border: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .contact-header {
       display: flex;
       align-items: center;
       justify-content: space-between;

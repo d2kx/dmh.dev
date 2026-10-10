@@ -1,4 +1,4 @@
-# dmh.dev — Dennis Martin Herbers
+# dmh.dev | Dennis Martin Herbers
 
 > Personal website, software projects, and blog of Dennis Martin Herbers.
 
@@ -10,3 +10,10 @@
 - [About](https://www.dmh.dev/about): Background on Dennis Martin Herbers and contact details.
 - [Impressum / Legal Notice](https://www.dmh.dev/impressum): Bilingual (German/English) statutory legal notice pursuant to § 5 DDG and § 18 Abs. 2 MStV.
 - [Datenschutzerklärung / Privacy Policy](https://www.dmh.dev/privacy): Bilingual (German/English) privacy policy pursuant to Art. 13 GDPR (DSGVO).
+
+## Social & Contact Links
+
+- GitHub: https://github.com/d2kx
+- LinkedIn: https://www.linkedin.com/in/dennis-martin-herbers-085058156
+- X: https://x.com/D2KX_
+- Email: mailto:dennis@dmh.dev

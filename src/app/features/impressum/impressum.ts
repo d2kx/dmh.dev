@@ -27,7 +27,7 @@ import { LegalInfoService, LegalLanguage } from '../../core/legal-info';
             {{ legal.lang() === 'de' ? 'Rechtliche Angaben' : 'Legal Disclosure' }}
           </p>
           <h1 id="impressum-heading">
-            {{ legal.lang() === 'de' ? 'Impressum' : 'Legal Notice (Impressum)' }}
+            {{ legal.lang() === 'de' ? 'Impressum' : 'Legal Notice' }}
           </h1>
         </div>
 
@@ -51,12 +51,12 @@ import { LegalInfoService, LegalLanguage } from '../../core/legal-info';
               @if (legal.info().street) {
                 {{ legal.info().street }}<br />
               } @else {
-                <span class="pending-note">[Straße &amp; Hausnummer – siehe Hinweis unten]</span><br />
+                <span class="pending-note">[Straße &amp; Hausnummer ausstehend]</span><br />
               }
               @if (legal.info().postalCity) {
                 {{ legal.info().postalCity }}<br />
               } @else {
-                <span class="pending-note">[PLZ &amp; Ort – siehe Hinweis unten]</span><br />
+                <span class="pending-note">[PLZ &amp; Ort ausstehend]</span><br />
               }
               {{ legal.info().countryDe }}
             </address>
@@ -65,11 +65,12 @@ import { LegalInfoService, LegalLanguage } from '../../core/legal-info';
 
             <h2>Kontakt</h2>
             <p>
-              <strong>E-Mail:</strong>
-              <a [href]="'mailto:' + legal.info().email">{{ legal.info().email }}</a>
+              <strong>E-Mail:</strong>&nbsp;<a [href]="'mailto:' + legal.info().email">{{
+                legal.info().email
+              }}</a>
               @if (legal.info().phone) {
                 <br />
-                <strong>Telefon:</strong> {{ legal.info().phone }}
+                <strong>Telefon:</strong>&nbsp;{{ legal.info().phone }}
               }
             </p>
 
@@ -82,7 +83,7 @@ import { LegalInfoService, LegalLanguage } from '../../core/legal-info';
               @if (legal.info().street && legal.info().postalCity) {
                 <br />{{ legal.info().street }}, {{ legal.info().postalCity }}
               } @else {
-                (Anschrift wie oben)
+                <span> (Anschrift wie oben)</span>
               }
             </p>
 
@@ -137,12 +138,12 @@ import { LegalInfoService, LegalLanguage } from '../../core/legal-info';
               @if (legal.info().street) {
                 {{ legal.info().street }}<br />
               } @else {
-                <span class="pending-note">[Street address – pending configuration]</span><br />
+                <span class="pending-note">[Street address pending]</span><br />
               }
               @if (legal.info().postalCity) {
                 {{ legal.info().postalCity }}<br />
               } @else {
-                <span class="pending-note">[Postal code &amp; city – pending configuration]</span><br />
+                <span class="pending-note">[Postal code &amp; city pending]</span><br />
               }
               {{ legal.info().countryEn }}
             </address>
@@ -151,11 +152,12 @@ import { LegalInfoService, LegalLanguage } from '../../core/legal-info';
 
             <h2>Contact</h2>
             <p>
-              <strong>Email:</strong>
-              <a [href]="'mailto:' + legal.info().email">{{ legal.info().email }}</a>
+              <strong>Email:</strong>&nbsp;<a [href]="'mailto:' + legal.info().email">{{
+                legal.info().email
+              }}</a>
               @if (legal.info().phone) {
                 <br />
-                <strong>Phone:</strong> {{ legal.info().phone }}
+                <strong>Phone:</strong>&nbsp;{{ legal.info().phone }}
               }
             </p>
 
@@ -169,7 +171,7 @@ import { LegalInfoService, LegalLanguage } from '../../core/legal-info';
               @if (legal.info().street && legal.info().postalCity) {
                 <br />{{ legal.info().street }}, {{ legal.info().postalCity }}
               } @else {
-                (address as stated above)
+                <span> (address as stated above)</span>
               }
             </p>
 
@@ -211,7 +213,7 @@ import { LegalInfoService, LegalLanguage } from '../../core/legal-info';
 
             <p class="related-link">
               For details on how personal data is processed, please refer to the
-              <a routerLink="/privacy">Privacy Policy (Datenschutzerklärung)</a>.
+              <a routerLink="/privacy">Privacy Policy</a>.
             </p>
           </mat-card-content>
         </mat-card>

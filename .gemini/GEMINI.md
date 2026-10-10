@@ -50,6 +50,7 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Use native control flow (`@if`, `@for`, `@switch`) instead of `*ngIf`, `*ngFor`, `*ngSwitch`
 - Use the async pipe to handle observables
 - Do not assume globals like (`new Date()`) are available.
+- Be careful with Angular template whitespace collapsing: when an inline label like `<strong>Email:</strong>` is followed by another inline element (`<a ...>`), place `&nbsp;` or keep them on the same line so a space is always rendered.
 
 ## Services
 
@@ -64,7 +65,7 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 
 This section provides complete operational context so any fresh coding agent session can immediately understand the repository layout, architectural decisions, deployment pipeline, and rules without requiring re-explanation from the user.
 
-## 1. Project Overview & Security Policy
+## 1. Project Overview, Security & Content Rules
 
 - **Domain**: `dmh.dev` (owned by Dennis Martin Herbers, registered with GoDaddy).
 - **GitHub Repository**: [`https://github.com/d2kx/dmh.dev`](https://github.com/d2kx/dmh.dev) (**PUBLIC** repository).
@@ -74,6 +75,10 @@ This section provides complete operational context so any fresh coding agent ses
   - All runtime secrets, service-to-service connection strings, and personal legal address details must be configured as Railway Variables (e.g., `${{Postgres.DATABASE_URL}}`, `LEGAL_STREET`, `LEGAL_POSTAL_CITY`, `LEGAL_PHONE`).
 - **Visitor Content vs. Technical Documentation Rule**:
   - Keep visitor-facing pages (`Home`, `Projects`, `Blog`, `About`) focused on content relevant to visitors. Do NOT clutter visitor-facing copy with internal infrastructure details (e.g., "Hybrid Prerender & SSR", "Hosted on Railway", or monorepo `/apps` subdomain architecture). Keep those technical details documented here in `AGENTS.md` and `README.md`.
+- **Writing Style Rule (NO Em Dashes)**:
+  - **NEVER use `—` (em dashes)** in any visitor-facing text, page titles, meta descriptions, blog posts, or UI copy. The user never uses em dashes in their own writing and considers them unnatural/fake-looking. Use standard commas, colons, periods, or middle dots (`·`) / pipes (`|`) instead.
+- **Legal Maintenance Rule (`Impressum` & `Datenschutzerklärung`)**:
+  - Whenever you introduce any new functionality that affects legal disclosures or data privacy (such as analytics, cookies, new `localStorage` / `sessionStorage` keys, authentication, contact forms, database storage of user data, external embeds, or third-party APIs), you **MUST** proactively update `/impressum` (`src/app/features/impressum/impressum.ts`) and `/privacy` (`src/app/features/privacy/privacy.ts`) in both German (`de`) and English (`en`), and warn the user beforehand if a cookie/consent banner would become legally required under German DSGVO / TDDDG.
 - **Proactive Guidance Rule**:
   - The user welcomes proactive feedback and recommendations. If a requested approach has architectural, security, legal, DNS, or cost downsides, point it out clearly and suggest a better alternative.
 
@@ -86,12 +91,13 @@ dmh.dev/
 ├── src/                        # Main dmh.dev Angular 22 application source
 │   ├── app/
 │   │   ├── core/               # Singleton services (theme.ts, legal-info.ts)
+│   │   ├── shared/             # Reusable UI components (social-links.ts)
 │   │   ├── features/           # Lazy-loaded route feature components (home, projects, blog, about, impressum, privacy)
 │   │   ├── app.config.ts       # Client providers (Router + ViewTransitions, HttpClient + Fetch, Hydration + EventReplay)
 │   │   ├── app.config.server.ts# Server providers (provideServerRendering with serverRoutes)
 │   │   ├── app.routes.ts       # Client route definitions
 │   │   ├── app.routes.server.ts# Hybrid rendering config (RenderMode.Prerender + RenderMode.Server)
-│   │   ├── app.ts              # Root shell component (Material Toolbar, nav, theme toggle, legal footer)
+│   │   ├── app.ts              # Root shell component (Material Toolbar, Sakura logo, nav, theme toggle, legal footer)
 │   │   ├── app.html            # Accessible site shell template
 │   │   └── app.css             # Shell layout styles
 │   ├── server.ts               # Express 5 + AngularNodeAppEngine SSR server, /healthz & /api/legal-info endpoints
@@ -117,18 +123,24 @@ dmh.dev/
 - **Framework & Official Libraries**:
   - Angular v22 (`@angular/core` ^22.2.0, `@angular/ssr` ^22.2.2, `angular-eslint` ^22.5.0, TypeScript ~6.0, Vitest ^5.0).
   - UI & Helpers: `@angular/material` ^22.2.0 and `@angular/cdk` ^22.2.0 (`MediaMatcher`, `Platform`, `LiveAnnouncer`, `Clipboard`). Prefer official Angular Material components and CDK utilities before reaching for third-party UI libraries.
-- **Design System, Theme & Typography**:
+- **Design System, Theme, Brand Mark & Social Links**:
   - **Theme**: Clean neutral light/dark surfaces with playful **Sakura / Cherry-Blossom Pink** accents (`--accent-light: #b81d5c`, `--accent-dark: #ff8ab5`, soft sakura containers `#fde8f0` / `#3b1225`). All color pairings exceed WCAG AA (4.5:1) contrast requirements.
+  - **Brand Logo**: Custom 5-petal notched Sakura cherry blossom SVG mark paired with `dmh.dev` in `src/app/app.html`.
+  - **Social & Contact Links (`src/app/shared/social-links.ts`)**: Reusable `<app-social-links />` component displayed on `Home` and `About` with official inline SVG icons and light/dark brand color schemes for:
+    - GitHub: `https://github.com/d2kx`
+    - LinkedIn: `https://www.linkedin.com/in/dennis-martin-herbers-085058156`
+    - X (Twitter): `https://x.com/D2KX_`
+    - Email: `mailto:dennis@dmh.dev`
   - **Light/Dark Mode Toggle**: Implemented via `src/app/core/theme.ts` (`ThemeService`), `<meta name="color-scheme" content="light dark">` in `src/index.html`, and `:root:has(> head > meta[name="color-scheme"])` rules in `src/styles.css` so `light-dark()` and Angular Material M3 `--mat-sys-*` tokens adapt seamlessly with zero FOUC.
   - **Self-Hosted Font (`Google Sans Flex`)**: Uses `@fontsource-variable/google-sans-flex` (SIL Open Font License 1.1) bundled locally at build time via `angular.json`. **Never load fonts from `fonts.googleapis.com` or `fonts.gstatic.com`**—dynamic requests to Google Fonts CDN without prior consent violate German GDPR/DSGVO case law (LG München I, Az. 3 O 17493/20).
 - **German Legal Compliance (`Impressum` & `Datenschutzerklärung`)**:
   - Routes `/impressum` (`src/app/features/impressum/impressum.ts`) and `/privacy` (`src/app/features/privacy/privacy.ts`) are linked in the global footer (1 click from every page) and offer an instant **Deutsch (`de`) | English (`en`)** switcher via `LegalInfoService` (`src/app/core/legal-info.ts`).
-  - `/impressum` covers **§ 5 DDG** (Digitale-Dienste-Gesetz) and **§ 18 Abs. 2 MStV** (Medienstaatsvertrag).
+  - `/impressum` covers **§ 5 DDG** (Digitale-Dienste-Gesetz) and **§ 18 Abs. 2 MStV** (Medienstaatsvertrag). In English mode it uses the clean heading `Legal Notice`.
   - `/privacy` covers **Art. 13 DSGVO (GDPR)** and **§ 25 Abs. 2 Nr. 2 TDDDG** (Railway server access logs, HTTPS, locally hosted `Google Sans Flex`, `localStorage` theme preference, email contact, and data subject rights).
-  - **Runtime Contact Details (`/api/legal-info`)**: To avoid committing a private residential street address or phone number to the public GitHub repository, `src/server.ts` serves `/api/legal-info` from Railway environment variables:
+  - **Runtime Contact Details (`/api/legal-info`)**: To avoid committing a private residential street address or phone number to the public GitHub repository, `src/server.ts` serves `/api/legal-info` from Railway environment variables (already configured in Railway `production` on service `web`):
     - `LEGAL_NAME` (defaults to `Dennis Martin Herbers`)
-    - `LEGAL_STREET` (street and house number)
-    - `LEGAL_POSTAL_CITY` (postal code and city)
+    - `LEGAL_STREET` (configured in Railway Variables)
+    - `LEGAL_POSTAL_CITY` (configured in Railway Variables)
     - `LEGAL_COUNTRY_DE` (defaults to `Deutschland`)
     - `LEGAL_COUNTRY_EN` (defaults to `Germany`)
     - `LEGAL_EMAIL` (defaults to `dennis@dmh.dev`)
@@ -151,7 +163,7 @@ dmh.dev/
 - **Local Development & Scripts**:
   - `npm run dev` (or `ng serve`): Starts local dev server with HMR at `http://localhost:4200`.
   - `npm run build` (or `ng build`): Builds browser and server bundles + prerenders static routes into `dist/dmh-dev/`.
-  - `npm start` (or `npm run serve:ssr:dmh-dev`): Runs the production Express + Angular SSR server (`node dist/dmh-dev/server/server.mjs`) on `PORT` (defaults to `4000`).
+  - `npm start` (or `npm run serve:ssr:dmh-dev`): Runs the compiled production Express + Angular SSR server (`node dist/dmh-dev/server/server.mjs`) on `PORT` (defaults to `4000`).
   - `npm run lint` (or `ng lint`): Lints all TypeScript and HTML templates in `src/` via `angular-eslint`.
   - `npm test` (or `ng test --watch=false`): Runs unit tests via Vitest.
 

@@ -16,13 +16,13 @@ describe('Impressum', () => {
     const fixture = TestBed.createComponent(Impressum);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Impressum');
+    expect(compiled.querySelector('h1')?.textContent?.trim()).toBe('Impressum');
     expect(compiled.textContent).toContain('Angaben gemäß § 5 DDG');
 
     const legalService = TestBed.inject(LegalInfoService);
     legalService.setLanguage('en');
     await fixture.whenStable();
-    expect(compiled.querySelector('h1')?.textContent).toContain('Legal Notice (Impressum)');
+    expect(compiled.querySelector('h1')?.textContent?.trim()).toBe('Legal Notice');
     expect(compiled.textContent).toContain('Information pursuant to Section 5 DDG');
   });
 });

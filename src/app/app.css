@@ -36,19 +36,31 @@
   color: var(--text-primary);
   display: inline-flex;
   align-items: center;
+  gap: 0.45rem;
 }
 
 .brand:hover {
   color: var(--text-primary);
+  text-decoration: none;
 }
 
-.sakura-dot {
-  width: 0.625rem;
-  height: 0.625rem;
-  border-radius: 999px;
-  background-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-subtle);
-  margin-right: 0.5rem;
+.sakura-logo {
+  color: var(--accent);
+  flex-shrink: 0;
+  transition: transform 250ms ease;
+}
+
+.brand:hover .sakura-logo {
+  transform: rotate(18deg) scale(1.05);
+}
+
+.sakura-center {
+  fill: var(--accent-subtle);
+}
+
+.brand-text {
+  display: inline-flex;
+  align-items: baseline;
 }
 
 .brand-domain {

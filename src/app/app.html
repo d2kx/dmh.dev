@@ -4,9 +4,39 @@
   <mat-toolbar role="banner" class="site-header">
     <div class="header-inner">
       <a routerLink="/" class="brand" aria-label="dmh.dev home">
-        <span class="sakura-dot" aria-hidden="true"></span>
-        <span class="brand-monogram">dmh</span>
-        <span class="brand-domain">.dev</span>
+        <svg
+          class="sakura-logo"
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+          width="22"
+          height="22"
+        >
+          <g class="sakura-petals" fill="currentColor">
+            <path
+              d="M 12 10.5 C 9.1 8.7 7.7 5.2 9.5 2.5 C 10.2 1.5 11.3 1.9 12 3.3 C 12.7 1.9 13.8 1.5 14.5 2.5 C 16.3 5.2 14.9 8.7 12 10.5 Z"
+            />
+            <path
+              d="M 12 10.5 C 9.1 8.7 7.7 5.2 9.5 2.5 C 10.2 1.5 11.3 1.9 12 3.3 C 12.7 1.9 13.8 1.5 14.5 2.5 C 16.3 5.2 14.9 8.7 12 10.5 Z"
+              transform="rotate(72 12 12)"
+            />
+            <path
+              d="M 12 10.5 C 9.1 8.7 7.7 5.2 9.5 2.5 C 10.2 1.5 11.3 1.9 12 3.3 C 12.7 1.9 13.8 1.5 14.5 2.5 C 16.3 5.2 14.9 8.7 12 10.5 Z"
+              transform="rotate(144 12 12)"
+            />
+            <path
+              d="M 12 10.5 C 9.1 8.7 7.7 5.2 9.5 2.5 C 10.2 1.5 11.3 1.9 12 3.3 C 12.7 1.9 13.8 1.5 14.5 2.5 C 16.3 5.2 14.9 8.7 12 10.5 Z"
+              transform="rotate(216 12 12)"
+            />
+            <path
+              d="M 12 10.5 C 9.1 8.7 7.7 5.2 9.5 2.5 C 10.2 1.5 11.3 1.9 12 3.3 C 12.7 1.9 13.8 1.5 14.5 2.5 C 16.3 5.2 14.9 8.7 12 10.5 Z"
+              transform="rotate(288 12 12)"
+            />
+          </g>
+          <circle class="sakura-center" cx="12" cy="12" r="1.75" />
+        </svg>
+        <span class="brand-text">
+          <span class="brand-monogram">dmh</span><span class="brand-domain">.dev</span>
+        </span>
       </a>
 
       <div class="header-actions">
@@ -85,7 +115,7 @@
   <footer class="site-footer">
     <div class="footer-inner">
       <p class="footer-brand">
-        <strong>{{ title() }}</strong> — Dennis Martin Herbers
+        <strong>{{ title() }}</strong> · Dennis Martin Herbers
       </p>
 
       <nav aria-label="Legal and secondary links">

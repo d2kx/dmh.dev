@@ -65,11 +65,12 @@ import { LegalInfoService, LegalLanguage } from '../../core/legal-info';
                 {{ legal.info().postalCity }}<br />
               }
               {{ legal.info().countryDe }}<br />
-              <strong>E-Mail:</strong>
-              <a [href]="'mailto:' + legal.info().email">{{ legal.info().email }}</a>
+              <strong>E-Mail:</strong>&nbsp;<a [href]="'mailto:' + legal.info().email">{{
+                legal.info().email
+              }}</a>
               @if (legal.info().phone) {
                 <br />
-                <strong>Telefon:</strong> {{ legal.info().phone }}
+                <strong>Telefon:</strong>&nbsp;{{ legal.info().phone }}
               }
             </address>
 
@@ -190,11 +191,12 @@ import { LegalInfoService, LegalLanguage } from '../../core/legal-info';
                 {{ legal.info().postalCity }}<br />
               }
               {{ legal.info().countryEn }}<br />
-              <strong>Email:</strong>
-              <a [href]="'mailto:' + legal.info().email">{{ legal.info().email }}</a>
+              <strong>Email:</strong>&nbsp;<a [href]="'mailto:' + legal.info().email">{{
+                legal.info().email
+              }}</a>
               @if (legal.info().phone) {
                 <br />
-                <strong>Phone:</strong> {{ legal.info().phone }}
+                <strong>Phone:</strong>&nbsp;{{ legal.info().phone }}
               }
             </address>
 
@@ -283,7 +285,7 @@ import { LegalInfoService, LegalLanguage } from '../../core/legal-info';
 
             <p class="related-link">
               For statutory provider identification details, please see the
-              <a routerLink="/impressum">Legal Notice (Impressum)</a>.
+              <a routerLink="/impressum">Legal Notice</a>.
             </p>
           </mat-card-content>
         </mat-card>

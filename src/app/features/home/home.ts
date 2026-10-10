@@ -2,6 +2,7 @@ import { Component, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatButton } from '@angular/material/button';
 import { MatCard, MatCardActions, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
+import { SocialLinks } from '../../shared/social-links';
 
 interface HighlightCard {
   readonly title: string;
@@ -20,18 +21,22 @@ interface HighlightCard {
     MatCardTitle,
     MatCardContent,
     MatCardActions,
+    SocialLinks,
   ],
   template: `
     <section class="hero" aria-labelledby="hero-heading">
       <span class="sakura-pill">Software · Web · Projects</span>
       <h1 id="hero-heading">Hi, I’m Dennis Martin Herbers.</h1>
       <p class="lead">
-        Welcome to my personal space on the web — a home for my software engineering work,
+        Welcome to my personal space on the web, a home for my software engineering work,
         side projects, interactive tools, and technical notes.
       </p>
       <div class="hero-actions">
         <a mat-flat-button routerLink="/projects" class="cta-primary">Explore Projects</a>
         <a mat-stroked-button routerLink="/about" class="cta-secondary">About Me</a>
+      </div>
+      <div class="hero-socials">
+        <app-social-links />
       </div>
     </section>
 
@@ -86,13 +91,18 @@ interface HighlightCard {
       font-size: 1.15rem;
       color: var(--text-muted);
       max-width: 42rem;
-      margin: 0 0 1.75rem;
+      margin: 0 0 1.5rem;
     }
 
     .hero-actions {
       display: flex;
       gap: 0.75rem;
       flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-socials {
+      padding-top: 0.25rem;
     }
 
     .cta-primary,

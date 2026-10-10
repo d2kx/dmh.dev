@@ -91,7 +91,7 @@ export class Blog {
   protected readonly posts = signal<readonly BlogPostPreview[]>([
     {
       slug: 'welcome-to-dmh-dev',
-      title: 'Welcome to dmh.dev — Notes on Software, Design & Side Projects',
+      title: 'Welcome to dmh.dev: Notes on Software, Design & Side Projects',
       date: '2026-10-10',
       excerpt:
         'A fresh space to share thoughts on software engineering, clean interfaces, and the projects I am working on.',
