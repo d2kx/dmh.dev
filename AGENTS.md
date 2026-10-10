@@ -131,12 +131,15 @@ dmh.dev/
 
 All infrastructure is hosted on Railway using the `use-railway` skill / Railway CLI.
 
-### Railway Resource IDs
+### Railway Resource IDs & Domains
 - **Workspace**: `Dennis Martin Herbers's Projects` (`7d85a0e4-7193-4b4c-857b-d779e3a36cd6`)
 - **Project**: `dmh.dev` (`4df1008f-af41-461c-8af2-313e8e1b04b0`)
   - Dashboard: `https://railway.com/project/4df1008f-af41-461c-8af2-313e8e1b04b0`
 - **Environment**: `production` (`ba9dcd20-f764-4a5e-b6fe-61a18bd66ae0`)
 - **Main Service**: `web` (`9c477572-b4a1-491f-bee9-6a5261f63e68`)
+  - **Custom Domain**: `https://www.dmh.dev` (verified with SSL certificate on Railway, target port `8080`, `CNAME` `www` -> `sbnq1uoz.up.railway.app`).
+  - **Railway Service Domain**: `https://web-production-e94e.up.railway.app` (target port `8080`).
+  - **DNS / Nameserver Constraint**: The domain `dmh.dev` is managed on GoDaddy's nameservers (cannot be moved to third-party nameservers). Because GoDaddy does not support `CNAME` flattening at the root (`@`), `www.dmh.dev` is the primary custom domain on Railway and `dmh.dev` uses GoDaddy Domain Forwarding (`301` redirect to `https://www.dmh.dev`). Future mini-apps on subdomains (`app1.dmh.dev`, `app2.dmh.dev`, etc.) use standard `CNAME` records in GoDaddy DNS directly.
 
 ### Cost-Control & Performance Configuration on `web`
 To keep Railway costs as low as possible while supporting full SSR + Prerendering:
