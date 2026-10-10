@@ -99,7 +99,8 @@ dmh.dev/
 ├── public/                     # Static public assets (favicon, etc.)
 ├── apps/                       # Directory for future standalone mini-apps (app1.dmh.dev, etc.)
 │   └── README.md               # Guide for adding and deploying new mini-apps
-├── angular.json                # Angular CLI build/serve/SSR configuration & SSRF allowedHosts
+├── angular.json                # Angular CLI build/serve/SSR/lint configuration & SSRF allowedHosts
+├── eslint.config.js            # ESLint + angular-eslint (TS, inline templates, a11y rules)
 ├── package.json                # Root scripts & dependencies
 ├── AGENTS.md                   # Primary agent instructions & project architecture (this file)
 └── .gemini/GEMINI.md           # Synchronized copy of AGENTS.md for Gemini tooling
@@ -109,7 +110,7 @@ dmh.dev/
 
 ## 3. Main `dmh.dev` Application Details
 
-- **Framework**: Angular v22 (`@angular/core` ^22.2.0, `@angular/ssr` ^22.2.2, TypeScript ~6.0, Vitest ^5.0).
+- **Framework**: Angular v22 (`@angular/core` ^22.2.0, `@angular/ssr` ^22.2.2, `angular-eslint` ^22.5.0, TypeScript ~6.0, Vitest ^5.0).
 - **File Naming Style**: Angular `2025` ("Intent over Role") style guide — suffixless filenames (`home.ts`, `app.ts`) and class names (`Home`, `App`), with `.spec.ts` for unit tests and `.model.ts` for interfaces/models.
 - **Hybrid Rendering (Prerender + SSR)**:
   - Configured via `outputMode: "server"` in `angular.json` and `serverRoutes` in `src/app/app.routes.server.ts`.
@@ -121,10 +122,14 @@ dmh.dev/
   - Authorized hosts are configured in `angular.json` under `projects.dmh-dev.architect.build.options.security.allowedHosts`:
     `["dmh.dev", "*.dmh.dev", "*.up.railway.app", "localhost"]`.
   - Can also be overridden at runtime via the `NG_ALLOWED_HOSTS` environment variable.
+- **Code Quality & Linting (`angular-eslint`)**:
+  - Configured in `eslint.config.js` with `tseslint.configs.recommended`, `tseslint.configs.stylistic`, `angular.configs.tsRecommended`, `angular.configs.templateRecommended`, and `angular.configs.templateAccessibility`.
+  - Always run `npm run lint` (or `ng lint`) alongside `npm run build` and `npm test` after making code changes to ensure zero lint or accessibility rule violations.
 - **Local Development & Scripts**:
   - `npm run dev` (or `ng serve`): Starts local dev server with HMR at `http://localhost:4200`.
   - `npm run build` (or `ng build`): Builds browser and server bundles + prerenders static routes into `dist/dmh-dev/`.
   - `npm start` (or `npm run serve:ssr:dmh-dev`): Runs the production Express + Angular SSR server (`node dist/dmh-dev/server/server.mjs`) on `PORT` (defaults to `4000`).
+  - `npm run lint` (or `ng lint`): Lints all TypeScript and HTML templates in `src/` via `angular-eslint`.
   - `npm test` (or `ng test --watch=false`): Runs unit tests via Vitest.
 
 ## 4. Railway Infrastructure & Cost Optimization

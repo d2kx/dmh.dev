@@ -22,6 +22,9 @@ npm run build
 # Run the compiled production SSR server locally (http://localhost:4000)
 npm start
 
+# Lint TypeScript and HTML templates (angular-eslint)
+npm run lint
+
 # Run unit tests (Vitest)
 npm test
 ```
