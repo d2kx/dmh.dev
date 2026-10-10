@@ -20,6 +20,24 @@ app.get('/healthz', (_req, res) => {
 });
 
 /**
+ * Runtime legal contact details endpoint so personal address and phone number
+ * can be configured via Railway environment variables without committing them
+ * to the public GitHub repository.
+ */
+app.get('/api/legal-info', (_req, res) => {
+  res.setHeader('Cache-Control', 'public, max-age=300');
+  res.status(200).json({
+    name: process.env['LEGAL_NAME'] || 'Dennis Martin Herbers',
+    street: process.env['LEGAL_STREET'] || '',
+    postalCity: process.env['LEGAL_POSTAL_CITY'] || '',
+    countryDe: process.env['LEGAL_COUNTRY_DE'] || 'Deutschland',
+    countryEn: process.env['LEGAL_COUNTRY_EN'] || 'Germany',
+    email: process.env['LEGAL_EMAIL'] || 'dennis@dmh.dev',
+    phone: process.env['LEGAL_PHONE'] || '',
+  });
+});
+
+/**
  * Serve static files from /browser
  */
 app.use(

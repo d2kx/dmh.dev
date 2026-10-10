@@ -1,46 +1,72 @@
 :root {
-  --surface-bg-light: #f8fafc;
-  --surface-bg-dark: #0b0f19;
+  --surface-bg-light: #faf9fb;
+  --surface-bg-dark: #0f1117;
   --surface-card-light: #ffffff;
-  --surface-card-dark: #111827;
-  --text-primary-light: #0f172a;
-  --text-primary-dark: #f1f5f9;
-  --text-muted-light: #475569;
-  --text-muted-dark: #94a3b8;
-  --border-subtle-light: #e2e8f0;
-  --border-subtle-dark: #1e293b;
-  --accent-light: #2563eb;
-  --accent-dark: #60a5fa;
-  --accent-subtle-light: #eff6ff;
-  --accent-subtle-dark: #172554;
+  --surface-card-dark: #171a23;
+  --surface-subtle-light: #f3f2f6;
+  --surface-subtle-dark: #1f2430;
+  --text-primary-light: #111318;
+  --text-primary-dark: #f3f4f8;
+  --text-muted-light: #464d5d;
+  --text-muted-dark: #a0a8ba;
+  --border-subtle-light: #e4e2ea;
+  --border-subtle-dark: #272c3a;
 
-  /* Fallbacks for browsers without light-dark() support */
-  --surface-bg: var(--surface-bg-light);
-  --surface-card: var(--surface-card-light);
-  --text-primary: var(--text-primary-light);
-  --text-muted: var(--text-muted-light);
-  --border-subtle: var(--border-subtle-light);
-  --accent: var(--accent-light);
-  --accent-subtle: var(--accent-subtle-light);
-
-  @media (prefers-color-scheme: dark) {
-    --surface-bg: var(--surface-bg-dark);
-    --surface-card: var(--surface-card-dark);
-    --text-primary: var(--text-primary-dark);
-    --text-muted: var(--text-muted-dark);
-    --border-subtle: var(--border-subtle-dark);
-    --accent: var(--accent-dark);
-    --accent-subtle: var(--accent-subtle-dark);
-  }
+  /* Sakura / Cherry-Blossom Pink Accent Palette (WCAG AA+ verified) */
+  --accent-light: #b81d5c;
+  --accent-dark: #ff8ab5;
+  --accent-hover-light: #961449;
+  --accent-hover-dark: #ffa3c5;
+  --accent-on-light: #ffffff;
+  --accent-on-dark: #290011;
+  --accent-subtle-light: #fde8f0;
+  --accent-subtle-dark: #3b1225;
+  --accent-on-subtle-light: #5c092b;
+  --accent-on-subtle-dark: #ffd9e6;
+  --accent-border-light: #f5bfd4;
+  --accent-border-dark: #662040;
 
   color-scheme: light dark;
+
+  &:has(> head > meta[name='color-scheme'][content='dark']) {
+    color-scheme: dark;
+  }
+
+  &:has(> head > meta[name='color-scheme'][content='light']) {
+    color-scheme: light;
+  }
+
   --surface-bg: light-dark(var(--surface-bg-light), var(--surface-bg-dark));
   --surface-card: light-dark(var(--surface-card-light), var(--surface-card-dark));
+  --surface-subtle: light-dark(var(--surface-subtle-light), var(--surface-subtle-dark));
   --text-primary: light-dark(var(--text-primary-light), var(--text-primary-dark));
   --text-muted: light-dark(var(--text-muted-light), var(--text-muted-dark));
   --border-subtle: light-dark(var(--border-subtle-light), var(--border-subtle-dark));
   --accent: light-dark(var(--accent-light), var(--accent-dark));
+  --accent-hover: light-dark(var(--accent-hover-light), var(--accent-hover-dark));
+  --accent-on: light-dark(var(--accent-on-light), var(--accent-on-dark));
   --accent-subtle: light-dark(var(--accent-subtle-light), var(--accent-subtle-dark));
+  --accent-on-subtle: light-dark(var(--accent-on-subtle-light), var(--accent-on-subtle-dark));
+  --accent-border: light-dark(var(--accent-border-light), var(--accent-border-dark));
+
+  /* Harmonize Angular Material M3 system tokens with our neutral + Sakura palette */
+  --mat-sys-background: var(--surface-bg);
+  --mat-sys-on-background: var(--text-primary);
+  --mat-sys-surface: var(--surface-bg);
+  --mat-sys-surface-container-lowest: var(--surface-card);
+  --mat-sys-surface-container-low: var(--surface-card);
+  --mat-sys-surface-container: var(--surface-subtle);
+  --mat-sys-surface-container-high: var(--surface-subtle);
+  --mat-sys-on-surface: var(--text-primary);
+  --mat-sys-on-surface-variant: var(--text-muted);
+  --mat-sys-primary: var(--accent);
+  --mat-sys-on-primary: var(--accent-on);
+  --mat-sys-primary-container: var(--accent-subtle);
+  --mat-sys-on-primary-container: var(--accent-on-subtle);
+  --mat-sys-secondary-container: var(--accent-subtle);
+  --mat-sys-on-secondary-container: var(--accent-on-subtle);
+  --mat-sys-outline: var(--text-muted);
+  --mat-sys-outline-variant: var(--border-subtle);
 
   accent-color: var(--accent);
   scrollbar-width: thin;
@@ -60,27 +86,45 @@ body {
   background-color: var(--surface-bg);
   color: var(--text-primary);
   font-family:
+    'Google Sans Flex Variable',
     system-ui,
     -apple-system,
     BlinkMacSystemFont,
     'Segoe UI',
     Roboto,
-    Oxygen,
-    Ubuntu,
-    Cantarell,
     sans-serif;
-  line-height: 1.6;
+  line-height: 1.65;
   -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  color: var(--text-primary);
+  font-variation-settings: 'GRAD' 0;
+  letter-spacing: -0.02em;
 }
 
 a {
   color: var(--accent);
-  text-decoration-thickness: 1px;
+  text-decoration-thickness: 1.5px;
   text-underline-offset: 3px;
+  transition: color 150ms ease;
 }
 
 a:hover {
+  color: var(--accent-hover);
   text-decoration-thickness: 2px;
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.9em;
+  background-color: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.375rem;
 }
 
 :focus-visible {
@@ -91,13 +135,13 @@ a:hover {
 
 .skip-link {
   position: absolute;
-  top: -3rem;
+  top: -3.5rem;
   left: 1rem;
   background: var(--surface-card);
   color: var(--text-primary);
   padding: 0.5rem 1rem;
   border: 2px solid var(--accent);
-  border-radius: 0.375rem;
+  border-radius: 0.5rem;
   z-index: 100;
   font-weight: 600;
   text-decoration: none;

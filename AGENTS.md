@@ -69,11 +69,13 @@ This section provides complete operational context so any fresh coding agent ses
 - **Domain**: `dmh.dev` (owned by Dennis Martin Herbers, registered with GoDaddy).
 - **GitHub Repository**: [`https://github.com/d2kx/dmh.dev`](https://github.com/d2kx/dmh.dev) (**PUBLIC** repository).
 - **CRITICAL PUBLIC REPO RULE**:
-  - **NEVER commit secrets, API keys, tokens, database URLs, or `.env` files to this repository.**
+  - **NEVER commit secrets, API keys, tokens, database URLs, private home addresses, private phone numbers, or `.env` files to this repository.**
   - If any feature or integration could risk exposing sensitive data or credentials in the repository, **stop and warn the user immediately** before proceeding so they can decide whether to store it in Railway environment variables or make the repository private.
-  - All runtime secrets and service-to-service connection strings must be configured as Railway Variables (e.g., `${{Postgres.DATABASE_URL}}`).
+  - All runtime secrets, service-to-service connection strings, and personal legal address details must be configured as Railway Variables (e.g., `${{Postgres.DATABASE_URL}}`, `LEGAL_STREET`, `LEGAL_POSTAL_CITY`, `LEGAL_PHONE`).
+- **Visitor Content vs. Technical Documentation Rule**:
+  - Keep visitor-facing pages (`Home`, `Projects`, `Blog`, `About`) focused on content relevant to visitors. Do NOT clutter visitor-facing copy with internal infrastructure details (e.g., "Hybrid Prerender & SSR", "Hosted on Railway", or monorepo `/apps` subdomain architecture). Keep those technical details documented here in `AGENTS.md` and `README.md`.
 - **Proactive Guidance Rule**:
-  - The user welcomes proactive feedback and recommendations. If a requested approach has architectural, security, DNS, or cost downsides, point it out clearly and suggest a better alternative.
+  - The user welcomes proactive feedback and recommendations. If a requested approach has architectural, security, legal, DNS, or cost downsides, point it out clearly and suggest a better alternative.
 
 ## 2. Repository Layout (Monorepo)
 
@@ -83,19 +85,21 @@ Everything for `dmh.dev`—both the main personal website/blog and future standa
 dmh.dev/
 ├── src/                        # Main dmh.dev Angular 22 application source
 │   ├── app/
-│   │   ├── features/           # Lazy-loaded route feature components (home, projects, blog, about)
-│   │   ├── app.config.ts       # Client providers (Router + ViewTransitions, Hydration + EventReplay)
+│   │   ├── core/               # Singleton services (theme.ts, legal-info.ts)
+│   │   ├── features/           # Lazy-loaded route feature components (home, projects, blog, about, impressum, privacy)
+│   │   ├── app.config.ts       # Client providers (Router + ViewTransitions, HttpClient + Fetch, Hydration + EventReplay)
 │   │   ├── app.config.server.ts# Server providers (provideServerRendering with serverRoutes)
 │   │   ├── app.routes.ts       # Client route definitions
 │   │   ├── app.routes.server.ts# Hybrid rendering config (RenderMode.Prerender + RenderMode.Server)
-│   │   ├── app.ts              # Root shell component
-│   │   ├── app.html            # Accessible site shell (header, nav, main, footer)
+│   │   ├── app.ts              # Root shell component (Material Toolbar, nav, theme toggle, legal footer)
+│   │   ├── app.html            # Accessible site shell template
 │   │   └── app.css             # Shell layout styles
-│   ├── server.ts               # Express 5 + AngularNodeAppEngine SSR server & /healthz endpoint
+│   ├── server.ts               # Express 5 + AngularNodeAppEngine SSR server, /healthz & /api/legal-info endpoints
 │   ├── main.ts                 # Browser bootstrap
 │   ├── main.server.ts          # Server bootstrap
-│   ├── styles.css              # Global CSS (light-dark() theme, view transitions, a11y focus styles)
-│   └── index.html              # Root HTML document
+│   ├── theme.scss              # Angular Material 3 mat.theme() config (rose/sakura + Google Sans Flex Variable)
+│   ├── styles.css              # Global CSS (Sakura light-dark() tokens, color-scheme overrides, focus styles)
+│   └── index.html              # Root HTML document (color-scheme meta + FOUC script)
 ├── public/                     # Static public assets (favicon.ico, robots.txt, llms.txt)
 ├── apps/                       # Directory for future standalone mini-apps (app1.dmh.dev, etc.)
 │   └── README.md               # Guide for adding and deploying new mini-apps
@@ -110,11 +114,29 @@ dmh.dev/
 
 ## 3. Main `dmh.dev` Application Details
 
-- **Framework**: Angular v22 (`@angular/core` ^22.2.0, `@angular/ssr` ^22.2.2, `angular-eslint` ^22.5.0, TypeScript ~6.0, Vitest ^5.0).
+- **Framework & Official Libraries**:
+  - Angular v22 (`@angular/core` ^22.2.0, `@angular/ssr` ^22.2.2, `angular-eslint` ^22.5.0, TypeScript ~6.0, Vitest ^5.0).
+  - UI & Helpers: `@angular/material` ^22.2.0 and `@angular/cdk` ^22.2.0 (`MediaMatcher`, `Platform`, `LiveAnnouncer`, `Clipboard`). Prefer official Angular Material components and CDK utilities before reaching for third-party UI libraries.
+- **Design System, Theme & Typography**:
+  - **Theme**: Clean neutral light/dark surfaces with playful **Sakura / Cherry-Blossom Pink** accents (`--accent-light: #b81d5c`, `--accent-dark: #ff8ab5`, soft sakura containers `#fde8f0` / `#3b1225`). All color pairings exceed WCAG AA (4.5:1) contrast requirements.
+  - **Light/Dark Mode Toggle**: Implemented via `src/app/core/theme.ts` (`ThemeService`), `<meta name="color-scheme" content="light dark">` in `src/index.html`, and `:root:has(> head > meta[name="color-scheme"])` rules in `src/styles.css` so `light-dark()` and Angular Material M3 `--mat-sys-*` tokens adapt seamlessly with zero FOUC.
+  - **Self-Hosted Font (`Google Sans Flex`)**: Uses `@fontsource-variable/google-sans-flex` (SIL Open Font License 1.1) bundled locally at build time via `angular.json`. **Never load fonts from `fonts.googleapis.com` or `fonts.gstatic.com`**—dynamic requests to Google Fonts CDN without prior consent violate German GDPR/DSGVO case law (LG München I, Az. 3 O 17493/20).
+- **German Legal Compliance (`Impressum` & `Datenschutzerklärung`)**:
+  - Routes `/impressum` (`src/app/features/impressum/impressum.ts`) and `/privacy` (`src/app/features/privacy/privacy.ts`) are linked in the global footer (1 click from every page) and offer an instant **Deutsch (`de`) | English (`en`)** switcher via `LegalInfoService` (`src/app/core/legal-info.ts`).
+  - `/impressum` covers **§ 5 DDG** (Digitale-Dienste-Gesetz) and **§ 18 Abs. 2 MStV** (Medienstaatsvertrag).
+  - `/privacy` covers **Art. 13 DSGVO (GDPR)** and **§ 25 Abs. 2 Nr. 2 TDDDG** (Railway server access logs, HTTPS, locally hosted `Google Sans Flex`, `localStorage` theme preference, email contact, and data subject rights).
+  - **Runtime Contact Details (`/api/legal-info`)**: To avoid committing a private residential street address or phone number to the public GitHub repository, `src/server.ts` serves `/api/legal-info` from Railway environment variables:
+    - `LEGAL_NAME` (defaults to `Dennis Martin Herbers`)
+    - `LEGAL_STREET` (street and house number)
+    - `LEGAL_POSTAL_CITY` (postal code and city)
+    - `LEGAL_COUNTRY_DE` (defaults to `Deutschland`)
+    - `LEGAL_COUNTRY_EN` (defaults to `Germany`)
+    - `LEGAL_EMAIL` (defaults to `dennis@dmh.dev`)
+    - `LEGAL_PHONE` (optional phone number)
 - **File Naming Style**: Angular `2025` ("Intent over Role") style guide — suffixless filenames (`home.ts`, `app.ts`) and class names (`Home`, `App`), with `.spec.ts` for unit tests and `.model.ts` for interfaces/models.
 - **Hybrid Rendering (Prerender + SSR)**:
   - Configured via `outputMode: "server"` in `angular.json` and `serverRoutes` in `src/app/app.routes.server.ts`.
-  - Static routes (`''`, `'projects'`, `'blog'`, `'about'`) use `RenderMode.Prerender`: they are pre-rendered into static HTML at `ng build` time and served immediately by the server without per-request rendering overhead.
+  - Static routes (`''`, `'projects'`, `'blog'`, `'about'`, `'impressum'`, `'privacy'`) use `RenderMode.Prerender`: they are pre-rendered into static HTML at `ng build` time and served immediately by the server without per-request rendering overhead.
   - Dynamic / catch-all routes (`'**'`) use `RenderMode.Server`: rendered on demand by `AngularNodeAppEngine` in `src/server.ts`.
   - Parameterized static routes (e.g., future `blog/:slug` posts) should use `RenderMode.Prerender` with `getPrerenderParams()` (and `fallback: PrerenderFallback.Server` if dynamic posts are added later).
 - **SSRF Host Protection (`allowedHosts`)**:

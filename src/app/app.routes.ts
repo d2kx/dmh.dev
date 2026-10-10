@@ -8,7 +8,7 @@ export const routes: Routes = [
   },
   {
     path: 'projects',
-    title: 'Projects & Mini-Apps — dmh.dev',
+    title: 'Projects — dmh.dev',
     loadComponent: () => import('./features/projects/projects').then((m) => m.Projects),
   },
   {
@@ -20,6 +20,16 @@ export const routes: Routes = [
     path: 'about',
     title: 'About — dmh.dev',
     loadComponent: () => import('./features/about/about').then((m) => m.About),
+  },
+  {
+    path: 'impressum',
+    title: 'Impressum / Legal Notice — dmh.dev',
+    loadComponent: () => import('./features/impressum/impressum').then((m) => m.Impressum),
+  },
+  {
+    path: 'privacy',
+    title: 'Datenschutzerklärung / Privacy Policy — dmh.dev',
+    loadComponent: () => import('./features/privacy/privacy').then((m) => m.Privacy),
   },
   {
     path: '**',

@@ -5,8 +5,9 @@ Personal website, blog, and mini-apps monorepo for **Dennis Martin Herbers** ([d
 ## Tech Stack & Architecture
 
 - **Framework**: [Angular 22](https://angular.dev) with Hybrid Rendering (`@angular/ssr`):
-  - **Build-Time Prerendering (SSG)** (`RenderMode.Prerender`) for static content routes (`/`, `/projects`, `/blog`, `/about`).
-  - **Server-Side Rendering (SSR)** (`RenderMode.Server`) via Express 5 & `AngularNodeAppEngine` (`src/server.ts`) for dynamic routes and server endpoints (`/healthz`).
+  - **Build-Time Prerendering (SSG)** (`RenderMode.Prerender`) for static content routes (`/`, `/projects`, `/blog`, `/about`, `/impressum`, `/privacy`).
+  - **Server-Side Rendering (SSR)** (`RenderMode.Server`) via Express 5 & `AngularNodeAppEngine` (`src/server.ts`) for dynamic routes and server endpoints (`/healthz`, `/api/legal-info`).
+- **UI & Design**: `@angular/material` & `@angular/cdk` with a custom Sakura / Cherry-Blossom Pink Light & Dark theme (`light-dark()`) and self-hosted `Google Sans Flex Variable` typography (`@fontsource-variable/google-sans-flex`, SIL Open Font License 1.1).
 - **Hosting & Deployment**: [Railway](https://railway.com) (`dmh.dev` project) with Railpack build caching, Edge CDN, and Serverless (App Sleep) enabled for low-cost operation.
 - **Mini-Apps (`apps/`)**: Subdirectory reserved for standalone mini-apps deployed to subdomains (`app1.dmh.dev`, `app2.dmh.dev`, etc.).
 

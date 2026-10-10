@@ -17,11 +17,13 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should render brand link and navigation', async () => {
+  it('should render brand link, primary navigation, theme toggle, and legal footer links', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('.brand')?.textContent).toContain('dmh');
-    expect(compiled.querySelectorAll('nav a').length).toBe(4);
+    expect(compiled.querySelectorAll('nav[aria-label="Primary"] a').length).toBe(4);
+    expect(compiled.querySelector('.theme-toggle')).toBeTruthy();
+    expect(compiled.querySelectorAll('.footer-links a').length).toBe(3);
   });
 });

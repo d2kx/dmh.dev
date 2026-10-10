@@ -1,41 +1,59 @@
 import { Component, signal } from '@angular/core';
+import { MatCard, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
+import { MatChip, MatChipSet } from '@angular/material/chips';
 
 interface ProjectEntry {
   readonly name: string;
-  readonly status: 'Live' | 'Planned';
-  readonly subdomain: string;
+  readonly status: 'Live' | 'In Progress';
+  readonly tags: readonly string[];
   readonly summary: string;
 }
 
 @Component({
   selector: 'app-projects',
+  imports: [MatCard, MatCardHeader, MatCardTitle, MatCardContent, MatChipSet, MatChip],
   template: `
     <section aria-labelledby="projects-heading">
-      <h1 id="projects-heading">Projects &amp; Mini-Apps</h1>
+      <p class="eyebrow">Work &amp; Experiments</p>
+      <h1 id="projects-heading">Projects</h1>
       <p class="intro">
-        This monorepo powers both <code>dmh.dev</code> and standalone mini-apps deployed on
-        dedicated subdomains (<code>app1.dmh.dev</code>, <code>app2.dmh.dev</code>, etc.).
+        A growing collection of personal software projects, interactive web applications, and tools.
       </p>
 
       <div class="project-list">
         @for (project of projects(); track project.name) {
-          <article class="project-card">
-            <div class="project-header">
-              <h2>{{ project.name }}</h2>
-              <span class="badge" [class.badge-live]="project.status === 'Live'">
+          <mat-card appearance="outlined" class="project-card">
+            <mat-card-header class="project-header">
+              <mat-card-title class="project-title">{{ project.name }}</mat-card-title>
+              <span class="status-badge" [class.status-live]="project.status === 'Live'">
                 {{ project.status }}
               </span>
-            </div>
-            <p class="subdomain">{{ project.subdomain }}</p>
-            <p class="summary">{{ project.summary }}</p>
-          </article>
+            </mat-card-header>
+            <mat-card-content class="project-body">
+              <p class="summary">{{ project.summary }}</p>
+              <mat-chip-set aria-label="Project tags">
+                @for (tag of project.tags; track tag) {
+                  <mat-chip>{{ tag }}</mat-chip>
+                }
+              </mat-chip-set>
+            </mat-card-content>
+          </mat-card>
         }
       </div>
     </section>
   `,
   styles: `
+    .eyebrow {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      margin: 0 0 0.375rem;
+    }
+
     h1 {
-      font-size: 2rem;
+      font-size: clamp(1.75rem, 3.5vw, 2.25rem);
       margin: 0 0 0.75rem;
     }
 
@@ -47,14 +65,13 @@ interface ProjectEntry {
 
     .project-list {
       display: grid;
-      gap: 1rem;
+      gap: 1.25rem;
     }
 
     .project-card {
       background-color: var(--surface-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: 0.75rem;
-      padding: 1.5rem;
+      border-color: var(--border-subtle);
+      border-radius: 1rem;
     }
 
     .project-header {
@@ -62,27 +79,30 @@ interface ProjectEntry {
       align-items: center;
       justify-content: space-between;
       gap: 1rem;
+      padding-bottom: 0.5rem;
     }
 
-    .project-header h2 {
+    .project-title {
       margin: 0;
       font-size: 1.25rem;
+      font-weight: 650;
     }
 
-    .badge {
+    .status-badge {
       font-size: 0.75rem;
       font-weight: 600;
-      padding: 0.25rem 0.625rem;
+      padding: 0.25rem 0.65rem;
       border-radius: 999px;
       background-color: var(--accent-subtle);
-      color: var(--accent);
+      color: var(--accent-on-subtle);
+      border: 1px solid var(--accent-border);
+      margin-left: auto;
     }
 
-    .subdomain {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 0.875rem;
-      color: var(--accent);
-      margin: 0.375rem 0 0.75rem;
+    .project-body {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
     }
 
     .summary {
@@ -94,18 +114,18 @@ interface ProjectEntry {
 export class Projects {
   protected readonly projects = signal<readonly ProjectEntry[]>([
     {
-      name: 'dmh.dev Main Site',
+      name: 'dmh.dev',
       status: 'Live',
-      subdomain: 'dmh.dev',
+      tags: ['TypeScript', 'Angular', 'Material Design'],
       summary:
-        'Personal website and hub built with Angular 22 using hybrid build-time prerendering (SSG) and Server-Side Rendering (SSR) on Railway.',
+        'My personal website and blog featuring a custom Sakura-accented light and dark theme, accessible typography, and space for writing and experiments.',
     },
     {
-      name: 'Future Mini-Apps',
-      status: 'Planned',
-      subdomain: '*.dmh.dev / apps/',
+      name: 'Upcoming Web Tools & Mini-Projects',
+      status: 'In Progress',
+      tags: ['Web Apps', 'Utilities', 'Side Projects'],
       summary:
-        'Upcoming self-contained mini-apps and experiments hosted from the /apps directory of the dmh.dev monorepo.',
+        'Small, focused web applications and hobby utilities currently in development. New projects will be listed here as they launch.',
     },
   ]);
 }

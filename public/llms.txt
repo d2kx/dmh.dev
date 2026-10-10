@@ -1,10 +1,12 @@
 # dmh.dev — Dennis Martin Herbers
 
-> Personal website, software engineering portfolio, standalone mini-apps hub, and technical blog of Dennis Martin Herbers.
+> Personal website, software projects, and blog of Dennis Martin Herbers.
 
 ## Main Sections
 
-- [Home](https://www.dmh.dev/): Overview of dmh.dev, engineering focus, and featured sections.
-- [Projects & Mini-Apps](https://www.dmh.dev/projects): Showcase of software projects and standalone mini-apps hosted on `*.dmh.dev` subdomains.
-- [Blog](https://www.dmh.dev/blog): Articles and notes on software architecture, Angular, modern web development, and side projects.
-- [About](https://www.dmh.dev/about): Background on Dennis Martin Herbers, work, and engineering interests.
+- [Home](https://www.dmh.dev/): Overview of dmh.dev and featured sections.
+- [Projects](https://www.dmh.dev/projects): Showcase of software projects and interactive web applications.
+- [Blog](https://www.dmh.dev/blog): Articles and notes on software development, web design, and side projects.
+- [About](https://www.dmh.dev/about): Background on Dennis Martin Herbers and contact details.
+- [Impressum / Legal Notice](https://www.dmh.dev/impressum): Bilingual (German/English) statutory legal notice pursuant to § 5 DDG and § 18 Abs. 2 MStV.
+- [Datenschutzerklärung / Privacy Policy](https://www.dmh.dev/privacy): Bilingual (German/English) privacy policy pursuant to Art. 13 GDPR (DSGVO).
