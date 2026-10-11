@@ -1,11 +1,10 @@
 # Kaleidoscope (kaleidoscope.dmh.dev)
 
-> Interactive WebGL shader kaleidoscope blending fractal mirror symmetry, procedural sakura cherry blossoms, and harmonic color palettes. Part of dmh.dev by Dennis Martin Herbers.
+> Real-time WebGL shader kaleidoscope continuously blending psychedelic fractal symmetry, sakura cherry blossoms, lotus mandalas, and crystal color palettes. Part of dmh.dev by Dennis Martin Herbers.
 
 ## Features
-- Real-time WebGL fragment shader rendering with four visual presets: Sakura Bloom, Prism Fractal, Lotus Mandala, and Neon Cyber.
-- Adjustable mirror symmetry segments (4 to 16 folds), animation speed, floral bloom intensity, and pointer-reactive prism tilt.
-- Optional glassmorphic performance HUD (FPS and frame time sparkline) and full reduced-motion support.
+- Hands-free, continuously evolving WebGL fragment shader that smoothly crossfades across 6, 8, 10, and 12 mirror segments, floral sakura/lotus geometry, and harmonic color palettes without abrupt transitions.
+- Unified glassmorphic top-left pill featuring the custom Kaleidoscope logo, optional inline performance HUD (FPS, frame time, and live SVG sparkline), and fullscreen mode.
 
 ## Links
 - [Kaleidoscope App](https://kaleidoscope.dmh.dev/)

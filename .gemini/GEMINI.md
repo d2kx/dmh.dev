@@ -212,7 +212,7 @@ To keep Railway costs as low as possible while supporting full SSR + Prerenderin
    - **Custom Domain**: `https://kaleidoscope.dmh.dev` (target port `8080`, `CNAME` `kaleidoscope` -> `oxvts028.up.railway.app`, `TXT` `_railway-verify.kaleidoscope` -> `railway-verify=b3d0173c8fab362faa67d7e4702bd979ff3235bac28889c510955107d68c613c`).
    - **Railway Service Domain**: `https://kaleidoscope-production.up.railway.app`
    - **Tech Stack**: Vite + TypeScript + pure WebGL2/WebGL fullscreen GLSL shader engine (`src/kaleidoscope-gl.ts`), self-hosted `@fontsource-variable/google-sans-flex`, and a zero-dependency Node HTTP server (`server.mjs`) with gzip and `/healthz`.
-   - **Features**: 4 visual modes (`Sakura`, `Prism`, `Lotus`, `Cyber`), adjustable symmetry segments (`4–16`), speed, floral bloom intensity, pointer-reactive prism tilt, reduced-motion support, and an optional glassmorphic performance HUD (`FPS` + `ms` + live SVG sparkline).
+   - **Features**: Hands-free continuously evolving shader blending Sakura, Prism, Lotus, and Cyber aesthetics with smooth tear-free symmetry transitions (6–12 folds) and breathing bloom, plus a single unified top-left glassmorphic pill combining the brand logo, legal links, optional inline performance HUD (`FPS` + `ms` + live SVG sparkline), and Fullscreen button.
 
 ### Adding Future Mini-Apps (`app2.dmh.dev`, etc.)
 - Place each standalone mini-app in `apps/<app-name>/`.
