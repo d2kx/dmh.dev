@@ -180,6 +180,7 @@ All infrastructure is hosted on Railway using the `use-railway` skill / Railway 
   - Dashboard: `https://railway.com/project/4df1008f-af41-461c-8af2-313e8e1b04b0`
 - **Environment**: `production` (`ba9dcd20-f764-4a5e-b6fe-61a18bd66ae0`)
 - **Main Service**: `web` (`9c477572-b4a1-491f-bee9-6a5261f63e68`)
+  - **Region**: Europe (Netherlands / Amsterdam) (`europe-west4-drams3a`).
   - **Custom Domain**: `https://www.dmh.dev` (verified with SSL certificate on Railway, target port `8080`, `CNAME` `www` -> `sbnq1uoz.up.railway.app`).
   - **Railway Service Domain**: `https://web-production-e94e.up.railway.app` (target port `8080`).
   - **DNS / Nameserver Constraint**: The domain `dmh.dev` is managed on GoDaddy's nameservers (cannot be moved to third-party nameservers). Because GoDaddy does not support `CNAME` flattening at the root (`@`), `www.dmh.dev` is the primary custom domain on Railway and `dmh.dev` uses GoDaddy Domain Forwarding (`301` redirect to `https://www.dmh.dev`). Future mini-apps on subdomains (`app1.dmh.dev`, `app2.dmh.dev`, etc.) use standard `CNAME` records in GoDaddy DNS directly.
@@ -196,8 +197,8 @@ To keep Railway costs as low as possible while supporting full SSR + Prerenderin
    - Prevents changes inside `apps/` or markdown docs (`AGENTS.md`, `README.md`) from triggering unnecessary paid rebuilds of the main `web` service.
 4. **Serverless / App Sleep (`deploy.sleepApplication: true`)**:
    - Automatically puts the container to sleep after ~5–10 minutes of inactivity so idle compute cost is $0, waking automatically on incoming requests.
-5. **Single Replica (`deploy.numReplicas: 1`)**:
-   - Runs a single lightweight instance.
+5. **Single EU Replica (`deploy.multiRegionConfig: { "europe-west4-drams3a": { "numReplicas": 1 } }`)**:
+   - Runs a single lightweight instance in the EU (Netherlands) region for low latency in Germany/Europe and EU data residency.
 6. **Railway Edge CDN Caching (`railway cdn enable --service web`)**:
    - Caches static assets (`maxAge: 1y`) and cacheable responses at the Railway CDN edge so cache hits don't even wake or hit the Node container.
 
@@ -209,7 +210,7 @@ To keep Railway costs as low as possible while supporting full SSR + Prerenderin
   ```bash
   railway add --service <app-name> --json
   ```
-- Configure the service to build only from `/apps/<app-name>` with its own watch pattern and App Sleep enabled:
+- Configure the service to build only from `/apps/<app-name>` in the EU (Netherlands) region (`europe-west4-drams3a`) with its own watch pattern and App Sleep enabled:
   ```bash
   railway environment edit --service-config <app-name> source.repo "d2kx/dmh.dev"
   railway environment edit --service-config <app-name> source.branch "main"
@@ -217,11 +218,12 @@ To keep Railway costs as low as possible while supporting full SSR + Prerenderin
   railway environment edit --service-config <app-name> build.watchPatterns '["apps/<app-name>/**"]'
   railway environment edit --service-config <app-name> deploy.sleepApplication true
   ```
+  *(Also ensure `deploy.multiRegionConfig` is set to `{"europe-west4-drams3a": {"numReplicas": 1}}` and any default US region key is set to `null`.)*
 - Add the subdomain (`railway domain <app-name>.dmh.dev --service <app-name> --json`) and configure the returned `CNAME` + `_railway-verify` `TXT` records in DNS.
 - Document every new mini-app in this `AGENTS.md` file under a **Current Apps & Services** list.
 
 ### Databases & Storage
-- When a database is needed later, provision it inside the `dmh.dev` Railway project:
+- When a database is needed later, provision it inside the `dmh.dev` Railway project (and ensure its region is set to `europe-west4-drams3a` so it is co-located with the app services in Amsterdam):
   ```bash
   railway add --database postgres --json
   ```
