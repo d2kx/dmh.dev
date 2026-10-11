@@ -24,9 +24,7 @@ export class App {
   protected readonly title = signal('dmh.dev');
   protected readonly navItems = signal<readonly NavItem[]>([
     { path: '/', label: 'Home', exact: true },
-    { path: '/projects', label: 'Projects', exact: false },
     { path: '/blog', label: 'Blog', exact: false },
-    { path: '/about', label: 'About', exact: false },
   ]);
 
   constructor() {

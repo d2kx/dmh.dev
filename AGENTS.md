@@ -95,7 +95,7 @@ dmh.dev/
 │   ├── app/
 │   │   ├── core/               # Singleton services (theme.ts, legal-info.ts, seo.ts)
 │   │   ├── shared/             # Reusable UI components (social-links.ts)
-│   │   ├── features/           # Lazy-loaded route feature components (home, projects, blog, about, impressum, privacy)
+│   │   ├── features/           # Lazy-loaded route feature components (home, blog, impressum, privacy)
 │   │   ├── app.config.ts       # Client providers (Router + ViewTransitions, HttpClient + Fetch, Hydration + EventReplay)
 │   │   ├── app.config.server.ts# Server providers (provideServerRendering with serverRoutes)
 │   │   ├── app.routes.ts       # Client route definitions & route SEO/Open Graph metadata
@@ -130,8 +130,8 @@ dmh.dev/
 - **Design System, Theme, Brand Mark & Social Links**:
   - **Theme**: Clean neutral light/dark surfaces with playful **Sakura / Cherry-Blossom Pink** accents (`--accent-light: #b81d5c`, `--accent-dark: #ff8ab5`, soft sakura containers `#fde8f0` / `#3b1225`). All color pairings exceed WCAG AA (4.5:1) contrast requirements.
   - **Brand Logo & Favicon**: Custom 5-petal notched Sakura cherry blossom SVG mark paired with `dmh.dev` in `src/app/app.html` and adaptive SVG favicon in `public/favicon.svg`.
-  - **Projects Page (`src/app/features/projects/projects.ts`)**: Inspired by `t3.gg/sponsors`—displays a responsive grid of full-card clickable project cards featuring each project's custom SVG logo (with ambient radial glow), project title, domain badge, concise description, and category pills.
-  - **Social & Contact Links (`src/app/shared/social-links.ts`)**: Reusable `<app-social-links />` component displayed on `Home` and `About` with official inline SVG icons and light/dark brand color schemes for:
+  - **Navigation & Consolidated Home Page (`src/app/features/home/home.ts`)**: Primary navigation has two items (`Home` and `Blog`). `Home` combines the personal intro/bio, social links, and the `t3.gg/sponsors`-inspired **Projects** grid (full-card clickable project cards featuring each project's custom SVG logo with ambient radial glow, project title, domain badge, concise description, and category pills). Once real blog posts are published in the future, `Home` should also include a preview section showing the latest 3 blog posts (headline + short summary).
+  - **Social & Contact Links (`src/app/shared/social-links.ts`)**: Reusable `<app-social-links />` component displayed on `Home` with official inline SVG icons and light/dark brand color schemes for:
     - GitHub: `https://github.com/d2kx`
     - LinkedIn: `https://www.linkedin.com/in/dennis-martin-herbers-085058156`
     - X (Twitter): `https://x.com/D2KX_`
@@ -156,7 +156,7 @@ dmh.dev/
 - **File Naming Style**: Angular `2025` ("Intent over Role") style guide — suffixless filenames (`home.ts`, `app.ts`) and class names (`Home`, `App`), with `.spec.ts` for unit tests and `.model.ts` for interfaces/models.
 - **Hybrid Rendering (Prerender + SSR)**:
   - Configured via `outputMode: "server"` in `angular.json` and `serverRoutes` in `src/app/app.routes.server.ts`.
-  - Static routes (`''`, `'projects'`, `'blog'`, `'about'`, `'impressum'`, `'privacy'`) use `RenderMode.Prerender`: they are pre-rendered into static HTML at `ng build` time and served immediately by the server without per-request rendering overhead.
+  - Static routes (`''`, `'blog'`, `'impressum'`, `'privacy'`) use `RenderMode.Prerender`: they are pre-rendered into static HTML at `ng build` time and served immediately by the server without per-request rendering overhead.
   - Dynamic / catch-all routes (`'**'`) use `RenderMode.Server`: rendered on demand by `AngularNodeAppEngine` in `src/server.ts`.
   - Parameterized static routes (e.g., future `blog/:slug` posts) should use `RenderMode.Prerender` with `getPrerenderParams()` (and `fallback: PrerenderFallback.Server` if dynamic posts are added later).
 - **SSRF Host Protection (`allowedHosts`)**:

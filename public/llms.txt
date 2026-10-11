@@ -4,10 +4,8 @@
 
 ## Main Sections
 
-- [Home](https://www.dmh.dev/): Overview of dmh.dev and featured sections.
-- [Projects](https://www.dmh.dev/projects): Showcase of software projects and interactive web applications.
+- [Home](https://www.dmh.dev/): Profile, social links, and showcase of software projects and interactive web applications.
 - [Blog](https://www.dmh.dev/blog): Articles and notes on software development, web design, and side projects.
-- [About](https://www.dmh.dev/about): Background on Dennis Martin Herbers and contact details.
 - [Impressum / Legal Notice](https://www.dmh.dev/impressum): Bilingual (German/English) statutory legal notice pursuant to § 5 DDG and § 18 Abs. 2 MStV.
 - [Datenschutzerklärung / Privacy Policy](https://www.dmh.dev/privacy): Bilingual (German/English) privacy policy pursuant to Art. 13 GDPR (DSGVO).
 

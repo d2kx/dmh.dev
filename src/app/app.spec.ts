@@ -24,9 +24,9 @@ describe('App', () => {
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('.brand')?.textContent).toContain('dmh');
-    expect(compiled.querySelectorAll('nav[aria-label="Primary"] a').length).toBe(4);
+    expect(compiled.querySelectorAll('nav[aria-label="Primary"] a').length).toBe(2);
     expect(compiled.querySelector('.theme-toggle')).toBeTruthy();
-    expect(compiled.querySelectorAll('.footer-links a').length).toBe(3);
+    expect(compiled.querySelectorAll('.footer-links a').length).toBe(2);
   });
 
   it('should update Open Graph, Twitter Card, and canonical tags on route navigation', async () => {
@@ -35,14 +35,14 @@ describe('App', () => {
     const meta = TestBed.inject(Meta);
     const doc = TestBed.inject(DOCUMENT);
 
-    await router.navigateByUrl('/projects');
+    await router.navigateByUrl('/blog');
     await fixture.whenStable();
 
-    expect(meta.getTag('property="og:title"')?.content).toBe('Projects | dmh.dev');
-    expect(meta.getTag('property="og:url"')?.content).toBe('https://www.dmh.dev/projects');
+    expect(meta.getTag('property="og:title"')?.content).toBe('Blog | dmh.dev');
+    expect(meta.getTag('property="og:url"')?.content).toBe('https://www.dmh.dev/blog');
     expect(meta.getTag('name="twitter:card"')?.content).toBe('summary_large_image');
     expect(doc.querySelector<HTMLLinkElement>('link[rel="canonical"]')?.href).toBe(
-      'https://www.dmh.dev/projects',
+      'https://www.dmh.dev/blog',
     );
   });
 });

@@ -15,18 +15,6 @@ export const routes: Routes = [
     loadComponent: () => import('./features/home/home').then((m) => m.Home),
   },
   {
-    path: 'projects',
-    title: 'Projects | dmh.dev',
-    data: {
-      seo: {
-        description:
-          'Software engineering projects, interactive web applications, and tools built by Dennis Martin Herbers.',
-        ogType: 'website',
-      } satisfies RouteSeoData,
-    },
-    loadComponent: () => import('./features/projects/projects').then((m) => m.Projects),
-  },
-  {
     path: 'blog',
     title: 'Blog | dmh.dev',
     data: {
@@ -37,18 +25,6 @@ export const routes: Routes = [
       } satisfies RouteSeoData,
     },
     loadComponent: () => import('./features/blog/blog').then((m) => m.Blog),
-  },
-  {
-    path: 'about',
-    title: 'About | dmh.dev',
-    data: {
-      seo: {
-        description:
-          'Background on Dennis Martin Herbers, software engineer in Germany, along with social profiles and contact details.',
-        ogType: 'profile',
-      } satisfies RouteSeoData,
-    },
-    loadComponent: () => import('./features/about/about').then((m) => m.About),
   },
   {
     path: 'impressum',
