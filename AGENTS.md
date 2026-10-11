@@ -79,6 +79,9 @@ This section provides complete operational context so any fresh coding agent ses
   - **NEVER use `—` (em dashes)** in any visitor-facing text, page titles, meta descriptions, blog posts, or UI copy. The user never uses em dashes in their own writing and considers them unnatural/fake-looking. Use standard commas, colons, periods, or middle dots (`·`) / pipes (`|`) instead.
 - **Legal Maintenance Rule (`Impressum` & `Datenschutzerklärung`)**:
   - Whenever you introduce any new functionality that affects legal disclosures or data privacy (such as analytics, cookies, new `localStorage` / `sessionStorage` keys, authentication, contact forms, database storage of user data, external embeds, or third-party APIs), you **MUST** proactively update `/impressum` (`src/app/features/impressum/impressum.ts`) and `/privacy` (`src/app/features/privacy/privacy.ts`) in both German (`de`) and English (`en`), and warn the user beforehand if a cookie/consent banner would become legally required under German DSGVO / TDDDG.
+- **Package & Tooling Version Currency Rule**:
+  - When generating a project with an existing framework CLI (e.g., `@angular/cli`), it is fine to keep the package versions predefined by that framework's official scaffold.
+  - However, when creating standalone/vanilla apps (such as Vite mini-apps in `apps/`) or adding new packages manually, **always check and use current latest stable releases** (e.g., via `npm create vite@latest` or `npm view <pkg> version`) rather than writing older package versions from training weights.
 - **Proactive Guidance Rule**:
   - The user welcomes proactive feedback and recommendations. If a requested approach has architectural, security, legal, DNS, or cost downsides, point it out clearly and suggest a better alternative.
 
@@ -211,7 +214,7 @@ To keep Railway costs as low as possible while supporting full SSR + Prerenderin
    - **Railway Service ID**: `74f94487-13fd-461b-8b2c-24f9c5ec02c4` (region `europe-west4-drams3a`, `sleepApplication: true`, Edge CDN enabled).
    - **Custom Domain**: `https://kaleidoscope.dmh.dev` (target port `8080`, `CNAME` `kaleidoscope` -> `oxvts028.up.railway.app`, `TXT` `_railway-verify.kaleidoscope` -> `railway-verify=b3d0173c8fab362faa67d7e4702bd979ff3235bac28889c510955107d68c613c`).
    - **Railway Service Domain**: `https://kaleidoscope-production.up.railway.app`
-   - **Tech Stack**: Vite + TypeScript + pure WebGL2/WebGL fullscreen GLSL shader engine (`src/kaleidoscope-gl.ts`), self-hosted `@fontsource-variable/google-sans-flex`, and a zero-dependency Node HTTP server (`server.mjs`) with gzip and `/healthz`.
+   - **Tech Stack**: Vite 8 (`^8.3.4`) + TypeScript 6.0 + pure WebGL2/WebGL fullscreen GLSL shader engine (`src/kaleidoscope-gl.ts`), self-hosted `@fontsource-variable/google-sans-flex` (`^5.3.2`), and a zero-dependency Node HTTP server (`server.mjs`) with gzip and `/healthz`.
    - **Features**: Hands-free continuously evolving shader blending Sakura, Prism, Lotus, and Cyber aesthetics with smooth tear-free symmetry transitions (6–12 folds) and breathing bloom, plus a single unified top-left glassmorphic pill combining the brand logo, legal links, optional inline performance HUD (`FPS` + `ms` + live SVG sparkline), and Fullscreen button.
 
 ### Adding Future Mini-Apps (`app2.dmh.dev`, etc.)

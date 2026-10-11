@@ -1,5 +1,5 @@
 import './style.css';
-import { FrameStats, KaleidoscopeEngine } from './kaleidoscope-gl.ts';
+import { KaleidoscopeEngine, type FrameStats } from './kaleidoscope-gl.ts';
 
 const canvas = document.getElementById('kaleidoscope-canvas') as HTMLCanvasElement;
 const hudBar = document.getElementById('hud-bar') as HTMLElement;
