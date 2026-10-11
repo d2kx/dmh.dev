@@ -1,0 +1,21 @@
+{
+  "name": "dmh-kaleidoscope",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "start": "node server.mjs"
+  },
+  "dependencies": {
+    "@fontsource-variable/google-sans-flex": "^5.2.6"
+  },
+  "devDependencies": {
+    "typescript": "~6.0.2",
+    "vite": "^6.3.5"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

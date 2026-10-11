@@ -107,7 +107,8 @@ dmh.dev/
 │   ├── styles.css              # Global CSS (Sakura light-dark() tokens, color-scheme overrides, focus styles)
 │   └── index.html              # Root HTML document (color-scheme meta, FOUC script, default Open Graph tags)
 ├── public/                     # Static public assets (favicon.svg, favicon.ico, og-image.png, robots.txt, llms.txt)
-├── apps/                       # Directory for future standalone mini-apps (app1.dmh.dev, etc.)
+├── apps/                       # Directory for standalone mini-apps on subdomains (<app>.dmh.dev)
+│   ├── kaleidoscope/           # Interactive Sakura & Fractal WebGL Kaleidoscope (kaleidoscope.dmh.dev)
 │   └── README.md               # Guide for adding and deploying new mini-apps
 ├── angular.json                # Angular CLI build/serve/SSR/lint configuration & SSRF allowedHosts
 ├── eslint.config.js            # ESLint + angular-eslint (TS, inline templates, a11y rules)
@@ -126,6 +127,7 @@ dmh.dev/
 - **Design System, Theme, Brand Mark & Social Links**:
   - **Theme**: Clean neutral light/dark surfaces with playful **Sakura / Cherry-Blossom Pink** accents (`--accent-light: #b81d5c`, `--accent-dark: #ff8ab5`, soft sakura containers `#fde8f0` / `#3b1225`). All color pairings exceed WCAG AA (4.5:1) contrast requirements.
   - **Brand Logo & Favicon**: Custom 5-petal notched Sakura cherry blossom SVG mark paired with `dmh.dev` in `src/app/app.html` and adaptive SVG favicon in `public/favicon.svg`.
+  - **Projects Page (`src/app/features/projects/projects.ts`)**: Inspired by `t3.gg/sponsors`—displays a responsive grid of full-card clickable project cards featuring each project's custom SVG logo (with ambient radial glow), project title, domain badge, concise description, and category pills.
   - **Social & Contact Links (`src/app/shared/social-links.ts`)**: Reusable `<app-social-links />` component displayed on `Home` and `About` with official inline SVG icons and light/dark brand color schemes for:
     - GitHub: `https://github.com/d2kx`
     - LinkedIn: `https://www.linkedin.com/in/dennis-martin-herbers-085058156`
@@ -183,7 +185,7 @@ All infrastructure is hosted on Railway using the `use-railway` skill / Railway 
   - **Region**: Europe (Netherlands / Amsterdam) (`europe-west4-drams3a`).
   - **Custom Domain**: `https://www.dmh.dev` (verified with SSL certificate on Railway, target port `8080`, `CNAME` `www` -> `sbnq1uoz.up.railway.app`).
   - **Railway Service Domain**: `https://web-production-e94e.up.railway.app` (target port `8080`).
-  - **DNS / Nameserver Constraint**: The domain `dmh.dev` is managed on GoDaddy's nameservers (cannot be moved to third-party nameservers). Because GoDaddy does not support `CNAME` flattening at the root (`@`), `www.dmh.dev` is the primary custom domain on Railway and `dmh.dev` uses GoDaddy Domain Forwarding (`301` redirect to `https://www.dmh.dev`). Future mini-apps on subdomains (`app1.dmh.dev`, `app2.dmh.dev`, etc.) use standard `CNAME` records in GoDaddy DNS directly.
+  - **DNS / Nameserver Constraint**: The domain `dmh.dev` is managed on GoDaddy's nameservers (cannot be moved to third-party nameservers). Because GoDaddy does not support `CNAME` flattening at the root (`@`), `www.dmh.dev` is the primary custom domain on Railway and `dmh.dev` uses GoDaddy Domain Forwarding (`301` redirect to `https://www.dmh.dev`). Mini-apps on subdomains (`kaleidoscope.dmh.dev`, `app2.dmh.dev`, etc.) use standard `CNAME` records in GoDaddy DNS directly.
 
 ### Cost-Control & Performance Configuration on `web`
 To keep Railway costs as low as possible while supporting full SSR + Prerendering:
@@ -202,9 +204,17 @@ To keep Railway costs as low as possible while supporting full SSR + Prerenderin
 6. **Railway Edge CDN Caching (`railway cdn enable --service web`)**:
    - Caches static assets (`maxAge: 1y`) and cacheable responses at the Railway CDN edge so cache hits don't even wake or hit the Node container.
 
-## 5. Adding Future Mini-Apps (`apps/`) & Databases
+## 5. Current Apps & Services (`apps/`) & Adding Future Mini-Apps
 
-### Mini-Apps (`app1.dmh.dev`, `app2.dmh.dev`, etc.)
+### Current Standalone Mini-Apps
+1. **`kaleidoscope` (`apps/kaleidoscope/`)**:
+   - **Railway Service ID**: `74f94487-13fd-461b-8b2c-24f9c5ec02c4` (region `europe-west4-drams3a`, `sleepApplication: true`, Edge CDN enabled).
+   - **Custom Domain**: `https://kaleidoscope.dmh.dev` (target port `8080`, `CNAME` `kaleidoscope` -> `oxvts028.up.railway.app`, `TXT` `_railway-verify.kaleidoscope` -> `railway-verify=b3d0173c8fab362faa67d7e4702bd979ff3235bac28889c510955107d68c613c`).
+   - **Railway Service Domain**: `https://kaleidoscope-production.up.railway.app`
+   - **Tech Stack**: Vite + TypeScript + pure WebGL2/WebGL fullscreen GLSL shader engine (`src/kaleidoscope-gl.ts`), self-hosted `@fontsource-variable/google-sans-flex`, and a zero-dependency Node HTTP server (`server.mjs`) with gzip and `/healthz`.
+   - **Features**: 4 visual modes (`Sakura`, `Prism`, `Lotus`, `Cyber`), adjustable symmetry segments (`4–16`), speed, floral bloom intensity, pointer-reactive prism tilt, reduced-motion support, and an optional glassmorphic performance HUD (`FPS` + `ms` + live SVG sparkline).
+
+### Adding Future Mini-Apps (`app2.dmh.dev`, etc.)
 - Place each standalone mini-app in `apps/<app-name>/`.
 - Create a dedicated Railway service in the `dmh.dev` project:
   ```bash
@@ -220,7 +230,7 @@ To keep Railway costs as low as possible while supporting full SSR + Prerenderin
   ```
   *(Also ensure `deploy.multiRegionConfig` is set to `{"europe-west4-drams3a": {"numReplicas": 1}}` and any default US region key is set to `null`.)*
 - Add the subdomain (`railway domain <app-name>.dmh.dev --service <app-name> --json`) and configure the returned `CNAME` + `_railway-verify` `TXT` records in DNS.
-- Document every new mini-app in this `AGENTS.md` file under a **Current Apps & Services** list.
+- Document every new mini-app in this `AGENTS.md` file under **Current Standalone Mini-Apps**.
 
 ### Databases & Storage
 - When a database is needed later, provision it inside the `dmh.dev` Railway project (and ensure its region is set to `europe-west4-drams3a` so it is co-located with the app services in Amsterdam):

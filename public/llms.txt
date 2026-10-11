@@ -11,6 +11,11 @@
 - [Impressum / Legal Notice](https://www.dmh.dev/impressum): Bilingual (German/English) statutory legal notice pursuant to § 5 DDG and § 18 Abs. 2 MStV.
 - [Datenschutzerklärung / Privacy Policy](https://www.dmh.dev/privacy): Bilingual (German/English) privacy policy pursuant to Art. 13 GDPR (DSGVO).
 
+## Apps & Projects
+
+- [Kaleidoscope](https://kaleidoscope.dmh.dev/): Interactive WebGL shader kaleidoscope blending psychedelic fractal symmetry with sakura cherry blossom geometry.
+- [dmh.dev Repository](https://github.com/d2kx/dmh.dev): Public monorepo for dmh.dev and standalone mini-apps.
+
 ## Social & Contact Links
 
 - GitHub: https://github.com/d2kx
