@@ -51,7 +51,7 @@ const server = createServer(async (req, res) => {
     const isHashedAsset = url.pathname.startsWith('/assets/');
     const cacheControl = isHashedAsset
       ? 'public, max-age=31536000, immutable'
-      : 'public, max-age=3600';
+      : 'public, max-age=0, must-revalidate';
 
     const rawBuffer = await readFile(targetPath);
     const acceptEncoding = String(req.headers['accept-encoding'] || '');

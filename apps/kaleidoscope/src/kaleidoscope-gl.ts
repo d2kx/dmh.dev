@@ -134,11 +134,11 @@ void main() {
 
   vec3 finalColor = vec3(0.0);
 
-  // Iterative fractal + floral folding
-  float foldScale = 1.48 + 0.08 * sin(u_time * 0.043);
+  // Iterative fractal + floral mirror folding (continuous triangle-wave reflection, zero seams)
+  float foldScale = 1.25 + 0.08 * sin(u_time * 0.043);
   for (float i = 0.0; i < 4.0; i++) {
-    uv = fract(uv * foldScale) - 0.5;
-    uv *= rot(u_time * 0.24 + i * PI * 0.22);
+    uv = (abs(fract(uv * foldScale - 0.5) - 0.5) * 2.0 - 0.5);
+    uv *= rot(u_time * 0.22 + i * PI * 0.22);
 
     float radialDecay = exp(-length(uv0) * 0.85);
     float dRing = length(uv) * radialDecay;
