@@ -61,11 +61,17 @@ for (const s of explorerData.specimens) {
   s.imageUrl = img ? '/pages/' + path.basename(img) : '';
 }
 
-// 3. Scan all 196 images in pages/
+// 3. Scan all git-tracked images in pages/
 const pagesDir = path.join(VOYNICH_REPO, 'pages');
+const trackedPages = new Set(
+  execSync(`git -C "${VOYNICH_REPO}" ls-files pages/`, { encoding: 'utf-8' })
+    .split(/\r?\n/)
+    .map((p) => path.basename(p.trim()))
+    .filter(Boolean),
+);
 const pageFiles = fs
   .readdirSync(pagesDir)
-  .filter((f) => /\.(png|jpg|jpeg|webp)$/i.test(f))
+  .filter((f) => /\.(png|jpg|jpeg|webp)$/i.test(f) && trackedPages.has(f))
   .sort();
 
 const pagesCatalog = pageFiles.map((file) => {
@@ -175,11 +181,17 @@ const foliosList = Object.values(folioIndexRaw.folios).map((f) => {
   };
 });
 
-// 6. Catalog all files in data/
+// 6. Catalog all git-tracked files in data/
 const dataDir = path.join(VOYNICH_REPO, 'data');
+const trackedData = new Set(
+  execSync(`git -C "${VOYNICH_REPO}" ls-files data/`, { encoding: 'utf-8' })
+    .split(/\r?\n/)
+    .map((p) => path.basename(p.trim()))
+    .filter(Boolean),
+);
 const dataFiles = fs
   .readdirSync(dataDir)
-  .filter((f) => /\.(json|txt)$/i.test(f))
+  .filter((f) => /\.(json|txt)$/i.test(f) && trackedData.has(f))
   .sort()
   .map((file) => {
     const stat = fs.statSync(path.join(dataDir, file));

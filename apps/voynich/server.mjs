@@ -56,11 +56,19 @@ function sendBuffer(req, res, statusCode, contentType, cacheControl, buf, ext) {
     headers['Vary'] = 'Accept-Encoding';
     headers['Content-Length'] = String(zipped.length);
     res.writeHead(statusCode, headers);
-    res.end(zipped);
+    if (req.method === 'HEAD') {
+      res.end();
+    } else {
+      res.end(zipped);
+    }
   } else {
     headers['Content-Length'] = String(buf.length);
     res.writeHead(statusCode, headers);
-    res.end(buf);
+    if (req.method === 'HEAD') {
+      res.end();
+    } else {
+      res.end(buf);
+    }
   }
 }
 
@@ -86,7 +94,7 @@ async function handleRepoAssetProxy(req, res, folder, rawFilename) {
 
   // 2. Check container disk cache
   try {
-    fs.mkdirSync( path.join(CACHE_DIR, folder), { recursive: true });
+    fs.mkdirSync(path.join(CACHE_DIR, folder), { recursive: true });
     const cachedPath = path.join(CACHE_DIR, folder, `${PINNED_COMMIT.slice(0, 7)}_${filename}`);
     if (fs.existsSync(cachedPath)) {
       const buf = fs.readFileSync(cachedPath);
@@ -94,9 +102,13 @@ async function handleRepoAssetProxy(req, res, folder, rawFilename) {
       return;
     }
 
-    // 3. Fetch server-to-server from pinned commit on GitHub
-    const upstreamUrl = `https://raw.githubusercontent.com/d2kx/voynich-research/${PINNED_COMMIT}/${folder}/${encodeURIComponent(filename)}`;
-    const upstreamRes = await fetch(upstreamUrl);
+    // 3. Fetch server-to-server from pinned commit on GitHub (fallback to main if asset was added in a newer commit)
+    const primaryUrl = `https://raw.githubusercontent.com/d2kx/voynich-research/${PINNED_COMMIT}/${folder}/${encodeURIComponent(filename)}`;
+    let upstreamRes = await fetch(primaryUrl);
+    if (!upstreamRes.ok) {
+      const fallbackUrl = `https://raw.githubusercontent.com/d2kx/voynich-research/main/${folder}/${encodeURIComponent(filename)}`;
+      upstreamRes = await fetch(fallbackUrl);
+    }
     if (!upstreamRes.ok) {
       res.writeHead(upstreamRes.status, { 'Content-Type': 'text/plain; charset=utf-8' });
       res.end('Asset not found');
