@@ -321,4 +321,7 @@ code {
   border-bottom: none;
 }
 
-
+.sidebar-scroll-viewport .cdk-virtual-scroll-content-wrapper {
+  right: 0;
+  width: 100%;
+}

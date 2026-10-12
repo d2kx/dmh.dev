@@ -10,13 +10,13 @@
       </p>
       <div class="hero-actions">
         <a
+          mat-flat-button
           routerLink="/voynich/library"
           [queryParams]="{ subtab: 'docs', doc: 'plain-english-visual-readers-guide' }"
-          class="btn-primary"
         >
           Read Plain-English Guide →
         </a>
-        <a routerLink="/voynich/walkthroughs" class="btn-outline">
+        <a mat-stroked-button routerLink="/voynich/walkthroughs">
           Browse {{ voynich.version.stats.walkthroughFolios }} Folio Walkthroughs →
         </a>
       </div>
@@ -345,12 +345,17 @@
     </div>
 
     <div class="split-layout">
-      <aside class="sidebar-list walkthrough-sidebar" aria-label="Walkthrough folios">
-        <div class="folio-btn-list">
-          @for (f of filteredWalkthroughFolios(); track f.folio + '-' + $index) {
+      <aside class="sidebar-panel walkthrough-sidebar" aria-label="Walkthrough folios">
+        @if (filteredWalkthroughFolios().length > 0) {
+          <cdk-virtual-scroll-viewport
+            itemSize="64"
+            class="sidebar-scroll-viewport"
+            aria-label="Walkthrough folio list"
+          >
             <button
+              *cdkVirtualFor="let f of filteredWalkthroughFolios(); trackBy: trackByWalkthrough"
               type="button"
-              class="list-item-btn"
+              class="list-item-btn virtual-walkthrough-btn"
               [class.active-list-item]="activeWalkthrough()?.folio === f.folio"
               (click)="selectedWalkthroughFolio.set(f.folio)"
             >
@@ -358,12 +363,12 @@
                 <strong>{{ f.folio }}</strong>
                 <span class="item-meta">p.{{ f.pdf_page }}</span>
               </div>
-              <div class="item-sub">{{ f.title }}</div>
+              <div class="item-sub item-sub-clamp">{{ f.title }}</div>
             </button>
-          } @empty {
-            <div class="muted-cell">No folios match "{{ walkthroughSearch() }}".</div>
-          }
-        </div>
+          </cdk-virtual-scroll-viewport>
+        } @else {
+          <div class="muted-cell">No folios match "{{ walkthroughSearch() }}".</div>
+        }
       </aside>
 
       <div class="reading-pane">
@@ -373,7 +378,7 @@
               <div class="item-meta">{{ f.section }} · Yale PDF p. {{ f.pdf_page }}</div>
               <h2 class="walkthrough-title">Folio {{ f.folio }} · {{ f.title }}</h2>
             </div>
-            <button type="button" class="btn-outline" (click)="jumpToCorpusFolio(f.folio)">
+            <button type="button" mat-stroked-button (click)="jumpToCorpusFolio(f.folio)">
               Open {{ f.folio }} in 227-Folio Corpus →
             </button>
           </div>
@@ -655,7 +660,7 @@
     </div>
 
     <div class="split-layout">
-      <aside class="sidebar-list" aria-label="227 Folio Corpus Filter">
+      <aside class="sidebar-panel folios-sidebar" aria-label="227 Folio Corpus Filter">
         <div class="filter-stack">
           <div class="search-field">
             <svg
@@ -720,30 +725,29 @@
           </div>
         </div>
 
-        <div class="folio-btn-list">
-          @for (f of filteredCorpusFolios(); track f.folio) {
-            <button
-              type="button"
-              class="list-item-btn"
-              [class.active-list-item]="selectedCorpusFolioId() === f.folio"
-              (click)="selectedCorpusFolioId.set(f.folio)"
-            >
-              <div class="item-top">
-                <strong>{{ f.folio }}</strong>
-                <span class="item-meta">{{ f.sectionCode || '?' }} · {{ f.wordCount }}w</span>
-              </div>
-              <div class="item-sub">
-                {{ f.section }}
-                @if (f.lang) {
-                  · Lang {{ f.lang }}
-                }
-                @if (f.hand) {
-                  · Hand {{ f.hand }}
-                }
-              </div>
-            </button>
-          }
-        </div>
+        <cdk-virtual-scroll-viewport itemSize="58" class="sidebar-scroll-viewport">
+          <button
+            *cdkVirtualFor="let f of filteredCorpusFolios(); trackBy: trackByCorpusFolio"
+            type="button"
+            class="list-item-btn virtual-folio-btn"
+            [class.active-list-item]="selectedCorpusFolioId() === f.folio"
+            (click)="selectedCorpusFolioId.set(f.folio)"
+          >
+            <div class="item-top">
+              <strong>{{ f.folio }}</strong>
+              <span class="item-meta">{{ f.sectionCode || '?' }} · {{ f.wordCount }}w</span>
+            </div>
+            <div class="item-sub">
+              {{ f.section }}
+              @if (f.lang) {
+                · Lang {{ f.lang }}
+              }
+              @if (f.hand) {
+                · Hand {{ f.hand }}
+              }
+            </div>
+          </button>
+        </cdk-virtual-scroll-viewport>
       </aside>
 
       <div class="reading-pane">
@@ -888,37 +892,49 @@
         </p>
       </div>
       <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Root Stem</th>
-              <th>Category</th>
-              <th>Proposed Reading</th>
-              <th>Common Inflected Forms</th>
-              <th>Sections</th>
-              <th>Visual &amp; Physical Grounding</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (item of voynich.explorerData()?.lexicon ?? []; track item.stem) {
-              <tr>
-                <td>
-                  <strong><code>{{ item.stem }}</code></strong>
-                </td>
-                <td>{{ item.category }}</td>
-                <td><strong>{{ item.meaning }}</strong></td>
-                <td>
-                  @for (ex of splitTokens(item.examples); track $index) {
-                    <button type="button" class="word-chip" (click)="setWord(ex)">
-                      {{ ex }}
-                    </button>
-                  }
-                </td>
-                <td class="muted-cell">{{ item.sections }}</td>
-                <td class="muted-cell">{{ item.grounding }}</td>
-              </tr>
-            }
-          </tbody>
+        <table mat-table [dataSource]="voynich.explorerData()?.lexicon ?? []" class="voynich-mat-table">
+          <ng-container matColumnDef="stem">
+            <th mat-header-cell *matHeaderCellDef>Root Stem</th>
+            <td mat-cell *matCellDef="let item">
+              <strong><code>{{ item.stem }}</code></strong>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="category">
+            <th mat-header-cell *matHeaderCellDef>Category</th>
+            <td mat-cell *matCellDef="let item">{{ item.category }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="meaning">
+            <th mat-header-cell *matHeaderCellDef>Proposed Reading</th>
+            <td mat-cell *matCellDef="let item">
+              <strong>{{ item.meaning }}</strong>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="examples">
+            <th mat-header-cell *matHeaderCellDef>Common Inflected Forms</th>
+            <td mat-cell *matCellDef="let item">
+              @for (ex of splitTokens(item.examples); track $index) {
+                <button type="button" class="word-chip" (click)="setWord(ex)">
+                  {{ ex }}
+                </button>
+              }
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="sections">
+            <th mat-header-cell *matHeaderCellDef>Sections</th>
+            <td mat-cell *matCellDef="let item" class="muted-cell">{{ item.sections }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="grounding">
+            <th mat-header-cell *matHeaderCellDef>Visual &amp; Physical Grounding</th>
+            <td mat-cell *matCellDef="let item" class="muted-cell">{{ item.grounding }}</td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="lexiconColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: lexiconColumns"></tr>
         </table>
       </div>
     </section>
@@ -942,35 +958,42 @@
             </div>
             <p class="paradigm-sub">{{ p.base_meaning }}</p>
             <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Grammatical Slot</th>
-                    <th>Affix</th>
-                    <th>Top Form</th>
-                    <th>Hits</th>
-                    <th>Role in Recipes</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (c of p.cases; track c.case) {
-                    <tr>
-                      <td><strong>{{ c.case }}</strong></td>
-                      <td><code>{{ c.suffix }}</code></td>
-                      <td>
-                        <button
-                          type="button"
-                          class="word-chip"
-                          (click)="setWord(c.form)"
-                        >
-                          {{ c.form }}
-                        </button>
-                      </td>
-                      <td>{{ c.count }} ({{ c.pct }}%)</td>
-                      <td class="muted-cell">{{ c.gloss }}</td>
-                    </tr>
-                  }
-                </tbody>
+              <table mat-table [dataSource]="p.cases" class="voynich-mat-table">
+                <ng-container matColumnDef="case">
+                  <th mat-header-cell *matHeaderCellDef>Grammatical Slot</th>
+                  <td mat-cell *matCellDef="let c">
+                    <strong>{{ c.case }}</strong>
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="suffix">
+                  <th mat-header-cell *matHeaderCellDef>Affix</th>
+                  <td mat-cell *matCellDef="let c">
+                    <code>{{ c.suffix }}</code>
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="form">
+                  <th mat-header-cell *matHeaderCellDef>Top Form</th>
+                  <td mat-cell *matCellDef="let c">
+                    <button type="button" class="word-chip" (click)="setWord(c.form)">
+                      {{ c.form }}
+                    </button>
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="count">
+                  <th mat-header-cell *matHeaderCellDef>Hits</th>
+                  <td mat-cell *matCellDef="let c">{{ c.count }} ({{ c.pct }}%)</td>
+                </ng-container>
+
+                <ng-container matColumnDef="gloss">
+                  <th mat-header-cell *matHeaderCellDef>Role in Recipes</th>
+                  <td mat-cell *matCellDef="let c" class="muted-cell">{{ c.gloss }}</td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="paradigmColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: paradigmColumns"></tr>
               </table>
             </div>
           </div>
@@ -988,47 +1011,71 @@
         </p>
       </div>
       <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Folio</th>
-              <th>Zodiac Medallion</th>
-              <th>European Month Crib</th>
-              <th>Element &amp; Season</th>
-              <th>Ring Words</th>
-              <th>Nymph Labels</th>
-              <th><code>o-</code> Nominal Rate</th>
-              <th>Sample Star-Nymph Labels</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (z of voynich.explorerData()?.zodiac ?? []; track z.folio) {
-              <tr>
-                <td>
-                  <button
-                    type="button"
-                    class="folio-jump-chip"
-                    (click)="jumpToCorpusFolio(z.folio)"
-                  >
-                    {{ z.folio }}
-                  </button>
-                </td>
-                <td><strong>{{ z.sign }}</strong></td>
-                <td><code>{{ z.european_month_gloss }}</code></td>
-                <td class="muted-cell">{{ z.triplicity }} ({{ z.season }})</td>
-                <td>{{ z.ring_token_count }}</td>
-                <td>{{ z.nymph_label_count }}</td>
-                <td><strong>{{ formatPercent(z.o_prefix_rate) }}</strong></td>
-                <td>
-                  @for (lbl of z.top_nymph_labels.slice(0, 5); track $index) {
-                    <button type="button" class="word-chip" (click)="setWord(lbl)">
-                      {{ lbl }}
-                    </button>
-                  }
-                </td>
-              </tr>
-            }
-          </tbody>
+        <table mat-table [dataSource]="voynich.explorerData()?.zodiac ?? []" class="voynich-mat-table">
+          <ng-container matColumnDef="folio">
+            <th mat-header-cell *matHeaderCellDef>Folio</th>
+            <td mat-cell *matCellDef="let z">
+              <button
+                type="button"
+                class="folio-jump-chip"
+                (click)="jumpToCorpusFolio(z.folio)"
+              >
+                {{ z.folio }}
+              </button>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="sign">
+            <th mat-header-cell *matHeaderCellDef>Zodiac Medallion</th>
+            <td mat-cell *matCellDef="let z">
+              <strong>{{ z.sign }}</strong>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="month">
+            <th mat-header-cell *matHeaderCellDef>European Month Crib</th>
+            <td mat-cell *matCellDef="let z">
+              <code>{{ z.european_month_gloss }}</code>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="season">
+            <th mat-header-cell *matHeaderCellDef>Element &amp; Season</th>
+            <td mat-cell *matCellDef="let z" class="muted-cell">
+              {{ z.triplicity }} ({{ z.season }})
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="ringWords">
+            <th mat-header-cell *matHeaderCellDef>Ring Words</th>
+            <td mat-cell *matCellDef="let z">{{ z.ring_token_count }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="nymphLabels">
+            <th mat-header-cell *matHeaderCellDef>Nymph Labels</th>
+            <td mat-cell *matCellDef="let z">{{ z.nymph_label_count }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="oRate">
+            <th mat-header-cell *matHeaderCellDef><code>o-</code> Nominal Rate</th>
+            <td mat-cell *matCellDef="let z">
+              <strong>{{ formatPercent(z.o_prefix_rate) }}</strong>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="sampleLabels">
+            <th mat-header-cell *matHeaderCellDef>Sample Star-Nymph Labels</th>
+            <td mat-cell *matCellDef="let z">
+              @for (lbl of z.top_nymph_labels.slice(0, 5); track $index) {
+                <button type="button" class="word-chip" (click)="setWord(lbl)">
+                  {{ lbl }}
+                </button>
+              }
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="zodiacColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: zodiacColumns"></tr>
         </table>
       </div>
     </section>
@@ -1043,51 +1090,72 @@
         </p>
       </div>
       <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Folio</th>
-              <th>Prose Words</th>
-              <th>Boil Rate (<code>qokeedy</code>)</th>
-              <th>Wash Rate (<code>shedy</code>)</th>
-              <th>Vessel Rate (<code>ol-</code>)</th>
-              <th>Pipe &amp; Nymph Labels</th>
-              <th>Top Prose Recipe Words</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (b of voynich.explorerData()?.balneo ?? []; track b.folio) {
-              <tr>
-                <td>
-                  <button type="button" class="folio-jump-chip" (click)="jumpToCorpusFolio(b.folio)">
-                    {{ b.folio }}
+        <table mat-table [dataSource]="voynich.explorerData()?.balneo ?? []" class="voynich-mat-table">
+          <ng-container matColumnDef="folio">
+            <th mat-header-cell *matHeaderCellDef>Folio</th>
+            <td mat-cell *matCellDef="let b">
+              <button type="button" class="folio-jump-chip" (click)="jumpToCorpusFolio(b.folio)">
+                {{ b.folio }}
+              </button>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="proseWords">
+            <th mat-header-cell *matHeaderCellDef>Prose Words</th>
+            <td mat-cell *matCellDef="let b">
+              <strong>{{ b.prose_tokens }}</strong>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="boilRate">
+            <th mat-header-cell *matHeaderCellDef>Boil Rate (<code>qokeedy</code>)</th>
+            <td mat-cell *matCellDef="let b">
+              <code>{{ formatPercent(b.thermal_boil_rate) }}</code>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="washRate">
+            <th mat-header-cell *matHeaderCellDef>Wash Rate (<code>shedy</code>)</th>
+            <td mat-cell *matCellDef="let b">
+              <code>{{ formatPercent(b.wash_bathe_rate) }}</code>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="vesselRate">
+            <th mat-header-cell *matHeaderCellDef>Vessel Rate (<code>ol-</code>)</th>
+            <td mat-cell *matCellDef="let b">
+              <code>{{ formatPercent(b.pool_vessel_rate) }}</code>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="pipeLabels">
+            <th mat-header-cell *matHeaderCellDef>Pipe &amp; Nymph Labels</th>
+            <td mat-cell *matCellDef="let b">
+              @if (combineBalneoLabels(b).length > 0) {
+                @for (lbl of combineBalneoLabels(b); track $index) {
+                  <button type="button" class="word-chip" (click)="setWord(lbl)">
+                    {{ lbl }}
                   </button>
-                </td>
-                <td><strong>{{ b.prose_tokens }}</strong></td>
-                <td><code>{{ formatPercent(b.thermal_boil_rate) }}</code></td>
-                <td><code>{{ formatPercent(b.wash_bathe_rate) }}</code></td>
-                <td><code>{{ formatPercent(b.pool_vessel_rate) }}</code></td>
-                <td>
-                  @if (combineBalneoLabels(b).length > 0) {
-                    @for (lbl of combineBalneoLabels(b); track $index) {
-                      <button type="button" class="word-chip" (click)="setWord(lbl)">
-                        {{ lbl }}
-                      </button>
-                    }
-                  } @else {
-                    <span class="muted-inline">Unlabeled pool / pure text</span>
-                  }
-                </td>
-                <td>
-                  @for (pw of b.top_prose_words.slice(0, 4); track $index) {
-                    <button type="button" class="word-chip" (click)="setWord(pw)">
-                      {{ pw }}
-                    </button>
-                  }
-                </td>
-              </tr>
-            }
-          </tbody>
+                }
+              } @else {
+                <span class="muted-inline">Unlabeled pool / pure text</span>
+              }
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="topWords">
+            <th mat-header-cell *matHeaderCellDef>Top Prose Recipe Words</th>
+            <td mat-cell *matCellDef="let b">
+              @for (pw of b.top_prose_words.slice(0, 4); track $index) {
+                <button type="button" class="word-chip" (click)="setWord(pw)">
+                  {{ pw }}
+                </button>
+              }
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="balneoColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: balneoColumns"></tr>
         </table>
       </div>
     </section>
@@ -1140,7 +1208,7 @@
       @case ('docs') {
         @if (activeDocSlug()) {
           <div class="reader-nav-bar">
-            <button type="button" class="btn-outline back-dir-btn" (click)="closeDocReader()">
+            <button type="button" mat-stroked-button (click)="closeDocReader()">
               ← Back to Research Guides
             </button>
             <span class="item-meta">{{ activeDocMeta() }}</span>
@@ -1235,7 +1303,7 @@
                   [href]="b.downloadUrl"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="btn-primary"
+                  mat-flat-button
                 >
                   Download Full PDF ({{ b.sizeMB }} MB) ↗
                 </a>
@@ -1243,7 +1311,7 @@
                   [href]="b.sourceUrl"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="btn-outline"
+                  mat-stroked-button
                 >
                   Original Catalog Page ↗
                 </a>
@@ -1251,7 +1319,7 @@
                   [href]="b.githubBlobUrl"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="btn-outline"
+                  mat-stroked-button
                 >
                   View in Repository ↗
                 </a>
@@ -1342,7 +1410,7 @@
       @case ('datasets') {
         @if (activeDataFile()) {
           <div class="reader-nav-bar">
-            <button type="button" class="btn-outline back-dir-btn" (click)="closeDataInspector()">
+            <button type="button" mat-stroked-button (click)="closeDataInspector()">
               ← Back to All Datasets
             </button>
             <div class="reader-nav-actions">
@@ -1352,7 +1420,7 @@
                   [href]="activeDataRawUrl()"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="btn-outline"
+                  mat-stroked-button
                 >
                   Open Raw File ↗
                 </a>

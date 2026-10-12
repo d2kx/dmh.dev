@@ -1,3 +1,4 @@
+import { CdkVirtualScrollViewport, ScrollingModule } from '@angular/cdk/scrolling';
 import { NgOptimizedImage } from '@angular/common';
 import {
   Component,
@@ -5,8 +6,11 @@ import {
   computed,
   inject,
   signal,
+  viewChild,
 } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatTableModule } from '@angular/material/table';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
@@ -52,7 +56,14 @@ const VALID_SECTIONS = new Set<VoynichSection>([
 
 @Component({
   selector: 'app-voynich',
-  imports: [RouterLink, NgOptimizedImage, MatPaginatorModule],
+  imports: [
+    RouterLink,
+    NgOptimizedImage,
+    ScrollingModule,
+    MatButtonModule,
+    MatPaginatorModule,
+    MatTableModule,
+  ],
   templateUrl: './voynich.html',
   styleUrl: './voynich.css',
   host: {
@@ -66,8 +77,46 @@ export class Voynich {
   private readonly router = inject(Router);
   private readonly sanitizer = inject(DomSanitizer);
 
+  private readonly virtualViewport = viewChild(CdkVirtualScrollViewport);
+
   protected readonly activeSection = signal<VoynichSection>('overview');
   protected readonly librarySubtab = signal<LibrarySubtab>('docs');
+
+  // Angular Material Table column definitions for Grammar & Atlases
+  protected readonly lexiconColumns: readonly string[] = [
+    'stem',
+    'category',
+    'meaning',
+    'examples',
+    'sections',
+    'grounding',
+  ];
+  protected readonly paradigmColumns: readonly string[] = [
+    'case',
+    'suffix',
+    'form',
+    'count',
+    'gloss',
+  ];
+  protected readonly zodiacColumns: readonly string[] = [
+    'folio',
+    'sign',
+    'month',
+    'season',
+    'ringWords',
+    'nymphLabels',
+    'oRate',
+    'sampleLabels',
+  ];
+  protected readonly balneoColumns: readonly string[] = [
+    'folio',
+    'proseWords',
+    'boilRate',
+    'washRate',
+    'vesselRate',
+    'pipeLabels',
+    'topWords',
+  ];
 
   // Visual showcase cards on Overview introducing the manuscript's key sections
   protected readonly overviewShowcase: readonly OverviewShowcaseCard[] = [
@@ -392,11 +441,29 @@ export class Voynich {
   protected selectWalkthroughByFolio(folioId: string): void {
     const folios = this.voynich.explorerData()?.folios ?? [];
     const match = folios.find((f) => f.folio === folioId || f.folio.startsWith(folioId));
-    this.selectedWalkthroughFolio.set(match ? match.folio : folioId);
+    const targetFolio = match ? match.folio : folioId;
+    this.selectedWalkthroughFolio.set(targetFolio);
+
+    if (typeof window !== 'undefined') {
+      setTimeout(() => {
+        const idx = this.filteredWalkthroughFolios().findIndex((f) => f.folio === targetFolio);
+        if (idx >= 0) {
+          this.virtualViewport()?.scrollToIndex(Math.max(0, idx - 2), 'smooth');
+        }
+      }, 50);
+    }
   }
 
   protected onWalkthroughSearch(value: string): void {
     this.walkthroughSearch.set(value);
+  }
+
+  protected trackByWalkthrough(_index: number, item: WalkthroughFolio): string {
+    return item.folio;
+  }
+
+  protected trackByCorpusFolio(_index: number, item: CorpusFolio): string {
+    return item.folio;
   }
 
   protected setLibrarySubtab(subtab: LibrarySubtab): void {

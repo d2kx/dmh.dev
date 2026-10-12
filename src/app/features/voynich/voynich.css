@@ -113,10 +113,10 @@
 .section-intro-with-visual {
   display: grid;
   grid-template-columns: 1fr 270px;
-  gap: 2.25rem;
+  gap: 2rem;
   align-items: start;
-  padding-bottom: 2rem;
-  margin-bottom: 2rem;
+  padding-bottom: 1.4rem;
+  margin-bottom: 1.4rem;
   border-bottom: 1px solid var(--border-subtle);
 }
 
@@ -136,7 +136,7 @@
 
 .intro-visual-img-wrap {
   position: relative;
-  height: 220px;
+  height: 195px;
   background: #f5efe6;
   overflow: hidden;
 }
@@ -526,7 +526,7 @@
 /* Split Master-Detail Layout (Open Reading Canvas, No Nested Box Wrapper) */
 .split-layout {
   display: grid;
-  grid-template-columns: 265px 1fr;
+  grid-template-columns: 286px 1fr;
   gap: 2.15rem;
   align-items: start;
 }
@@ -538,25 +538,48 @@
   }
 }
 
-.sidebar-list {
-  padding-right: 1rem;
+.sidebar-panel {
+  display: flex;
+  flex-direction: column;
+  padding-right: 0.9rem;
   border-right: 1px solid var(--border-subtle);
-  max-height: clamp(14.5rem, calc(100dvh - 25.5rem), 26.5rem);
-  overflow-y: auto;
   position: sticky;
   top: 4.8rem;
+}
+
+.walkthrough-sidebar {
+  height: max(20rem, calc(100dvh - 26.5rem));
+}
+
+.folios-sidebar {
+  height: max(22rem, calc(100dvh - 37.5rem));
+}
+
+.sidebar-scroll-viewport {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  width: 100%;
+  padding-right: 0.25rem;
   scrollbar-width: thin;
   scrollbar-color: var(--border-subtle) transparent;
 }
 
 @media (max-width: 920px) {
-  .sidebar-list {
+  .sidebar-panel {
     padding-right: 0;
     border-right: 0;
     border-bottom: 1px solid var(--border-subtle);
     padding-bottom: 1rem;
     position: static;
-    max-height: 36vh;
+  }
+
+  .walkthrough-sidebar {
+    height: 36vh;
+  }
+
+  .folios-sidebar {
+    height: 44vh;
   }
 }
 
@@ -567,42 +590,34 @@
 .filter-stack {
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
-  margin-bottom: 0.85rem;
+  gap: 0.5rem;
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.65rem;
+  border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0;
 }
 
 .filter-row {
-  display: flex;
-  gap: 0.45rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.4rem;
 }
 
 .select-input {
   width: 100%;
+  min-width: 0;
   background: var(--surface-card);
   border: 1px solid var(--border-subtle);
   border-radius: 0.55rem;
-  padding: 0.5rem 0.65rem;
+  padding: 0.45rem 0.45rem;
   color: var(--text-primary);
   font-family: inherit;
-  font-size: 0.875rem;
+  font-size: 0.84rem;
 }
 
 .count-label {
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   color: var(--text-muted);
-}
-
-.folio-btn-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.group-header {
-  font-size: 0.8125rem;
-  font-weight: 700;
-  color: var(--accent);
-  margin: 0.9rem 0 0.3rem 0.5rem;
 }
 
 .list-item-btn {
@@ -612,20 +627,26 @@
   background: transparent;
   border: 1px solid transparent;
   border-radius: 0.6rem;
-  padding: 0.5rem 0.65rem;
+  padding: 0.45rem 0.65rem;
   color: var(--text-primary);
   font-family: inherit;
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
+  justify-content: center;
+  gap: 0.12rem;
+  box-sizing: border-box;
   transition: background 120ms ease, border-color 120ms ease;
 }
 
-.doc-list-title {
-  font-size: 0.9375rem;
-  font-weight: 560;
-  line-height: 1.4;
+.virtual-walkthrough-btn {
+  height: 60px;
+  margin-bottom: 4px;
+}
+
+.virtual-folio-btn {
+  height: 54px;
+  margin-bottom: 4px;
 }
 
 .list-item-btn:hover {
@@ -647,9 +668,12 @@
 }
 
 .item-sub {
-  font-size: 0.85rem;
+  font-size: 0.825rem;
   color: var(--text-muted);
-  line-height: 1.35;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Walkthroughs & Folio Corpus Reading Layout */
@@ -692,7 +716,7 @@
 
 .walkthrough-grid {
   display: grid;
-  grid-template-columns: minmax(215px, 265px) 1fr;
+  grid-template-columns: minmax(225px, 285px) 1fr;
   gap: 1.65rem;
   align-items: start;
 }
@@ -1069,6 +1093,40 @@
   margin: 0.25rem 0 0.75rem;
   font-size: 0.9375rem;
   color: var(--text-muted);
+}
+
+.voynich-mat-table {
+  background: transparent;
+  font-family: inherit;
+}
+
+.voynich-mat-table .mat-mdc-header-row,
+.voynich-mat-table .mat-mdc-row {
+  height: auto;
+}
+
+.voynich-mat-table .mat-mdc-header-cell {
+  background: var(--surface-subtle);
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.75rem 0.95rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.voynich-mat-table .mat-mdc-cell {
+  color: var(--text-primary);
+  font-size: 0.9375rem;
+  padding: 0.75rem 0.95rem;
+  border-bottom: 1px solid var(--border-subtle);
+  vertical-align: top;
+  line-height: 1.55;
+}
+
+.voynich-mat-table .mat-mdc-row:last-child .mat-mdc-cell {
+  border-bottom: 0;
 }
 
 /* Library Subtabs & Views */
