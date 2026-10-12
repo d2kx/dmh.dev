@@ -370,7 +370,8 @@ function formatInlineMarkdown(line: string): string {
   let out = line.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_m, alt: string, rawSrc: string) => {
     const base = rawSrc.split('/').pop() || rawSrc;
     const resolved = rawSrc.includes('pages/') ? `/pages/${base}` : rawSrc;
-    return `<img src="${escapeHtml(resolved)}" alt="${escapeHtml(alt)}" width="640" height="850" decoding="async" data-zoom="${escapeHtml(resolved)}" />`;
+    const displaySrc = resolved.startsWith('/pages/') ? `${resolved}?format=webp&w=960` : resolved;
+    return `<img src="${escapeHtml(displaySrc)}" alt="${escapeHtml(alt)}" width="640" height="850" loading="lazy" decoding="async" data-zoom="${escapeHtml(resolved)}" />`;
   });
 
   out = out.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_m, label: string, href: string) => {

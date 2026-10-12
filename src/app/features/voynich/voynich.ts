@@ -1,3 +1,4 @@
+import { NgOptimizedImage } from '@angular/common';
 import {
   Component,
   afterNextRender,
@@ -5,6 +6,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
@@ -16,6 +18,7 @@ import {
   BalneoEntry,
   CorpusFolio,
   DocMeta,
+  SpecimenEntry,
   WalkthroughFolio,
 } from './voynich.model';
 import { VoynichService } from './voynich.service';
@@ -49,7 +52,7 @@ const VALID_SECTIONS = new Set<VoynichSection>([
 
 @Component({
   selector: 'app-voynich',
-  imports: [RouterLink],
+  imports: [RouterLink, NgOptimizedImage, MatPaginatorModule],
   templateUrl: './voynich.html',
   styleUrl: './voynich.css',
   host: {
@@ -129,6 +132,50 @@ export class Voynich {
     const folios = this.voynich.explorerData()?.folios ?? [];
     return folios[this.selectedWalkthroughIdx()] ?? folios[0] ?? null;
   });
+  protected readonly activeWalkthroughList = computed<readonly WalkthroughFolio[]>(() => {
+    const w = this.activeWalkthrough();
+    return w ? [w] : [];
+  });
+
+  // Identifications search & pagination state (20 specimens per page default)
+  protected readonly specimenSearch = signal<string>('');
+  protected readonly specimenPageIndex = signal<number>(0);
+  protected readonly specimenPageSize = signal<number>(20);
+  protected readonly specimenPageSizeOptions: readonly number[] = [10, 20, 35, 65];
+
+  protected readonly filteredSpecimens = computed<readonly SpecimenEntry[]>(() => {
+    const specimens = this.voynich.explorerData()?.specimens ?? [];
+    const q = this.specimenSearch().trim().toLowerCase();
+    if (!q) return specimens;
+    return specimens.filter(
+      (s) =>
+        s.id.toLowerCase().includes(q) ||
+        s.folio.toLowerCase().includes(q) ||
+        s.common_name.toLowerCase().includes(q) ||
+        s.category.toLowerCase().includes(q) ||
+        s.section.toLowerCase().includes(q) ||
+        s.plain_english_dossier.toLowerCase().includes(q) ||
+        s.latin_candidates.some((l) => l.toLowerCase().includes(q)),
+    );
+  });
+
+  protected readonly pagedSpecimens = computed<readonly SpecimenEntry[]>(() => {
+    const all = this.filteredSpecimens();
+    const size = this.specimenPageSize();
+    const start = this.specimenPageIndex() * size;
+    return all.slice(start, start + size);
+  });
+
+  private readonly scanDimsMap = computed<ReadonlyMap<string, { width: number; height: number }>>(
+    () => {
+      const pages = this.voynich.catalogData()?.pages ?? [];
+      const map = new Map<string, { width: number; height: number }>();
+      for (const p of pages) {
+        map.set(p.file, { width: p.width, height: p.height });
+      }
+      return map;
+    },
+  );
 
   // Corpus 227-folio browser state
   protected readonly corpusSearch = signal<string>('');
@@ -349,8 +396,19 @@ export class Voynich {
   }
 
   protected cleanToken(tok: string): string {
-    const firstPart = (tok || '').trim().split(/[\s(/]+/)[0] || '';
+    const firstPart = (tok || '').trim().split(/[\s(./]+/)[0] || '';
     return firstPart.replace(/[^a-zA-Z0-9]/g, '');
+  }
+
+  protected displayToken(tok: string): string {
+    const firstPart = (tok || '').trim().split(/[\s(/]+/)[0] || '';
+    return firstPart.replace(/[^a-zA-Z0-9.]/g, '');
+  }
+
+  protected openingWordNote(raw: string): string {
+    const trimmed = (raw || '').trim();
+    const firstPart = trimmed.split(/[\s(]+/)[0] || '';
+    return trimmed.slice(firstPart.length).trim();
   }
 
   protected formatPercent(rate: number): string {
@@ -399,6 +457,28 @@ export class Voynich {
     } catch {
       this.activeDataPreview.set(`Could not load /data/${file}`);
     }
+  }
+
+  protected onSpecimenSearch(value: string): void {
+    this.specimenSearch.set(value);
+    this.specimenPageIndex.set(0);
+  }
+
+  protected onSpecimenPage(event: PageEvent): void {
+    this.specimenPageIndex.set(event.pageIndex);
+    this.specimenPageSize.set(event.pageSize);
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  protected getScanDims(filename: string): { width: number; height: number } {
+    return this.scanDimsMap().get(filename) ?? { width: 1500, height: 2000 };
+  }
+
+  protected shortConfidenceTier(tier: string): string {
+    const m = (tier || '').match(/^(Tier\s+[A-Z+]+)/i);
+    return m ? m[1] : tier;
   }
 
   protected onHostClick(event: MouseEvent): void {

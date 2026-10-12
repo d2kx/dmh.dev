@@ -28,7 +28,7 @@ export class VoynichService {
   private readonly docCache = new Map<string, CachedDocResult>();
   private readonly dataTextCache = new Map<string, string>();
 
-  private readonly cacheQuery = `?v=${VOYNICH_VERSION.shortSha}-2`;
+  private readonly cacheQuery = `?v=${VOYNICH_VERSION.shortSha}-4`;
 
   ensureInitialized(): Promise<void> {
     if (this.initPromise) {
@@ -99,10 +99,21 @@ export class VoynichService {
   }
 
   openLightbox(url: string): void {
-    this.lightboxUrl.set(url);
+    const base = url.split('?')[0] || url;
+    this.lightboxUrl.set(base);
   }
 
   closeLightbox(): void {
     this.lightboxUrl.set(null);
+  }
+
+  rawPngUrl(url: string): string {
+    const base = url.split('?')[0] || url;
+    return `${base}?raw=1`;
+  }
+
+  optimizedFullUrl(url: string): string {
+    const base = url.split('?')[0] || url;
+    return base.startsWith('/pages/') ? `${base}?format=webp&w=1600` : base;
   }
 }

@@ -10,7 +10,11 @@ export interface WalkthroughFolio {
   readonly section: string;
   readonly pdf_page: number;
   readonly image: string;
+  readonly imageWidth: number;
+  readonly imageHeight: number;
   readonly secondary_image?: string;
+  readonly secondaryImageWidth?: number;
+  readonly secondaryImageHeight?: number;
   readonly summary: string;
   readonly clauses: readonly WalkthroughClause[];
   readonly labels: readonly string[];
@@ -34,6 +38,8 @@ export interface SpecimenEntry {
   readonly plain_english_dossier: string;
   readonly confidence_tier: string;
   readonly imageUrl: string;
+  readonly imageWidth: number;
+  readonly imageHeight: number;
 }
 
 export interface LexiconEntry {
@@ -159,6 +165,8 @@ export interface ScanCatalogItem {
   readonly url: string;
   readonly folio: string;
   readonly sizeKB: number;
+  readonly width: number;
+  readonly height: number;
   readonly isEnhanced: boolean;
 }
 

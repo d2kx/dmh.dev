@@ -69,35 +69,200 @@ function extractWordsList(rawArr, limit = 32) {
   return out;
 }
 
-// 2. Extract embedded DATA JSON from explorer/index.html
-const explorerHtml = fs.readFileSync(path.join(VOYNICH_REPO, 'explorer', 'index.html'), 'utf-8');
-const dataMatch = explorerHtml.match(/const DATA = (\{[\s\S]*?\});\s*\n\s*const PREFIX_RULES/);
-if (!dataMatch) {
-  throw new Error('Could not extract const DATA from explorer/index.html');
+// Helper to read intrinsic width & height from PNG IHDR header
+function getPngDimensions(filePath) {
+  try {
+    const fd = fs.openSync(filePath, 'r');
+    const buf = Buffer.alloc(24);
+    fs.readSync(fd, buf, 0, 24, 0);
+    fs.closeSync(fd);
+    // PNG magic bytes: 89 50 4E 47 0D 0A 1A 0A
+    if (buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4e && buf[3] === 0x47) {
+      return {
+        width: buf.readUInt32BE(16),
+        height: buf.readUInt32BE(20),
+      };
+    }
+  } catch {
+    // Fall back to standard manuscript aspect ratio
+  }
+  return { width: 1500, height: 2000 };
 }
-const explorerData = JSON.parse(cleanDashes(dataMatch[1]));
 
-// Normalize image paths and strip raw markdown backticks in explorerData.folios and explorerData.specimens
-for (const f of explorerData.folios) {
-  if (f.image) f.image = '/pages/' + path.basename(f.image);
-  if (f.secondary_image) f.secondary_image = '/pages/' + path.basename(f.secondary_image);
-  if (f.title) f.title = String(f.title).replace(/`/g, '');
-  if (f.summary) f.summary = String(f.summary).replace(/`/g, '');
-  if (Array.isArray(f.clauses)) {
-    for (const c of f.clauses) {
-      if (c.english) c.english = String(c.english).replace(/`/g, '');
+// Helper to strip raw image filenames, Markdown syntax, LaTeX math, Attack IDs, and IVTFF codes from prose/titles
+function cleanStructuredText(raw) {
+  if (!raw) return '';
+  let s = String(raw);
+  // 0. Strip Markdown bold/italic/backticks first (preserving literal (*) as (★)) so subsequent regexes match cleanly
+  s = s
+    .replace(/\(\s*`?\*`?\s*\)/g, '(★)')
+    .replace(/\*+/g, '')
+    .replace(/`/g, '');
+  // 1. Specific inline filename phrases
+  s = s.replace(/\bon\s+(?:\.\.\/)?pages\/(f\d+[rv]\d*)_[a-z0-9_]+\.png/gi, 'on Folio $1');
+  s = s.replace(
+    /Paired with\s+(?:\.\.\/)?pages\/p213_[a-z0-9_]+\.png\s*\(p213\)/gi,
+    'Paired with the physical spine scan (p. 213)',
+  );
+  // 2. Strip pages/*.png inside comma-separated parentheticals
+  s = s.replace(/\(\s*(?:\.\.\/)?pages\/[a-z0-9_.-]+\.(?:png|jpg|webp)\s*,\s*/gi, '(');
+  s = s.replace(/,\s*(?:\.\.\/)?pages\/[a-z0-9_.-]+\.(?:png|jpg|webp)\s*\)/gi, ')');
+  // 3. Strip standalone (pages/*.png)
+  s = s.replace(/\s*\(\s*(?:\.\.\/)?pages\/[a-z0-9_.-]+\.(?:png|jpg|webp)\s*\)/gi, '');
+  // 4. Fallback for any remaining pages/*.png
+  s = s.replace(/(?:\.\.\/)?pages\/([a-z0-9_]+)\.(?:png|jpg|webp)/gi, (_m, base) =>
+    base.split('_')[0],
+  );
+  // 5. Strip raw IVTFF locus tags (including ranges like <f70r2.1,@P0>–<f70r2.16,+P0>)
+  s = s.replace(
+    /<f\d+[rv]\d*\.[^>]+>(?:\s*[-–—]\s*<f\d+[rv]\d*\.[^>]+>)?\s*/g,
+    '',
+  );
+  // 6. Clean IVTFF symbols & locus type codes
+  s = s.replace(/\s*\(<%>\.\.\.<\$>\)/g, '');
+  s = s.replace(/\s*\(<%>\)/g, '');
+  s = s.replace(/\s*\(<\$>\)/g, '');
+  s = s.replace(/<%>\s*/g, '');
+  s = s.replace(/\s*at\s+<\$>\s+half-line/g, ' at half-line');
+  s = s.replace(/<\$>\s*/g, '');
+  s = s.replace(/\+P[0r]\s*/g, '');
+  s = s.replace(/@Cc\s+concentric\s+ring/gi, 'concentric ring');
+  s = s.replace(/@Cc\s+ring/gi, 'circular ring');
+  s = s.replace(/@Lz\s+degree/gi, 'labeled degree');
+  s = s.replace(/@Lz\s+nymphs/gi, 'degree-labeled nymphs');
+  s = s.replace(/@Lz\s+labels/gi, 'degree labels');
+  s = s.replace(/@Lz/g, 'degree-label');
+  s = s.replace(/@Cc/g, 'circular-ring');
+  s = s.replace(/@L[tznfp](?:\/@L[tznfp])?\s*:\s*/g, '');
+  s = s.replace(/@L[tznfp](?:\/@L[tznfp])?\s*/g, '');
+  // 7. Clean internal state machine / stem identifiers
+  s = s.replace(/\(s_[a-z0-9_/\s]+\s+([^)]+)\)/g, '($1)');
+  s = s.replace(/\(S\d+_[A-Z0-9_+\s]+\s+([^)]+)\)/g, '($1)');
+  s = s.replace(/S\d+_[A-Z0-9_]+\s*/g, '');
+  // 8. Clean $I=, $Q=, $L=, $H= metadata tags
+  s = s.replace(/\$[IQLH]=[A-Z0-9]+\s*,?\s*/g, '');
+  s = s.replace(/\[(Quire \d+)\]/g, '$1');
+  // 9. Clean internal "Attack N / Discovery N" experiment numbers
+  s = s.replace(
+    /In Attacks?\s*\d+(?:\s*(?:&|and|–|-)\s*\d+)?(?:\s*\(Discovery\s*\d+\))?,\s*we\s+(?:proved|found)\s+that\s+/gi,
+    'Across the corpus, ',
+  );
+  s = s.replace(
+    /In Attacks?\s*\d+(?:\s*(?:&|and|–|-)\s*\d+)?(?:\s*\(Discovery\s*\d+\))?,\s*we\s+/gi,
+    'We ',
+  );
+  s = s.replace(
+    /In Attacks?\s*\d+(?:\s*(?:&|and|–|-)\s*\d+)?(?:\s*\(Discovery\s*\d+\))?,\s*/gi,
+    '',
+  );
+  s = s.replace(
+    /\s*\(\s*Attacks?\s*\d+(?:\s*(?:&|and|–|-)\s*\d+)?(?:\s*\(Discovery\s*\d+\))?\s*\)/gi,
+    '',
+  );
+  s = s.replace(
+    /\(\s*Attacks?\s*\d+(?:\s*(?:&|and|–|-)\s*\d+)?(?:\s*\(Discovery\s*\d+\))?\s*,\s*([^)]+)\)/gi,
+    '($1)',
+  );
+  s = s.replace(
+    /,\s*Attacks?\s*\d+(?:\s*(?:&|and|–|-)\s*\d+)?(?:\s*\(Discovery\s*\d+\))?\s*\)/gi,
+    ')',
+  );
+  s = s.replace(
+    /\bAttacks?\s*\d+(?:\s*(?:&|and|–|-)\s*\d+)?(?:\s*\(Discovery\s*\d+\))?\s*,?\s*/gi,
+    '',
+  );
+  s = s.replace(/\s*\(\s*Discovery\s*\d+\s*\)/gi, '');
+  // 10. Clean IVTFF drawing-intrusion `<->` markers before general arrow replacement
+  s = s.replace(/<->\s+drawing/gi, 'drawing');
+  s = s.replace(/Leaf\s*<->\s*Intrusion/gi, 'Leaf Intrusion');
+  s = s.replace(/Leaf-Tip\s+<->\s+Split/gi, 'Leaf-Tip Line Split');
+  s = s.replace(/\s*\(\s*<->\s*\)/g, '');
+  // 11. Clean LaTeX math and arrows
+  s = s
+    .replace(/\\chi\^2/g, 'χ²')
+    .replace(/\\to/g, '→')
+    .replace(/\\times/g, '×')
+    .replace(/\\le/g, '≤')
+    .replace(/\\ge/g, '≥');
+  s = s.replace(/\$([^$]+)\$/g, '$1').replace(/\$(?=[a-zA-Z])/g, '');
+  s = s
+    .replace(/<->/g, '↔')
+    .replace(/\s+->\s+/g, ' → ')
+    .replace(/<=\s*/g, '≤ ')
+    .replace(/>=\s*/g, '≥ ');
+  // 12. Normalize (p180) -> (p. 180), strip dangling punctuation in parens, and fix spacing before punctuation
+  s = s.replace(/\(p(\d+)\)/g, '(p. $1)');
+  s = s
+    .replace(/\(\s*[-–—,]+\s*/g, '(')
+    .replace(/\s*,\s*\)/g, ')')
+    .replace(/\(\s*\)/g, '')
+    .replace(/\s+([,.;:!?])/g, '$1');
+  s = s.replace(/\s{2,}/g, ' ').trim();
+  return s;
+}
+
+function cleanSpecimenFolio(rawFolio) {
+  let s = cleanStructuredText(rawFolio);
+  s = s.replace(/\[[^\]]+\]/g, '');
+  s = s.replace(/\s*\(p\.?\s*\d+[^)]*\)/gi, '');
+  return s.trim();
+}
+
+function cleanSpecimenTitle(rawTitle) {
+  let s = cleanStructuredText(rawTitle);
+  // Strip redundant leading "The f84r ..." or "The f69v | f70r1 | f70r2 ..."
+  s = s.replace(/^The\s+Unfolded\s+f\d+[rv\d–\-|, &]+\s+/i, 'Unfolded ');
+  s = s.replace(/^The\s+f\d+[rv\d–\-|, &]+:\s*/i, '');
+  s = s.replace(/^The\s+f\d+[rv\d–\-|, &]+\s+/i, '');
+  s = s.replace(/^f\d+[rv\d–\-|, &]+\s+Unfolded\s+/i, 'Unfolded ');
+  // Strip redundant trailing folio repeat like "(f79r)" or stat notes in headings
+  s = s.replace(/\s*\(f\d+[rv]\d*\)$/i, '');
+  s = s.replace(
+    /\s*\((?:[\d.]+×\s+Surge|[\d.]+%\s+[^)]*|Polarity\s+z\s*=[^)]*|Frame\s+z\s*=[^)]*|18 Red\/White[^)]*)\)$/i,
+    '',
+  );
+  // Trim overly long second clauses after "&" if title exceeds 88 chars
+  if (s.length > 88 && s.includes(' & ')) {
+    const firstPart = s.split(' & ')[0].trim();
+    if (firstPart.length >= 28) {
+      s = firstPart;
     }
   }
-}
-for (const s of explorerData.specimens) {
-  const img = s.image_rel_notes || s.image || '';
-  s.imageUrl = img ? '/pages/' + path.basename(img) : '';
-  if (s.plain_english_dossier) {
-    s.plain_english_dossier = String(s.plain_english_dossier).replace(/`/g, '');
-  }
+  return s.trim();
 }
 
-// 3. Scan all git-tracked images in pages/
+function cleanSpecimenCategory(rawCategory) {
+  let s = cleanStructuredText(rawCategory);
+  s = s.replace(/^The\s+f\d+[rv\d–\-|, &]+\s+/i, '');
+  if (s.length > 56) {
+    // Strip parentheticals on overly long category strings
+    s = s.replace(/\s*\([^)]*\)/g, '').trim();
+  }
+  if (s.length > 56 && s.includes(' & ')) {
+    s = s.split(' & ')[0].trim();
+  }
+  if (s.length > 56 && s.includes(',')) {
+    s = s.split(',')[0].trim();
+  }
+  return s.trim();
+}
+
+function cleanSpecimenLatin(rawLatin) {
+  let s = cleanStructuredText(rawLatin);
+  // Strip leading folio prefixes like "f90r1: " or "Left (f95r2a): "
+  s = s.replace(/^(?:Left|Center|Right)?\s*\(?f\d+[rv]\d*[ab]?\)?:\s*/i, '');
+  // If there is a long parenthetical (> 28 chars) that merely restates the English description, strip it
+  s = s.replace(/\s*\(([^)]{28,})\)/g, '');
+  if (s.length > 75 && s.includes(';')) {
+    s = s.split(';')[0].trim();
+  }
+  if (s.length > 75 && s.includes(' + ')) {
+    s = s.split(' + ')[0].trim();
+  }
+  return s.trim();
+}
+
+// 2. Scan all git-tracked images in pages/ and read their intrinsic dimensions
 const pagesDir = path.join(VOYNICH_REPO, 'pages');
 const trackedPages = new Set(
   execSync(`git -C "${VOYNICH_REPO}" ls-files pages/`, { encoding: 'utf-8' })
@@ -110,14 +275,20 @@ const pageFiles = fs
   .filter((f) => /\.(png|jpg|jpeg|webp)$/i.test(f) && trackedPages.has(f))
   .sort();
 
+const dimensionsByFile = new Map();
 const pagesCatalog = pageFiles.map((file) => {
-  const stat = fs.statSync(path.join(pagesDir, file));
+  const fullPath = path.join(pagesDir, file);
+  const stat = fs.statSync(fullPath);
+  const dims = getPngDimensions(fullPath);
+  dimensionsByFile.set(file, dims);
   const folioMatch = file.match(/^(f\d+[rv]\d*)/i);
   return {
     file,
     url: `/pages/${file}`,
     folio: folioMatch ? folioMatch[1].toLowerCase() : 'general',
     sizeKB: Math.round((stat.size / 1024) * 10) / 10,
+    width: dims.width,
+    height: dims.height,
     isEnhanced: file.includes('_enh'),
   };
 });
@@ -128,6 +299,81 @@ for (const item of pagesCatalog) {
   const list = scansByFolio.get(item.folio) ?? [];
   list.push(item.file);
   scansByFolio.set(item.folio, list);
+}
+
+// 3. Extract embedded DATA JSON from explorer/index.html
+const explorerHtml = fs.readFileSync(path.join(VOYNICH_REPO, 'explorer', 'index.html'), 'utf-8');
+const dataMatch = explorerHtml.match(/const DATA = (\{[\s\S]*?\});\s*\n\s*const PREFIX_RULES/);
+if (!dataMatch) {
+  throw new Error('Could not extract const DATA from explorer/index.html');
+}
+const explorerData = JSON.parse(cleanDashes(dataMatch[1]));
+
+// Normalize image paths, attach dimensions, and clean text fields in explorerData.folios and explorerData.specimens
+for (const f of explorerData.folios) {
+  if (f.image) {
+    const base = path.basename(f.image);
+    f.image = '/pages/' + base;
+    const dims = dimensionsByFile.get(base) || { width: 1500, height: 2000 };
+    f.imageWidth = dims.width;
+    f.imageHeight = dims.height;
+  }
+  if (f.secondary_image) {
+    const base = path.basename(f.secondary_image);
+    f.secondary_image = '/pages/' + base;
+    const dims = dimensionsByFile.get(base) || { width: 1500, height: 2000 };
+    f.secondaryImageWidth = dims.width;
+    f.secondaryImageHeight = dims.height;
+  }
+  if (f.title) f.title = cleanStructuredText(f.title);
+  if (f.section) f.section = cleanStructuredText(f.section);
+  if (f.summary) f.summary = cleanStructuredText(f.summary);
+  if (Array.isArray(f.clauses)) {
+    for (const c of f.clauses) {
+      if (c.english) c.english = cleanStructuredText(c.english);
+    }
+  }
+}
+for (const s of explorerData.specimens) {
+  const img = s.image_rel_notes || s.image || '';
+  const base = img ? path.basename(img) : '';
+  s.imageUrl = base ? '/pages/' + base : '';
+  const dims = dimensionsByFile.get(base) || { width: 1500, height: 2000 };
+  s.imageWidth = dims.width;
+  s.imageHeight = dims.height;
+  delete s.image_rel_notes;
+  delete s.image_rel_root;
+
+  if (s.folio) s.folio = cleanSpecimenFolio(s.folio);
+  if (s.section) s.section = cleanStructuredText(s.section);
+  if (s.category) s.category = cleanSpecimenCategory(s.category);
+  if (s.common_name) s.common_name = cleanSpecimenTitle(s.common_name);
+  if (s.plain_english_dossier) s.plain_english_dossier = cleanStructuredText(s.plain_english_dossier);
+  if (s.confidence_tier) s.confidence_tier = cleanStructuredText(s.confidence_tier);
+  if (Array.isArray(s.latin_candidates)) {
+    s.latin_candidates = s.latin_candidates.map(cleanSpecimenLatin).filter(Boolean);
+  }
+  if (Array.isArray(s.medieval_herbal_parallels)) {
+    s.medieval_herbal_parallels = s.medieval_herbal_parallels.map(cleanStructuredText).filter(Boolean);
+  }
+  if (Array.isArray(s.visual_diagnostics)) {
+    s.visual_diagnostics = s.visual_diagnostics.map(cleanStructuredText).filter(Boolean);
+  }
+  if (s.voynich_stems) {
+    if (s.voynich_stems.opening_word) {
+      s.voynich_stems.opening_word = cleanStructuredText(s.voynich_stems.opening_word);
+    }
+    if (Array.isArray(s.voynich_stems.dominant_roots)) {
+      s.voynich_stems.dominant_roots = s.voynich_stems.dominant_roots
+        .map(cleanStructuredText)
+        .filter(Boolean);
+    }
+    if (Array.isArray(s.voynich_stems.cross_section_echoes)) {
+      s.voynich_stems.cross_section_echoes = s.voynich_stems.cross_section_echoes
+        .map(cleanStructuredText)
+        .filter(Boolean);
+    }
+  }
 }
 
 // 4. Parse ZL3b-n.txt to extract clean EVA lines per folio & global word frequencies
@@ -364,10 +610,16 @@ const rawDocs = [
   },
 ];
 
+const trackedNotes = new Set(
+  execSync(`git -C "${VOYNICH_REPO}" ls-files notes/`, { encoding: 'utf-8' })
+    .split(/\r?\n/)
+    .map((p) => path.basename(p.trim()))
+    .filter(Boolean),
+);
 const seenPaths = new Set(rawDocs.map((d) => d.sourcePath));
 const notesFiles = fs
   .readdirSync(path.join(VOYNICH_REPO, 'notes'))
-  .filter((f) => f.endsWith('.md'))
+  .filter((f) => f.endsWith('.md') && trackedNotes.has(f))
   .sort();
 
 for (const nf of notesFiles) {
@@ -379,6 +631,12 @@ for (const nf of notesFiles) {
     sourcePath: rel,
     pinnedOrder: 99,
   });
+}
+
+for (const existingDoc of fs.readdirSync(DOCS_DIR)) {
+  if (existingDoc.endsWith('.json')) {
+    fs.unlinkSync(path.join(DOCS_DIR, existingDoc));
+  }
 }
 
 const docsIndex = [];
