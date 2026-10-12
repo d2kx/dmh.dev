@@ -346,6 +346,7 @@
   border: 1px solid var(--border-subtle);
   border-radius: 1.15rem;
   padding: 2.25rem 1.75rem;
+  min-height: 40rem;
 }
 
 /* Split Master-Detail Layout */

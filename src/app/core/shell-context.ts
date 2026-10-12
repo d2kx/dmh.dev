@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import { DOCUMENT, Injectable, computed, inject, signal } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
@@ -26,9 +27,10 @@ export interface ProjectCatalogItem {
 @Injectable({ providedIn: 'root' })
 export class ShellContextService {
   private readonly router = inject(Router);
+  private readonly location = inject(Location);
   private readonly document = inject(DOCUMENT);
 
-  readonly currentPath = signal<string>('/');
+  readonly currentPath = signal<string>(this.location.path() || this.router.url || '/');
   readonly voynichVersion = VOYNICH_VERSION;
 
   readonly appMode = computed<ShellAppMode>(() => {
