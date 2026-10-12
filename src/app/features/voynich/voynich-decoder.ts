@@ -1,3 +1,5 @@
+import { Marked, Renderer, Tokens } from 'marked';
+
 export interface ParsedVoynichWord {
   readonly word: string;
   readonly prefix: string;
@@ -412,40 +414,69 @@ function splitMarkdownTableRow(trimmed: string): string[] {
   return cells;
 }
 
-function formatInlineMarkdown(line: string): string {
-  let out = line
+function cleanCodeSpanContent(rawCode: string): string {
+  let c = rawCode
     .replace(/<->/g, '↔')
-    .replace(/\s+->\s+/g, ' → ')
-    .replace(/\(`?s_[a-z0-9_/\s]+`?\s+([^)]+)\)/g, '($1)')
-    .replace(/`?s_[a-z0-9_]+(?:\s*\/\s*s_[a-z0-9_]+)*`?\s+/g, '');
+    .replace(/^<(f\d+[rv]\d*[^>]*)>$/i, '$1')
+    .replace(/^<%> PAR_OPEN$/i, 'Paragraph Start')
+    .replace(/^<\$> PAR_END$/i, 'Paragraph End')
+    .replace(/^\$I=([A-Z])$/, 'Section $1')
+    .replace(/^\$I=(.+)$/, '$1')
+    .replace(/^\$L=([AB])$/, 'Lang $1')
+    .replace(/^\$H=([0-9./-]+)$/, 'Hand $1')
+    .replace(/^\$Q=([A-Z0-9.-]+)$/, 'Quire $1')
+    .replace(/\b\$I=([A-Z])\b/g, 'Section $1')
+    .replace(/\b\$L=([AB])\b/g, 'Lang $1')
+    .replace(/\b\$H=([0-9./-]+)\b/g, 'Hand $1')
+    .replace(/\b\$Q=([A-Z0-9.-]+)\b/g, 'Quire $1');
 
-  out = out.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_m, alt: string, rawSrc: string) => {
-    const base = rawSrc.split('/').pop() || rawSrc;
-    const resolved = rawSrc.includes('pages/') ? `/pages/${base}` : rawSrc;
-    const displaySrc = resolved.startsWith('/pages/') ? `${resolved}?format=webp&w=960` : resolved;
-    return `<img src="${escapeHtml(displaySrc)}" alt="${escapeHtml(alt)}" width="640" height="850" loading="lazy" decoding="async" data-zoom="${escapeHtml(resolved)}" />`;
-  });
+  // Humanize structural POS tags in interlinear-glosses
+  c = c
+    .replace(/^\[BARE_NOMINAL\(oX\):([^\]]+)\]$/, '$1 (o- nominal)')
+    .replace(/^\[Q_NOMINAL\(q\+oX\):([^\]]+)\]$/, '$1 (qo- active)')
+    .replace(/^\[VERB\/STATE_MOD\(-dy\/-y\):([^\]]+)\]$/, '$1 (-dy/-y verb)')
+    .replace(/^\[GALLOWS_HEAD:([^\]]+)\]$/, '$1 (gallows opener)')
+    .replace(/^\[BENCH_STEM:([^\]]+)\]$/, '$1 (ch-/sh- stem)')
+    .replace(/^\[LINK\/PREP:([^\]]+)\]$/, '$1 (linker)')
+    .replace(/^\[DET\/CLOSER:([^\]]+)\]$/, '$1 (measure/closer)')
+    .replace(/^\[FRAME_MOD:([^\]]+)\]$/, '$1 (frame modifier)')
+    .replace(/^\[CLAUSE_CLOSER\(-m\):([^\]]+)\]$/, '$1 (-m closer)')
+    .replace(/^\[STEM:([^\]]+)\]$/, '$1 (stem)');
 
-  out = out.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_m, label: string, href: string) => {
-    if (href.endsWith('.md')) {
-      const base = href.split('/').pop() || '';
-      const slug = base.replace(/\.md$/i, '').toLowerCase().replace(/_/g, '-');
-      const mappedSlug = slug === 'notes' ? 'notes-master-research-log' : slug;
-      return `<a href="/voynich/library?doc=${escapeHtml(mappedSlug)}" data-doc-slug="${escapeHtml(mappedSlug)}">${label}</a>`;
-    }
-    if (href.includes('pages/')) {
-      const base = href.split('/').pop() || href;
-      const imgUrl = `/pages/${base}`;
-      return `<a href="${escapeHtml(imgUrl)}" data-zoom="${escapeHtml(imgUrl)}">${label}</a>`;
-    }
-    if (href.includes('data/')) {
-      const base = href.split('/').pop() || href;
-      return `<a href="/data/${escapeHtml(base)}" target="_blank" rel="noopener noreferrer">${label}</a>`;
-    }
-    return `<a href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer">${label}</a>`;
-  });
+  return c;
+}
 
-  out = out.replace(/\$([^$]+)\$/g, (_m, expr: string) => {
+function cleanOutsideCodeSegment(seg: string): string {
+  let s = seg
+    .replace(/<->/g, '↔')
+    .replace(/\s+->\s+/g, ' → ');
+
+  // Convert unbackticked <XREF DOMAIN [locus 'word', MS_cnt=N]> into clean inline code badges
+  s = s.replace(
+    /<XREF\s+([A-Z/]+)\s+\[([^\]]+)\]>/g,
+    (_m, domain: string, details: string) => {
+      const cleanDetails = details.replace(/,\s*MS_cnt=(\d+)/, ' ($1×)');
+      return `\`Cross-Ref ${domain}: ${cleanDetails}\``;
+    },
+  );
+
+  // Convert unbackticked IVTFF locus tags (<f102v1.2>, <f66r.16,@L>) and markers (<%>, <$>) into inline code
+  s = s
+    .replace(/<(f\d+[rv]\d*[^>\s]*)>/g, '`$1`')
+    .replace(/<fRos\.(\d+[^>\s]*)>/g, '`fRos.$1`')
+    .replace(/\(\s*<%>\s*\)/g, '')
+    .replace(/\(\s*<\$>\s*\)/g, '')
+    .replace(/<%>\s*/g, '')
+    .replace(/<\$>\s*/g, '');
+
+  // Escape any remaining non-HTML angle-bracket glosses (e.g. <SPRING-NOM[o-]+...>) into inline code so browsers don't swallow them
+  s = s.replace(
+    /<(?!(?:\/?(?:br|div|strong|em|code|span)\b))([A-Za-z0-9_%$!@-][^>\n]{1,90})>/g,
+    '`<$1>`',
+  );
+
+  // Format inline LaTeX math ($...$) ONLY outside backticks so $I= and $L= inside backticks never collide
+  s = s.replace(/\$([^$\n]+)\$/g, (_m, expr: string) => {
     const cleaned = expr
       .replace(/\\chi\^2/g, 'χ²')
       .replace(/\\times/g, '×')
@@ -454,156 +485,159 @@ function formatInlineMarkdown(line: string): string {
       .replace(/\\ge/g, '≥')
       .replace(/\\pm/g, '±')
       .replace(/\\to/g, '→')
+      .replace(/\\sum/g, '∑')
       .replace(/\\text\{([^}]*)\}/g, '$1')
       .replace(/\\mathtt\{([^}]*)\}/g, '$1')
       .trim();
-    return `<em>${escapeHtml(cleaned)}</em>`;
+    return `*${cleaned}*`;
   });
 
-  out = out.replace(/`([^`]+)`/g, (_m, codeText: string) => {
-    return `<code>${escapeHtml(codeText)}</code>`;
-  });
-
-  out = out.replace(/\*\*((?:(?!\*\*).)+)\*\*/g, '<strong>$1</strong>');
-  out = out.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-
-  return out;
+  return s;
 }
 
-export function renderMarkdownToHtml(md: string): string {
+function preprocessVoynichLine(rawLine: string): string {
+  const line = rawLine
+    // Omit unknown PDF p? placeholders in early folio headers
+    .replace(/,\s*PDF\s+`p\?`/gi, '')
+    // Strip redundant italicized rule-trace repeats in interlinear-glosses
+    .replace(
+      /\s*\*\[(?:TOP_LINE_GALLOWS|Q_PROCLITIC|INITIAL_Y_PROCLITIC|RIGHT_MARGIN_M_CLOSER)[^\]]*\]\*/g,
+      '',
+    )
+    // Strip internal s_tol/s_kol state-machine prefixes inside parentheticals
+    .replace(/\(`?s_[a-z0-9_/\s]+`?\s+([^)]+)\)/g, '($1)')
+    .replace(/`?s_[a-z0-9_]+(?:\s*\/\s*s_[a-z0-9_]+)*`?\s+/g, '');
+
+  // Split by inline code spans (`...`) so code spans and prose text are normalized independently
+  const parts = line.split(/(`[^`]+`)/g);
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i];
+    if (part.startsWith('`') && part.endsWith('`') && part.length >= 2) {
+      const inner = cleanCodeSpanContent(part.slice(1, -1));
+      parts[i] = `\`${inner}\``;
+    } else if (part) {
+      parts[i] = cleanOutsideCodeSegment(part);
+    }
+  }
+  return parts.join('');
+}
+
+function preprocessVoynichMarkdown(md: string): string {
   const lines = md.split(/\r?\n/);
-  const html: string[] = [];
+  const out: string[] = [];
   let inCodeBlock = false;
-  let codeBuffer: string[] = [];
-  let inTable = false;
-  let tableRows: string[][] = [];
-  let inList: 'ul' | 'ol' | null = null;
-
-  const flushTable = () => {
-    if (!inTable || tableRows.length === 0) return;
-    inTable = false;
-    const header = tableRows[0];
-    const colCount = header.length;
-    const body = tableRows.slice(1).filter((r) => !r.every((c) => /^[:\-\s]+$/.test(c)));
-    html.push('<div class="table-wrap"><table><thead><tr>');
-    for (const h of header) {
-      html.push(`<th>${formatInlineMarkdown(h.trim())}</th>`);
-    }
-    html.push('</tr></thead><tbody>');
-    for (const rawRow of body) {
-      const row =
-        rawRow.length > colCount
-          ? [...rawRow.slice(0, colCount - 1), rawRow.slice(colCount - 1).join(' · ')]
-          : rawRow;
-      html.push('<tr>');
-      for (let c = 0; c < colCount; c++) {
-        const cell = row[c] ?? '';
-        html.push(`<td>${formatInlineMarkdown(cell.trim())}</td>`);
-      }
-      html.push('</tr>');
-    }
-    html.push('</tbody></table></div>');
-    tableRows = [];
-  };
-
-  const flushList = () => {
-    if (!inList) return;
-    html.push(`</${inList}>`);
-    inList = null;
-  };
+  let tableHeaderCols = 0;
 
   for (const rawLine of lines) {
-    if (rawLine.trim().startsWith('```')) {
-      flushTable();
-      flushList();
-      if (!inCodeBlock) {
-        inCodeBlock = true;
-        codeBuffer = [];
-      } else {
-        inCodeBlock = false;
-        html.push(`<pre><code>${escapeHtml(codeBuffer.join('\n'))}</code></pre>`);
-      }
+    const trimmed = rawLine.trim();
+    if (trimmed.startsWith('```')) {
+      inCodeBlock = !inCodeBlock;
+      tableHeaderCols = 0;
+      out.push(rawLine);
       continue;
     }
 
     if (inCodeBlock) {
-      codeBuffer.push(rawLine);
+      out.push(rawLine);
       continue;
     }
 
-    const trimmed = rawLine.trim();
-
     if (trimmed.startsWith('$$') && trimmed.endsWith('$$')) {
-      flushTable();
-      flushList();
-      html.push(
-        `<div class="callout-box"><strong>Prefix</strong> (Action / Role) &nbsp;+&nbsp; <strong>Root Stem</strong> (Plant / Star / Vessel) &nbsp;+&nbsp; <strong>Suffix</strong> (Case / Dose)</div>`,
+      tableHeaderCols = 0;
+      out.push(
+        '<div class="callout-box"><strong>Prefix</strong> (Action / Role) &nbsp;+&nbsp; <strong>Root Stem</strong> (Plant / Star / Vessel) &nbsp;+&nbsp; <strong>Suffix</strong> (Case / Dose)</div>',
       );
       continue;
     }
 
     if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
-      flushList();
-      inTable = true;
-      const cells = splitMarkdownTableRow(trimmed);
-      tableRows.push(cells);
-      continue;
-    } else if (inTable) {
-      flushTable();
-    }
-
-    if (!trimmed) {
-      flushList();
-      continue;
-    }
-
-    if (/^---+$/.test(trimmed)) {
-      flushList();
-      continue;
-    }
-
-    const headingMatch = trimmed.match(/^(#{1,4})\s+(.+)$/);
-    if (headingMatch) {
-      flushList();
-      const rawLevel = headingMatch[1].length;
-      const level = rawLevel === 1 ? 1 : rawLevel === 2 ? 2 : 3;
-      html.push(`<h${level}>${formatInlineMarkdown(headingMatch[2])}</h${level}>`);
-      continue;
-    }
-
-    if (trimmed.startsWith('>')) {
-      flushList();
-      html.push(`<p>${formatInlineMarkdown(trimmed.replace(/^>\s*/, ''))}</p>`);
-      continue;
-    }
-
-    const ulMatch = trimmed.match(/^[-*]\s+(.+)$/);
-    if (ulMatch) {
-      if (inList !== 'ul') {
-        flushList();
-        inList = 'ul';
-        html.push('<ul>');
+      const rawCells = splitMarkdownTableRow(trimmed);
+      const isSeparator = rawCells.every((c) => /^[:\-\s]+$/.test(c));
+      if (!tableHeaderCols) {
+        tableHeaderCols = rawCells.length;
       }
-      html.push(`<li>${formatInlineMarkdown(ulMatch[1])}</li>`);
-      continue;
-    }
-
-    const olMatch = trimmed.match(/^\d+\.\s+(.+)$/);
-    if (olMatch) {
-      if (inList !== 'ol') {
-        flushList();
-        inList = 'ol';
-        html.push('<ol>');
+      if (isSeparator) {
+        const sepCells = Array.from(
+          { length: tableHeaderCols },
+          (_, idx) => rawCells[idx] || '---',
+        );
+        out.push(`| ${sepCells.join(' | ')} |`);
+        continue;
       }
-      html.push(`<li>${formatInlineMarkdown(olMatch[1])}</li>`);
+      const clampedCells =
+        rawCells.length > tableHeaderCols
+          ? [
+              ...rawCells.slice(0, tableHeaderCols - 1),
+              rawCells.slice(tableHeaderCols - 1).join(' · '),
+            ]
+          : Array.from({ length: tableHeaderCols }, (_, idx) => rawCells[idx] ?? '');
+
+      // Normalize each cell and escape any internal | as \| for GFM table compliance
+      const formattedCells = clampedCells.map((cell) =>
+        preprocessVoynichLine(cell).replace(/\\?\|/g, '\\|'),
+      );
+      out.push(`| ${formattedCells.join(' | ')} |`);
       continue;
+    } else {
+      tableHeaderCols = 0;
     }
 
-    flushList();
-    html.push(`<p>${formatInlineMarkdown(trimmed)}</p>`);
+    out.push(preprocessVoynichLine(rawLine));
   }
 
-  flushTable();
-  flushList();
-  return html.join('\n');
+  return out.join('\n');
 }
+
+const voynichRenderer = new Renderer();
+
+voynichRenderer.heading = function ({ tokens, depth }: Tokens.Heading): string {
+  const level = depth === 1 ? 1 : depth === 2 ? 2 : 3;
+  const inner = this.parser.parseInline(tokens);
+  return `<h${level}>${inner}</h${level}>\n`;
+};
+
+voynichRenderer.table = function (token: Tokens.Table): string {
+  const defaultTable = Renderer.prototype.table.call(this, token);
+  return `<div class="table-wrap">${defaultTable}</div>\n`;
+};
+
+voynichRenderer.image = function ({ href, text }: Tokens.Image): string {
+  const rawSrc = href || '';
+  const base = rawSrc.split('/').pop() || rawSrc;
+  const resolved = rawSrc.includes('pages/') ? `/pages/${base}` : rawSrc;
+  const displaySrc = resolved.startsWith('/pages/') ? `${resolved}?format=webp&w=960` : resolved;
+  return `<img src="${escapeHtml(displaySrc)}" alt="${escapeHtml(text || '')}" width="640" height="850" loading="lazy" decoding="async" data-zoom="${escapeHtml(resolved)}" />`;
+};
+
+voynichRenderer.link = function ({ href, tokens }: Tokens.Link): string {
+  const rawHref = href || '';
+  const label = this.parser.parseInline(tokens);
+  if (rawHref.endsWith('.md')) {
+    const base = rawHref.split('/').pop() || '';
+    const slug = base.replace(/\.md$/i, '').toLowerCase().replace(/_/g, '-');
+    const mappedSlug = slug === 'notes' ? 'notes-master-research-log' : slug;
+    return `<a href="/voynich/library?subtab=docs&amp;doc=${escapeHtml(mappedSlug)}" data-doc-slug="${escapeHtml(mappedSlug)}">${label}</a>`;
+  }
+  if (rawHref.includes('pages/')) {
+    const base = rawHref.split('/').pop() || rawHref;
+    const imgUrl = `/pages/${base}`;
+    return `<a href="${escapeHtml(imgUrl)}" data-zoom="${escapeHtml(imgUrl)}">${label}</a>`;
+  }
+  if (rawHref.includes('data/')) {
+    const base = rawHref.split('/').pop() || rawHref;
+    return `<a href="/data/${escapeHtml(base)}" target="_blank" rel="noopener noreferrer">${label}</a>`;
+  }
+  return `<a href="${escapeHtml(rawHref)}" target="_blank" rel="noopener noreferrer">${label}</a>`;
+};
+
+const voynichMarked = new Marked({
+  gfm: true,
+  breaks: false,
+  renderer: voynichRenderer,
+});
+
+export function renderMarkdownToHtml(md: string): string {
+  const preprocessed = preprocessVoynichMarkdown(md);
+  return voynichMarked.parse(preprocessed, { async: false }) as string;
+}
+

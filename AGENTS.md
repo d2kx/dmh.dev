@@ -131,7 +131,7 @@ dmh.dev/
 
 - **Framework & Official Libraries**:
   - Angular v22 (`@angular/core` ^22.2.0, `@angular/ssr` ^22.2.2, `angular-eslint` ^22.5.0, TypeScript ~6.0, Vitest ^5.0).
-  - UI & Helpers: `@angular/material` ^22.2.0 and `@angular/cdk` ^22.2.0 (`MediaMatcher`, `Platform`, `LiveAnnouncer`, `Clipboard`). Prefer official Angular Material components and CDK utilities before reaching for third-party UI libraries.
+  - UI & Helpers: `@angular/material` ^22.2.0 and `@angular/cdk` ^22.2.0 (`MediaMatcher`, `Platform`, `LiveAnnouncer`, `Clipboard`), plus `marked` ^18.1.1 for CommonMark + GFM Markdown rendering in Voynich Research Guides (`src/app/features/voynich/voynich-decoder.ts`). Prefer official Angular Material components and CDK utilities before reaching for third-party UI libraries.
 - **Design System, Theme, Brand Mark & Social Links**:
   - **Theme**: Clean neutral light/dark surfaces with playful **Sakura / Cherry-Blossom Pink** accents (`--accent-light: #b81d5c`, `--accent-dark: #ff8ab5`, soft sakura containers `#fde8f0` / `#3b1225`). All color pairings exceed WCAG AA (4.5:1) contrast requirements.
   - **Brand Logo & Route-Aware Favicons**: Custom 5-petal notched Sakura cherry blossom SVG mark paired with `dmh.dev` in `src/app/app.html`. `SeoService` dynamically switches `<link rel="icon">` between the main Sakura badge (`public/favicon.svg`, `public/favicon.ico`, `public/apple-touch-icon.png`), the Voynich Astrolabe & Rosette icon (`public/favicon-voynich.svg`, `public/favicon-voynich.ico`), and the Kaleidoscope Prism & Sakura icon (`public/favicon-kaleidoscope.svg`, `public/favicon-kaleidoscope.ico`).
