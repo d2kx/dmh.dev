@@ -2,7 +2,7 @@ import { Component, signal } from '@angular/core';
 import { SocialLinks } from '../../shared/social-links';
 
 interface ProjectCard {
-  readonly id: 'kaleidoscope' | 'dmh-dev';
+  readonly id: 'voynich' | 'kaleidoscope' | 'dmh-dev';
   readonly name: string;
   readonly url: string;
   readonly urlLabel: string;
@@ -58,10 +58,96 @@ interface ProjectCard {
               <div class="logo-wrapper" aria-hidden="true">
                 <div
                   class="logo-glow"
-                  [class.logo-glow-prism]="project.id === 'kaleidoscope'"
+                  [class.logo-glow-prism]="project.id === 'kaleidoscope' || project.id === 'voynich'"
                 ></div>
                 <div class="logo-box">
-                  @if (project.id === 'kaleidoscope') {
+                  @if (project.id === 'voynich') {
+                    <!-- Custom Voynich Illuminated Astrolabe & Botanical Rosette Logo -->
+                    <svg
+                      viewBox="0 0 64 64"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="project-svg"
+                    >
+                      <rect
+                        x="4"
+                        y="4"
+                        width="56"
+                        height="56"
+                        rx="16"
+                        fill="#140d1e"
+                        stroke="#f43f85"
+                        stroke-width="2.2"
+                      />
+                      <circle
+                        cx="32"
+                        cy="32"
+                        r="22"
+                        stroke="#f59e0b"
+                        stroke-width="1.5"
+                        stroke-opacity="0.78"
+                        stroke-dasharray="3 2.5"
+                      />
+                      <circle
+                        cx="32"
+                        cy="32"
+                        r="16.5"
+                        fill="#1e132d"
+                        stroke="#f43f85"
+                        stroke-width="1.2"
+                        stroke-opacity="0.65"
+                      />
+                      <line
+                        x1="32"
+                        y1="10"
+                        x2="32"
+                        y2="54"
+                        stroke="#f59e0b"
+                        stroke-width="1.1"
+                        stroke-opacity="0.45"
+                      />
+                      <line
+                        x1="10"
+                        y1="32"
+                        x2="54"
+                        y2="32"
+                        stroke="#f59e0b"
+                        stroke-width="1.1"
+                        stroke-opacity="0.45"
+                      />
+                      <g transform="translate(32 32)">
+                        <path
+                          d="M 0 -2 C -4 -7.5 -5.8 -13.5 -2.2 -16.2 L 0 -13.5 L 2.2 -16.2 C 5.8 -13.5 4 -7.5 0 -2 Z"
+                          fill="#f43f85"
+                        />
+                        <path
+                          d="M 0 -2 C -4 -7.5 -5.8 -13.5 -2.2 -16.2 L 0 -13.5 L 2.2 -16.2 C 5.8 -13.5 4 -7.5 0 -2 Z"
+                          fill="#fb7185"
+                          transform="rotate(72)"
+                        />
+                        <path
+                          d="M 0 -2 C -4 -7.5 -5.8 -13.5 -2.2 -16.2 L 0 -13.5 L 2.2 -16.2 C 5.8 -13.5 4 -7.5 0 -2 Z"
+                          fill="#f43f85"
+                          transform="rotate(144)"
+                        />
+                        <path
+                          d="M 0 -2 C -4 -7.5 -5.8 -13.5 -2.2 -16.2 L 0 -13.5 L 2.2 -16.2 C 5.8 -13.5 4 -7.5 0 -2 Z"
+                          fill="#fb7185"
+                          transform="rotate(216)"
+                        />
+                        <path
+                          d="M 0 -2 C -4 -7.5 -5.8 -13.5 -2.2 -16.2 L 0 -13.5 L 2.2 -16.2 C 5.8 -13.5 4 -7.5 0 -2 Z"
+                          fill="#f43f85"
+                          transform="rotate(288)"
+                        />
+                      </g>
+                      <circle cx="32" cy="32" r="3.6" fill="#fde68a" />
+                      <circle cx="19" cy="19" r="1.6" fill="#fde68a" />
+                      <circle cx="45" cy="19" r="1.6" fill="#fde68a" />
+                      <circle cx="19" cy="45" r="1.6" fill="#fde68a" />
+                      <circle cx="45" cy="45" r="1.6" fill="#fde68a" />
+                    </svg>
+                  } @else if (project.id === 'kaleidoscope') {
                     <!-- Custom Sakura Kaleidoscope Octagonal Prism Logo -->
                     <svg
                       viewBox="0 0 64 64"
@@ -437,6 +523,15 @@ interface ProjectCard {
 })
 export class Home {
   protected readonly projects = signal<readonly ProjectCard[]>([
+    {
+      id: 'voynich',
+      name: 'Voynich Manuscript Explorer',
+      url: 'https://voynich.dmh.dev',
+      urlLabel: 'voynich.dmh.dev',
+      description:
+        'Visual, linguistic, and computational research explorer for Beinecke MS 408 with a 3-step word analyzer, 16 page walkthroughs, 15 specimen cribs, and the full 227-folio corpus.',
+      tags: ['Research', 'Linguistics', 'Interactive Corpus'],
+    },
     {
       id: 'kaleidoscope',
       name: 'Kaleidoscope',

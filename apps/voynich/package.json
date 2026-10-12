@@ -1,0 +1,23 @@
+{
+  "name": "dmh-voynich",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Interactive Voynich Manuscript (Beinecke MS 408) Visual Reader, 227-Folio Corpus Explorer & Research Compendium for voynich.dmh.dev",
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "sync": "node scripts/sync-voynich.mjs",
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "start": "node server.mjs"
+  },
+  "dependencies": {
+    "@fontsource-variable/google-sans-flex": "^5.3.2"
+  },
+  "devDependencies": {
+    "typescript": "~6.0.2",
+    "vite": "^8.3.4"
+  }
+}

@@ -1,0 +1,14 @@
+# Voynich Manuscript Explorer | voynich.dmh.dev
+
+> Interactive visual, linguistic, and computational explorer for the Voynich Manuscript (Beinecke MS 408) by Dennis Martin Herbers.
+
+## Main Links
+
+- [Voynich Manuscript Explorer](https://voynich.dmh.dev/): Interactive 3-step word analyzer, 16 page walkthroughs, 15 specimen identifications, 227-folio corpus, and 42 research guides.
+- [Plain-English Visual Reader's Guide](https://voynich.dmh.dev/content/docs/plain-english-visual-readers-guide.json): Jargon-free walkthrough of the 3-step reading system and landmark manuscript pages.
+- [Visual Identifications Dossier](https://voynich.dmh.dev/content/docs/visual-botanical-and-astro-identifications.json): Matches 15 plant drawings, star clusters, Zodiac month wheels, and bath pipes to 15th-century European sources.
+- [Master Research Log (NOTES.md)](https://voynich.dmh.dev/content/docs/notes-master-research-log.json): Complete chronological log of Discoveries 1 to 173 and Attacks 1 to 156.
+- [Source Repository (voynich-research)](https://github.com/d2kx/voynich-research): Authoritative empirical and computational Voynich Manuscript research repository.
+- [dmh.dev Home](https://www.dmh.dev/): Main website, projects showcase, and blog of Dennis Martin Herbers.
+- [Impressum / Legal Notice](https://www.dmh.dev/impressum): Bilingual statutory legal notice pursuant to § 5 DDG.
+- [Datenschutzerklärung / Privacy Policy](https://www.dmh.dev/privacy): Bilingual GDPR privacy policy pursuant to Art. 13 DSGVO.

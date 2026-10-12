@@ -112,6 +112,7 @@ dmh.dev/
 ├── public/                     # Static public assets (favicon.svg, favicon.ico, og-image.png, robots.txt, llms.txt)
 ├── apps/                       # Directory for standalone mini-apps on subdomains (<app>.dmh.dev)
 │   ├── kaleidoscope/           # Interactive Sakura & Fractal WebGL Kaleidoscope (kaleidoscope.dmh.dev)
+│   ├── voynich/                # Voynich Manuscript Explorer & Corpus Hub (voynich.dmh.dev)
 │   └── README.md               # Guide for adding and deploying new mini-apps
 ├── angular.json                # Angular CLI build/serve/SSR/lint configuration & SSRF allowedHosts
 ├── eslint.config.js            # ESLint + angular-eslint (TS, inline templates, a11y rules)
@@ -188,7 +189,7 @@ All infrastructure is hosted on Railway using the `use-railway` skill / Railway 
   - **Region**: Europe (Netherlands / Amsterdam) (`europe-west4-drams3a`).
   - **Custom Domain**: `https://www.dmh.dev` (verified with SSL certificate on Railway, target port `8080`, `CNAME` `www` -> `sbnq1uoz.up.railway.app`).
   - **Railway Service Domain**: `https://web-production-e94e.up.railway.app` (target port `8080`).
-  - **DNS / Nameserver Constraint**: The domain `dmh.dev` is managed on GoDaddy's nameservers (cannot be moved to third-party nameservers). Because GoDaddy does not support `CNAME` flattening at the root (`@`), `www.dmh.dev` is the primary custom domain on Railway and `dmh.dev` uses GoDaddy Domain Forwarding (`301` redirect to `https://www.dmh.dev`). Mini-apps on subdomains (`kaleidoscope.dmh.dev`, `app2.dmh.dev`, etc.) use standard `CNAME` records in GoDaddy DNS directly.
+  - **DNS / Nameserver Constraint**: The domain `dmh.dev` is managed on GoDaddy's nameservers (cannot be moved to third-party nameservers). Because GoDaddy does not support `CNAME` flattening at the root (`@`), `www.dmh.dev` is the primary custom domain on Railway and `dmh.dev` uses GoDaddy Domain Forwarding (`301` redirect to `https://www.dmh.dev`). Mini-apps on subdomains (`kaleidoscope.dmh.dev`, `voynich.dmh.dev`, etc.) use standard `CNAME` records in GoDaddy DNS directly.
 
 ### Cost-Control & Performance Configuration on `web`
 To keep Railway costs as low as possible while supporting full SSR + Prerendering:
@@ -216,6 +217,14 @@ To keep Railway costs as low as possible while supporting full SSR + Prerenderin
    - **Railway Service Domain**: `https://kaleidoscope-production.up.railway.app`
    - **Tech Stack**: Vite 8 (`^8.3.4`) + TypeScript 6.0 + pure WebGL2/WebGL fullscreen GLSL shader engine (`src/kaleidoscope-gl.ts`), self-hosted `@fontsource-variable/google-sans-flex` (`^5.3.2`), and a zero-dependency Node HTTP server (`server.mjs`) with gzip and `/healthz`.
    - **Features**: Hands-free continuously evolving shader blending Sakura, Prism, Lotus, and Cyber aesthetics with smooth tear-free symmetry transitions (6–12 folds) and breathing bloom, plus a single unified top-left glassmorphic pill combining the brand logo, legal links, optional inline performance HUD (`FPS` + `ms` + live SVG sparkline), and Fullscreen button.
+2. **`voynich` (`apps/voynich/`)**:
+   - **Railway Service ID**: `f3ca2553-06b2-4f61-952b-5742d051b92c` (region `europe-west4-drams3a`, `sleepApplication: true`, Edge CDN enabled, `watchPatterns: ["apps/voynich/**"]`).
+   - **Custom Domain**: `https://voynich.dmh.dev` (target port `8080`, `CNAME` `voynich` -> `82xcd0ye.up.railway.app`, `TXT` `_railway-verify.voynich` -> `railway-verify=300ffc9c567639c6d3b131db85991b7d86fd25e7d70c315c7cbff3ec58f34d32`).
+   - **Railway Service Domain**: `https://voynich-production-eb51.up.railway.app`
+   - **Tech Stack**: Vite 8 (`^8.3.4`) + TypeScript 6.0 (`~6.0.2`), self-hosted `@fontsource-variable/google-sans-flex` (`^5.3.2`), and a zero-dependency Node HTTP server (`server.mjs`) with gzip, `/healthz`, `/api/version`, and GDPR-safe first-party server-to-server proxy + edge caching for `/pages/*.png` and `/data/*` pinned to the exact commit SHA of [`d2kx/voynich-research`](https://github.com/d2kx/voynich-research).
+   - **Updating / Syncing Research (`npm run sync`)**:
+     - Pinned to `d2kx/voynich-research` commit `5777b767d9ac0b2edd28ae8bb4af91f8a537d19e` (`5777b76`, `2026-10-12`, Wave 36) in `apps/voynich/src/voynich-version.json`.
+     - Whenever new commits land in `d2kx/voynich-research` (local clone at `C:\Users\denni\Documents\voynich`), run `npm run sync` inside `apps/voynich/` (`node scripts/sync-voynich.mjs`). It automatically reads the latest git commit SHA & date, compiles all 227 folios (38,949 words), 16 walkthroughs, 15 specimen identifications, lexicon, 8-case paradigm matrix, 12 Zodiac wheels, 20 Balneological pages, 42 Markdown guides (including `NOTES.md`), 197 scan entries, and 182 dataset metadata entries into `apps/voynich/public/content/` (~550 KB gzipped) while leaving the 508 MB `pages/` PNGs and 213 MB `books/` PDFs in `d2kx/voynich-research` ( eliminating any need for a paid Railway Bucket or git repo bloat).
 
 ### Adding Future Mini-Apps (`app2.dmh.dev`, etc.)
 - Place each standalone mini-app in `apps/<app-name>/`.
