@@ -28,14 +28,20 @@ export class VoynichService {
   private readonly docCache = new Map<string, CachedDocResult>();
   private readonly dataTextCache = new Map<string, string>();
 
+  private readonly cacheQuery = `?v=${VOYNICH_VERSION.shortSha}-2`;
+
   ensureInitialized(): Promise<void> {
     if (this.initPromise) {
       return this.initPromise;
     }
 
     this.initPromise = Promise.all([
-      firstValueFrom(this.http.get<ExplorerData>('/content/voynich/explorer-data.json')),
-      firstValueFrom(this.http.get<CatalogData>('/content/voynich/catalog.json')),
+      firstValueFrom(
+        this.http.get<ExplorerData>(`/content/voynich/explorer-data.json${this.cacheQuery}`),
+      ),
+      firstValueFrom(
+        this.http.get<CatalogData>(`/content/voynich/catalog.json${this.cacheQuery}`),
+      ),
     ])
       .then(([explorer, catalog]) => {
         this.explorerData.set(explorer);
@@ -55,7 +61,7 @@ export class VoynichService {
     }
     if (!this.corpusPromise) {
       this.corpusPromise = firstValueFrom(
-        this.http.get<CorpusData>('/content/voynich/folios-corpus.json'),
+        this.http.get<CorpusData>(`/content/voynich/folios-corpus.json${this.cacheQuery}`),
       ).then((data) => {
         this.corpusData.set(data);
         return data;
@@ -70,7 +76,9 @@ export class VoynichService {
       return cached;
     }
     const doc = await firstValueFrom(
-      this.http.get<DocFull>(`/content/voynich/docs/${encodeURIComponent(slug)}.json`),
+      this.http.get<DocFull>(
+        `/content/voynich/docs/${encodeURIComponent(slug)}.json${this.cacheQuery}`,
+      ),
     );
     const entry: CachedDocResult = {
       doc,

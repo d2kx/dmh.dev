@@ -154,9 +154,15 @@ app.get('/data/:filename', (req, res) => {
  */
 app.use(
   express.static(browserDistFolder, {
-    maxAge: '1y',
     index: false,
     redirect: false,
+    setHeaders: (res, filePath) => {
+      if (/[.-][0-9A-Za-z_-]{8}\.(js|css|woff2)$/i.test(path.basename(filePath))) {
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      } else {
+        res.setHeader('Cache-Control', 'public, max-age=300');
+      }
+    },
   }),
 );
 
