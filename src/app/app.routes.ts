@@ -15,6 +15,48 @@ export const routes: Routes = [
     loadComponent: () => import('./features/home/home').then((m) => m.Home),
   },
   {
+    path: 'voynich',
+    children: [
+      {
+        path: '',
+        title: 'Voynich Manuscript Explorer | dmh.dev',
+        data: {
+          seo: {
+            description:
+              'Interactive visual reader, 3-step morphological word decoder, 227-folio EVA corpus, and research archive for the Voynich Manuscript (Beinecke MS 408).',
+            ogType: 'website',
+          } satisfies RouteSeoData,
+        },
+        loadComponent: () => import('./features/voynich/voynich').then((m) => m.Voynich),
+      },
+      {
+        path: ':section',
+        title: 'Voynich Manuscript Explorer | dmh.dev',
+        data: {
+          seo: {
+            description:
+              'Explore annotated Voynich Manuscript walkthroughs, botanical and astronomical identifications, the 227-folio corpus, grammar paradigms, and research library.',
+            ogType: 'website',
+          } satisfies RouteSeoData,
+        },
+        loadComponent: () => import('./features/voynich/voynich').then((m) => m.Voynich),
+      },
+    ],
+  },
+  {
+    path: 'kaleidoscope',
+    title: 'Kaleidoscope | dmh.dev',
+    data: {
+      seo: {
+        description:
+          'Interactive WebGL shader kaleidoscope blending psychedelic fractal symmetry with sakura cherry blossom geometry and harmonic color palettes.',
+        ogType: 'website',
+      } satisfies RouteSeoData,
+    },
+    loadComponent: () =>
+      import('./features/kaleidoscope/kaleidoscope').then((m) => m.Kaleidoscope),
+  },
+  {
     path: 'blog',
     title: 'Blog | dmh.dev',
     data: {

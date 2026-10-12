@@ -74,46 +74,50 @@ This section provides complete operational context so any fresh coding agent ses
   - If any feature or integration could risk exposing sensitive data or credentials in the repository, **stop and warn the user immediately** before proceeding so they can decide whether to store it in Railway environment variables or make the repository private.
   - All runtime secrets, service-to-service connection strings, and personal legal address details must be configured as Railway Variables (e.g., `${{Postgres.DATABASE_URL}}`, `LEGAL_STREET`, `LEGAL_POSTAL_CITY`, `LEGAL_PHONE`).
 - **Visitor Content vs. Technical Documentation Rule**:
-  - Keep visitor-facing pages (`Home`, `Projects`, `Blog`, `About`) focused on content relevant to visitors. Do NOT clutter visitor-facing copy with internal infrastructure details (e.g., "Hybrid Prerender & SSR", "Hosted on Railway", or monorepo `/apps` subdomain architecture). Keep those technical details documented here in `AGENTS.md` and `README.md`.
+  - Keep visitor-facing pages (`Home`, `Blog`, `Voynich`, `Kaleidoscope`) focused on content relevant to visitors. Do NOT clutter visitor-facing copy with internal infrastructure details (e.g., "Hybrid Prerender & SSR" or "Hosted on Railway"). Keep those technical details documented here in `AGENTS.md` and `README.md`.
 - **Writing Style Rule (NO Em Dashes)**:
   - **NEVER use `—` (em dashes)** in any visitor-facing text, page titles, meta descriptions, blog posts, or UI copy. The user never uses em dashes in their own writing and considers them unnatural/fake-looking. Use standard commas, colons, periods, or middle dots (`·`) / pipes (`|`) instead.
 - **Legal Maintenance Rule (`Impressum` & `Datenschutzerklärung`)**:
   - Whenever you introduce any new functionality that affects legal disclosures or data privacy (such as analytics, cookies, new `localStorage` / `sessionStorage` keys, authentication, contact forms, database storage of user data, external embeds, or third-party APIs), you **MUST** proactively update `/impressum` (`src/app/features/impressum/impressum.ts`) and `/privacy` (`src/app/features/privacy/privacy.ts`) in both German (`de`) and English (`en`), and warn the user beforehand if a cookie/consent banner would become legally required under German DSGVO / TDDDG.
 - **Package & Tooling Version Currency Rule**:
   - When generating a project with an existing framework CLI (e.g., `@angular/cli`), it is fine to keep the package versions predefined by that framework's official scaffold.
-  - However, when creating standalone/vanilla apps (such as Vite mini-apps in `apps/`) or adding new packages manually, **always check and use current latest stable releases** (e.g., via `npm create vite@latest` or `npm view <pkg> version`) rather than writing older package versions from training weights.
+  - However, when adding new packages manually, **always check and use current latest stable releases** (e.g., via `npm view <pkg> version`) rather than writing older package versions from training weights.
 - **Proactive Guidance Rule**:
   - The user welcomes proactive feedback and recommendations. If a requested approach has architectural, security, legal, DNS, or cost downsides, point it out clearly and suggest a better alternative.
 
-## 2. Repository Layout (Monorepo)
+## 2. Repository Layout (Unified Angular 22 Application)
 
-Everything for `dmh.dev`—both the main personal website/blog and future standalone mini-apps—lives in this single repository:
+Everything for `dmh.dev`—both the main personal website/blog and custom interactive apps (`Voynich Manuscript Explorer`, `Kaleidoscope`, and future projects)—lives inside a single, unified Angular 22 SSR/Prerender application:
 
 ```text
 dmh.dev/
 ├── src/                        # Main dmh.dev Angular 22 application source
 │   ├── app/
-│   │   ├── core/               # Singleton services (theme.ts, legal-info.ts, seo.ts)
+│   │   ├── core/               # Singleton services (theme.ts, legal-info.ts, seo.ts, shell-context.ts)
 │   │   ├── shared/             # Reusable UI components (social-links.ts)
-│   │   ├── features/           # Lazy-loaded route feature components (home, blog, impressum, privacy)
-│   │   ├── app.config.ts       # Client providers (Router + ViewTransitions, HttpClient + Fetch, Hydration + EventReplay)
+│   │   ├── features/           # Lazy-loaded route feature components
+│   │   │   ├── home/           # Home page + Projects showcase grid
+│   │   │   ├── blog/           # Blog index
+│   │   │   ├── voynich/        # Voynich Manuscript Explorer (/voynich & /voynich/:section)
+│   │   │   ├── kaleidoscope/   # Full-bleed WebGL Sakura & Fractal Kaleidoscope (/kaleidoscope)
+│   │   │   ├── impressum/      # Bilingual Impressum / Legal Notice
+│   │   │   └── privacy/        # Bilingual Datenschutzerklärung / Privacy Policy
+│   │   ├── app.config.ts       # Client providers (Router + ViewTransitions + AnchorScrolling, HttpClient + Fetch, Hydration)
 │   │   ├── app.config.server.ts# Server providers (provideServerRendering with serverRoutes)
 │   │   ├── app.routes.ts       # Client route definitions & route SEO/Open Graph metadata
 │   │   ├── app.routes.server.ts# Hybrid rendering config (RenderMode.Prerender + RenderMode.Server)
-│   │   ├── app.ts              # Root shell component (Material Toolbar, Sakura logo, nav, theme toggle, legal footer)
+│   │   ├── app.ts              # Root shell component (Context-aware Material Toolbar, Projects flyout, theme toggle, footer)
 │   │   ├── app.html            # Accessible site shell template
-│   │   └── app.css             # Shell layout styles
-│   ├── server.ts               # Express 5 + AngularNodeAppEngine SSR server, /healthz & /api/legal-info endpoints
+│   │   └── app.css             # Shell & Projects flyout layout styles
+│   ├── server.ts               # Express 5 + AngularNodeAppEngine SSR server (/healthz, /api/legal-info, /pages/*, /data/*)
 │   ├── main.ts                 # Browser bootstrap
 │   ├── main.server.ts          # Server bootstrap
 │   ├── theme.scss              # Angular Material 3 mat.theme() config (rose/sakura + Google Sans Flex Variable)
-│   ├── styles.css              # Global CSS (Sakura light-dark() tokens, color-scheme overrides, focus styles)
+│   ├── styles.css              # Global CSS (Sakura light-dark() tokens, 66ch .markdown-body typography, focus styles)
 │   └── index.html              # Root HTML document (color-scheme meta, FOUC script, default Open Graph tags)
-├── public/                     # Static public assets (favicon.svg, favicon.ico, og-image.png, robots.txt, llms.txt)
-├── apps/                       # Directory for standalone mini-apps on subdomains (<app>.dmh.dev)
-│   ├── kaleidoscope/           # Interactive Sakura & Fractal WebGL Kaleidoscope (kaleidoscope.dmh.dev)
-│   ├── voynich/                # Voynich Manuscript Explorer & Corpus Hub (voynich.dmh.dev)
-│   └── README.md               # Guide for adding and deploying new mini-apps
+├── public/                     # Static public assets (favicon.svg, og-image.png, robots.txt, llms.txt, content/voynich/*)
+├── scripts/
+│   └── sync-voynich.mjs        # Syncs Voynich corpus, guides, and commit metadata from ../voynich
 ├── angular.json                # Angular CLI build/serve/SSR/lint configuration & SSRF allowedHosts
 ├── eslint.config.js            # ESLint + angular-eslint (TS, inline templates, a11y rules)
 ├── package.json                # Root scripts & dependencies
@@ -121,9 +125,9 @@ dmh.dev/
 └── .gemini/GEMINI.md           # Synchronized copy of AGENTS.md for Gemini tooling
 ```
 
-> **Note**: Whenever you update `AGENTS.md` with new architectural decisions, services, or mini-apps, keep `.gemini/GEMINI.md` synchronized as well.
+> **Note**: Whenever you update `AGENTS.md` with new architectural decisions, services, or project routes, keep `.gemini/GEMINI.md` synchronized as well.
 
-## 3. Main `dmh.dev` Application Details
+## 3. Main `dmh.dev` Application & Context-Aware Shell Details
 
 - **Framework & Official Libraries**:
   - Angular v22 (`@angular/core` ^22.2.0, `@angular/ssr` ^22.2.2, `angular-eslint` ^22.5.0, TypeScript ~6.0, Vitest ^5.0).
@@ -131,7 +135,11 @@ dmh.dev/
 - **Design System, Theme, Brand Mark & Social Links**:
   - **Theme**: Clean neutral light/dark surfaces with playful **Sakura / Cherry-Blossom Pink** accents (`--accent-light: #b81d5c`, `--accent-dark: #ff8ab5`, soft sakura containers `#fde8f0` / `#3b1225`). All color pairings exceed WCAG AA (4.5:1) contrast requirements.
   - **Brand Logo & Favicon**: Custom 5-petal notched Sakura cherry blossom SVG mark paired with `dmh.dev` in `src/app/app.html` and adaptive SVG favicon in `public/favicon.svg`.
-  - **Navigation & Consolidated Home Page (`src/app/features/home/home.ts`)**: Primary navigation has two items (`Home` and `Blog`). `Home` combines the personal intro/bio, social links, and the `t3.gg/sponsors`-inspired **Projects** grid (full-card clickable project cards featuring each project's custom SVG logo with ambient radial glow, project title, domain badge, concise description, and category pills). Once real blog posts are published in the future, `Home` should also include a preview section showing the latest 3 blog posts (headline + short summary).
+  - **Context-Aware Header (`ShellContextService` in `src/app/core/shell-context.ts`)**:
+    - **Main `dmh.dev` Mode (`/`, `/blog`, `/impressum`, `/privacy`)**: Displays the Sakura brand mark on the left and `Home`, `Projects ▾` (a Prisma-inspired hover/click flyout card listing each interactive project with its custom SVG icon, title, subtitle, and `Explore all projects →` anchor link), and `Blog` on the right.
+    - **Voynich Mode (`/voynich`, `/voynich/:section`)**: Switches the top toolbar to show a `← dmh.dev` back pill, the Voynich Astrolabe & Rosette icon + `voynich.dmh.dev`, the pinned `voynich-research` commit badge (`75c1c09 · 2026-10-12`), and the 6 Voynich sub-navigation links (`Overview`, `Walkthroughs`, `Identifications`, `Folios`, `Grammar`, `Library`).
+    - **Kaleidoscope Mode (`/kaleidoscope`)**: Switches the shell into full-bleed viewport mode (`isFullBleed() === true`) with a translucent glassmorphic floating toolbar that gently dims on idle and exposes the `← dmh.dev` back pill, `kaleidoscope.dmh.dev` brand, optional live `FPS / ms` + SVG sparkline readout, `Stats` toggle, and `Fullscreen` button.
+  - **Consolidated Home Page (`src/app/features/home/home.ts`)**: Combines the personal intro/bio, `<app-social-links />`, and the `t3.gg/sponsors`-inspired **Projects** grid (`#projects`). Once real blog posts are published in the future, `Home` should also include a preview section showing the latest 3 blog posts (headline + short summary).
   - **Social & Contact Links (`src/app/shared/social-links.ts`)**: Reusable `<app-social-links />` component displayed on `Home` with official inline SVG icons and light/dark brand color schemes for:
     - GitHub: `https://github.com/d2kx`
     - LinkedIn: `https://www.linkedin.com/in/dennis-martin-herbers-085058156`
@@ -146,39 +154,44 @@ dmh.dev/
   - Routes `/impressum` (`src/app/features/impressum/impressum.ts`) and `/privacy` (`src/app/features/privacy/privacy.ts`) are linked in the global footer (1 click from every page) and offer an instant **Deutsch (`de`) | English (`en`)** switcher via `LegalInfoService` (`src/app/core/legal-info.ts`).
   - `/impressum` covers **§ 5 DDG** (Digitale-Dienste-Gesetz) and **§ 18 Abs. 2 MStV** (Medienstaatsvertrag). In English mode it uses the clean heading `Legal Notice`.
   - `/privacy` covers **Art. 13 DSGVO (GDPR)** and **§ 25 Abs. 2 Nr. 2 TDDDG** (Railway server access logs, HTTPS, locally hosted `Google Sans Flex`, `localStorage` theme preference, email contact, and data subject rights).
-  - **Runtime Contact Details (`/api/legal-info`)**: To avoid committing a private residential street address or phone number to the public GitHub repository, `src/server.ts` serves `/api/legal-info` from Railway environment variables (already configured in Railway `production` on service `web`):
-    - `LEGAL_NAME` (defaults to `Dennis Martin Herbers`)
-    - `LEGAL_STREET` (configured in Railway Variables)
-    - `LEGAL_POSTAL_CITY` (configured in Railway Variables)
-    - `LEGAL_COUNTRY_DE` (defaults to `Deutschland`)
-    - `LEGAL_COUNTRY_EN` (defaults to `Germany`)
-    - `LEGAL_EMAIL` (defaults to `dennis@dmh.dev`)
-    - `LEGAL_PHONE` (optional phone number)
+  - **Runtime Contact Details (`/api/legal-info`)**: `src/server.ts` serves `/api/legal-info` from Railway environment variables (`LEGAL_NAME`, `LEGAL_STREET`, `LEGAL_POSTAL_CITY`, `LEGAL_COUNTRY_DE`, `LEGAL_COUNTRY_EN`, `LEGAL_EMAIL`, `LEGAL_PHONE`).
 - **File Naming Style**: Angular `2025` ("Intent over Role") style guide — suffixless filenames (`home.ts`, `app.ts`) and class names (`Home`, `App`), with `.spec.ts` for unit tests and `.model.ts` for interfaces/models.
 - **Hybrid Rendering (Prerender + SSR)**:
   - Configured via `outputMode: "server"` in `angular.json` and `serverRoutes` in `src/app/app.routes.server.ts`.
-  - Static routes (`''`, `'blog'`, `'impressum'`, `'privacy'`) use `RenderMode.Prerender`: they are pre-rendered into static HTML at `ng build` time and served immediately by the server without per-request rendering overhead.
+  - Static routes (`''`, `'voynich'`, `'voynich/:section'`, `'kaleidoscope'`, `'blog'`, `'impressum'`, `'privacy'`) use `RenderMode.Prerender`: pre-rendered into static HTML at `ng build` time (11 static routes).
   - Dynamic / catch-all routes (`'**'`) use `RenderMode.Server`: rendered on demand by `AngularNodeAppEngine` in `src/server.ts`.
-  - Parameterized static routes (e.g., future `blog/:slug` posts) should use `RenderMode.Prerender` with `getPrerenderParams()` (and `fallback: PrerenderFallback.Server` if dynamic posts are added later).
 - **SSRF Host Protection (`allowedHosts`)**:
-  - Angular v22 enforces host header validation in `AngularNodeAppEngine` and returns `400 Bad Request` for unrecognized hostnames.
   - Authorized hosts are configured in `angular.json` under `projects.dmh-dev.architect.build.options.security.allowedHosts`:
     `["dmh.dev", "*.dmh.dev", "*.up.railway.app", "localhost"]`.
-  - Can also be overridden at runtime via the `NG_ALLOWED_HOSTS` environment variable.
 - **Code Quality, Linting (`angular-eslint`), & Lighthouse Audits**:
-  - Configured in `eslint.config.js` with `tseslint.configs.recommended`, `tseslint.configs.stylistic`, `angular.configs.tsRecommended`, `angular.configs.templateRecommended`, and `angular.configs.templateAccessibility`.
-  - Always run `npm run lint` (or `ng lint`) alongside `npm run build` and `npm test` after making code changes to ensure zero lint or accessibility rule violations.
-  - **Lighthouse Habit**: Whenever relevant content, UI, or routing changes take place on any web app in the repository, run a Lighthouse audit (e.g., via the `chrome-devtools` MCP `lighthouse_audit` tool or Lighthouse CLI) and act upon its findings before wrapping up. Keep `public/robots.txt` and `public/llms.txt` up to date so SEO and Agentic Browsing audits continue to score 100.
+  - Always run `npm run lint` alongside `npm run build` and `npm test` after making code changes.
+  - **Lighthouse Habit**: Whenever relevant content, UI, or routing changes take place, run a Lighthouse audit and act upon its findings before wrapping up. Keep `public/robots.txt` and `public/llms.txt` up to date so SEO and Agentic Browsing audits continue to score 100.
 - **Local Development & Scripts**:
   - `npm run dev` (or `ng serve`): Starts local dev server with HMR at `http://localhost:4200`.
+  - `npm run sync:voynich`: Syncs Voynich Manuscript data and markdown guides from `../voynich` into `public/content/voynich/` and `src/app/features/voynich/voynich-version.ts`.
   - `npm run build` (or `ng build`): Builds browser and server bundles + prerenders static routes into `dist/dmh-dev/`.
   - `npm start` (or `npm run serve:ssr:dmh-dev`): Runs the compiled production Express + Angular SSR server (`node dist/dmh-dev/server/server.mjs`) on `PORT` (defaults to `4000`).
   - `npm run lint` (or `ng lint`): Lints all TypeScript and HTML templates in `src/` via `angular-eslint`.
   - `npm test` (or `ng test --watch=false`): Runs unit tests via Vitest.
 
-## 4. Railway Infrastructure & Cost Optimization
+## 4. Integrated Interactive Projects (`src/app/features/`)
 
-All infrastructure is hosted on Railway using the `use-railway` skill / Railway CLI.
+All interactive projects are integrated directly into the main `dmh.dev` Angular 22 app as lazy-loaded feature routes:
+
+1. **Voynich Manuscript Explorer (`/voynich` & `/voynich/:section` in `src/app/features/voynich/`)**:
+   - **Routes**: `/voynich` (`Overview`), `/voynich/walkthroughs`, `/voynich/identifications`, `/voynich/folios`, `/voynich/grammar`, `/voynich/library`.
+   - **Design**: Features a monochrome 4-segment morphological word analyzer strip (`.morph-strip`), a 6-card `Explore the Research` hub grid, and `66ch` centered editorial typography (`.markdown-body`) for reading long-form guides.
+   - **Server Proxy (`src/server.ts`)**: Serves `/pages/:filename` (208 high-res PNG scans) and `/data/:filename` (190 JSON/TXT research datasets) via a GDPR-safe first-party server-to-server proxy + `/tmp/voynich-edge-cache` disk cache + immutable `Cache-Control` headers pinned to `VOYNICH_VERSION.commitSha`.
+   - **Updating / Syncing Research (`npm run sync:voynich`)**:
+     - Currently pinned to `d2kx/voynich-research` commit `75c1c09e1215a3d0f32f301b6a95b0db87a1a817` (`75c1c09`, `2026-10-12`, Wave 39) in `src/app/features/voynich/voynich-version.ts`.
+     - Whenever new commits land in `d2kx/voynich-research` (local clone at `C:\Users\denni\Documents\voynich`), run `npm run sync:voynich` (`node scripts/sync-voynich.mjs`).
+2. **Kaleidoscope (`/kaleidoscope` in `src/app/features/kaleidoscope/`)**:
+   - **Tech Stack**: Pure WebGL2/WebGL fullscreen GLSL shader engine (`kaleidoscope-gl.ts`) wrapped in a lazy-loaded standalone Angular 22 component (`kaleidoscope.ts`) with `afterNextRender` initialization and `DestroyRef` cleanup.
+   - **Features**: Continuously evolving shader blending Sakura, Prism, Lotus, and Cyber aesthetics with smooth tear-free symmetry transitions (6–12 folds), breathing bloom, and toolbar controls for live `FPS / ms` + SVG sparkline stats and Fullscreen mode.
+
+## 5. Railway Infrastructure & Cost Optimization
+
+All infrastructure runs on a single consolidated Railway service (`web`) using the `use-railway` skill / Railway CLI.
 
 ### Railway Resource IDs & Domains
 - **Workspace**: `Dennis Martin Herbers's Projects` (`7d85a0e4-7193-4b4c-857b-d779e3a36cd6`)
@@ -189,68 +202,19 @@ All infrastructure is hosted on Railway using the `use-railway` skill / Railway 
   - **Region**: Europe (Netherlands / Amsterdam) (`europe-west4-drams3a`).
   - **Custom Domain**: `https://www.dmh.dev` (verified with SSL certificate on Railway, target port `8080`, `CNAME` `www` -> `sbnq1uoz.up.railway.app`).
   - **Railway Service Domain**: `https://web-production-e94e.up.railway.app` (target port `8080`).
-  - **DNS / Nameserver Constraint**: The domain `dmh.dev` is managed on GoDaddy's nameservers (cannot be moved to third-party nameservers). Because GoDaddy does not support `CNAME` flattening at the root (`@`), `www.dmh.dev` is the primary custom domain on Railway and `dmh.dev` uses GoDaddy Domain Forwarding (`301` redirect to `https://www.dmh.dev`). Mini-apps on subdomains (`kaleidoscope.dmh.dev`, `voynich.dmh.dev`, etc.) use standard `CNAME` records in GoDaddy DNS directly.
+  - **DNS / Nameserver Constraint**: The domain `dmh.dev` is managed on GoDaddy's nameservers. `www.dmh.dev` is the primary custom domain on Railway and `dmh.dev` uses GoDaddy Domain Forwarding (`301` redirect to `https://www.dmh.dev`).
 
 ### Cost-Control & Performance Configuration on `web`
-To keep Railway costs as low as possible while supporting full SSR + Prerendering:
-1. **Builder**: `RAILPACK` (automatically caches Node modules and build layers across deployments).
+1. **Builder**: `RAILPACK` (caches Node modules and build layers across deployments).
 2. **Build & Start Commands**:
    - `build.buildCommand`: `"npm run build"`
    - `deploy.startCommand`: `"node dist/dmh-dev/server/server.mjs"`
    - `deploy.healthcheckPath`: `"/healthz"`
 3. **Scoped Watch Patterns**:
    - `build.watchPatterns`: `["src/**", "public/**", "package.json", "package-lock.json", "angular.json", "tsconfig*.json"]`
-   - Prevents changes inside `apps/` or markdown docs (`AGENTS.md`, `README.md`) from triggering unnecessary paid rebuilds of the main `web` service.
 4. **Serverless / App Sleep (`deploy.sleepApplication: true`)**:
    - Automatically puts the container to sleep after ~5–10 minutes of inactivity so idle compute cost is $0, waking automatically on incoming requests.
 5. **Single EU Replica (`deploy.multiRegionConfig: { "europe-west4-drams3a": { "numReplicas": 1 } }`)**:
    - Runs a single lightweight instance in the EU (Netherlands) region for low latency in Germany/Europe and EU data residency.
 6. **Railway Edge CDN Caching (`railway cdn enable --service web`)**:
-   - Caches static assets (`maxAge: 1y`) and cacheable responses at the Railway CDN edge so cache hits don't even wake or hit the Node container.
-
-## 5. Current Apps & Services (`apps/`) & Adding Future Mini-Apps
-
-### Current Standalone Mini-Apps
-1. **`kaleidoscope` (`apps/kaleidoscope/`)**:
-   - **Railway Service ID**: `74f94487-13fd-461b-8b2c-24f9c5ec02c4` (region `europe-west4-drams3a`, `sleepApplication: true`, Edge CDN enabled).
-   - **Custom Domain**: `https://kaleidoscope.dmh.dev` (target port `8080`, `CNAME` `kaleidoscope` -> `oxvts028.up.railway.app`, `TXT` `_railway-verify.kaleidoscope` -> `railway-verify=b3d0173c8fab362faa67d7e4702bd979ff3235bac28889c510955107d68c613c`).
-   - **Railway Service Domain**: `https://kaleidoscope-production.up.railway.app`
-   - **Tech Stack**: Vite 8 (`^8.3.4`) + TypeScript 6.0 + pure WebGL2/WebGL fullscreen GLSL shader engine (`src/kaleidoscope-gl.ts`), self-hosted `@fontsource-variable/google-sans-flex` (`^5.3.2`), and a zero-dependency Node HTTP server (`server.mjs`) with gzip and `/healthz`.
-   - **Features**: Hands-free continuously evolving shader blending Sakura, Prism, Lotus, and Cyber aesthetics with smooth tear-free symmetry transitions (6–12 folds) and breathing bloom, plus a single unified top-left glassmorphic pill combining the brand logo, legal links, optional inline performance HUD (`FPS` + `ms` + live SVG sparkline), and Fullscreen button.
-2. **`voynich` (`apps/voynich/`)**:
-   - **Railway Service ID**: `f3ca2553-06b2-4f61-952b-5742d051b92c` (region `europe-west4-drams3a`, `sleepApplication: true`, Edge CDN enabled, `watchPatterns: ["apps/voynich/**"]`).
-   - **Custom Domain**: `https://voynich.dmh.dev` (target port `8080`, `CNAME` `voynich` -> `82xcd0ye.up.railway.app`, `TXT` `_railway-verify.voynich` -> `railway-verify=300ffc9c567639c6d3b131db85991b7d86fd25e7d70c315c7cbff3ec58f34d32`).
-   - **Railway Service Domain**: `https://voynich-production-eb51.up.railway.app`
-   - **Tech Stack**: Vite 8 (`^8.3.4`) + TypeScript 6.0 (`~6.0.2`), self-hosted `@fontsource-variable/google-sans-flex` (`^5.3.2`), and a zero-dependency Node HTTP server (`server.mjs`) with gzip, `/healthz`, `/api/version`, and GDPR-safe first-party server-to-server proxy + edge caching for `/pages/*.png` and `/data/*` pinned to the exact commit SHA of [`d2kx/voynich-research`](https://github.com/d2kx/voynich-research).
-   - **Updating / Syncing Research (`npm run sync`)**:
-     - Pinned to `d2kx/voynich-research` commit `5777b767d9ac0b2edd28ae8bb4af91f8a537d19e` (`5777b76`, `2026-10-12`, Wave 36) in `apps/voynich/src/voynich-version.json`.
-     - Whenever new commits land in `d2kx/voynich-research` (local clone at `C:\Users\denni\Documents\voynich`), run `npm run sync` inside `apps/voynich/` (`node scripts/sync-voynich.mjs`). It automatically reads the latest git commit SHA & date, compiles all 227 folios (38,949 words), 16 walkthroughs, 15 specimen identifications, lexicon, 8-case paradigm matrix, 12 Zodiac wheels, 20 Balneological pages, 42 Markdown guides (including `NOTES.md`), 197 scan entries, and 182 dataset metadata entries into `apps/voynich/public/content/` (~550 KB gzipped) while leaving the 508 MB `pages/` PNGs and 213 MB `books/` PDFs in `d2kx/voynich-research` ( eliminating any need for a paid Railway Bucket or git repo bloat).
-
-### Adding Future Mini-Apps (`app2.dmh.dev`, etc.)
-- Place each standalone mini-app in `apps/<app-name>/`.
-- Create a dedicated Railway service in the `dmh.dev` project:
-  ```bash
-  railway add --service <app-name> --json
-  ```
-- Configure the service to build only from `/apps/<app-name>` in the EU (Netherlands) region (`europe-west4-drams3a`) with its own watch pattern and App Sleep enabled:
-  ```bash
-  railway environment edit --service-config <app-name> source.repo "d2kx/dmh.dev"
-  railway environment edit --service-config <app-name> source.branch "main"
-  railway environment edit --service-config <app-name> source.rootDirectory "/apps/<app-name>"
-  railway environment edit --service-config <app-name> build.watchPatterns '["apps/<app-name>/**"]'
-  railway environment edit --service-config <app-name> deploy.sleepApplication true
-  ```
-  *(Also ensure `deploy.multiRegionConfig` is set to `{"europe-west4-drams3a": {"numReplicas": 1}}` and any default US region key is set to `null`.)*
-- Add the subdomain (`railway domain <app-name>.dmh.dev --service <app-name> --json`) and configure the returned `CNAME` + `_railway-verify` `TXT` records in DNS.
-- Document every new mini-app in this `AGENTS.md` file under **Current Standalone Mini-Apps**.
-
-### Databases & Storage
-- When a database is needed later, provision it inside the `dmh.dev` Railway project (and ensure its region is set to `europe-west4-drams3a` so it is co-located with the app services in Amsterdam):
-  ```bash
-  railway add --database postgres --json
-  ```
-- Connect services using Railway reference variables over the private network (`${{Postgres.DATABASE_URL}}` -> `postgres.railway.internal`) so traffic stays internal and incurs zero egress fees:
-  ```bash
-  railway variable set DATABASE_URL='${{Postgres.DATABASE_URL}}' --service <service-name>
-  ```
-- Note: Keep active database connection pools minimal or close idle connections if you want services with `sleepApplication: true` to sleep during inactivity (active outbound DB heartbeats prevent App Sleep).
+   - Caches static assets (`maxAge: 1y`) and proxied Voynich scans/datasets (`immutable`) at the Railway CDN edge.

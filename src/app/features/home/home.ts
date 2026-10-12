@@ -1,18 +1,11 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { ShellContextService } from '../../core/shell-context';
 import { SocialLinks } from '../../shared/social-links';
-
-interface ProjectCard {
-  readonly id: 'voynich' | 'kaleidoscope' | 'dmh-dev';
-  readonly name: string;
-  readonly url: string;
-  readonly urlLabel: string;
-  readonly description: string;
-  readonly tags: readonly string[];
-}
 
 @Component({
   selector: 'app-home',
-  imports: [SocialLinks],
+  imports: [SocialLinks, RouterLink],
   template: `
     <section class="hero" aria-labelledby="hero-heading">
       <span class="sakura-pill">Software · Web · Projects</span>
@@ -30,7 +23,7 @@ interface ProjectCard {
       </div>
     </section>
 
-    <section aria-labelledby="projects-heading" class="projects-section">
+    <section id="projects" aria-labelledby="projects-heading" class="projects-section">
       <header class="projects-header">
         <p class="eyebrow">Apps &amp; Experiments</p>
         <h2 id="projects-heading">Projects</h2>
@@ -46,169 +39,19 @@ interface ProjectCard {
       </div>
 
       <div class="project-grid">
-        @for (project of projects(); track project.id) {
+        @for (project of shell.projects; track project.id) {
           <article class="project-card-item">
-            <a
-              [href]="project.url"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="project-card-link"
-              [attr.aria-label]="project.name + ': ' + project.description"
-            >
-              <div class="logo-wrapper" aria-hidden="true">
-                <div
-                  class="logo-glow"
-                  [class.logo-glow-prism]="project.id === 'kaleidoscope' || project.id === 'voynich'"
-                ></div>
-                <div class="logo-box">
-                  @if (project.id === 'voynich') {
-                    <!-- Custom Voynich Illuminated Astrolabe & Botanical Rosette Logo -->
-                    <svg
-                      viewBox="0 0 64 64"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="project-svg"
-                    >
-                      <rect
-                        x="4"
-                        y="4"
-                        width="56"
-                        height="56"
-                        rx="16"
-                        fill="#140d1e"
-                        stroke="#f43f85"
-                        stroke-width="2.2"
-                      />
-                      <circle
-                        cx="32"
-                        cy="32"
-                        r="22"
-                        stroke="#f59e0b"
-                        stroke-width="1.5"
-                        stroke-opacity="0.78"
-                        stroke-dasharray="3 2.5"
-                      />
-                      <circle
-                        cx="32"
-                        cy="32"
-                        r="16.5"
-                        fill="#1e132d"
-                        stroke="#f43f85"
-                        stroke-width="1.2"
-                        stroke-opacity="0.65"
-                      />
-                      <line
-                        x1="32"
-                        y1="10"
-                        x2="32"
-                        y2="54"
-                        stroke="#f59e0b"
-                        stroke-width="1.1"
-                        stroke-opacity="0.45"
-                      />
-                      <line
-                        x1="10"
-                        y1="32"
-                        x2="54"
-                        y2="32"
-                        stroke="#f59e0b"
-                        stroke-width="1.1"
-                        stroke-opacity="0.45"
-                      />
-                      <g transform="translate(32 32)">
-                        <path
-                          d="M 0 -2 C -4 -7.5 -5.8 -13.5 -2.2 -16.2 L 0 -13.5 L 2.2 -16.2 C 5.8 -13.5 4 -7.5 0 -2 Z"
-                          fill="#f43f85"
-                        />
-                        <path
-                          d="M 0 -2 C -4 -7.5 -5.8 -13.5 -2.2 -16.2 L 0 -13.5 L 2.2 -16.2 C 5.8 -13.5 4 -7.5 0 -2 Z"
-                          fill="#fb7185"
-                          transform="rotate(72)"
-                        />
-                        <path
-                          d="M 0 -2 C -4 -7.5 -5.8 -13.5 -2.2 -16.2 L 0 -13.5 L 2.2 -16.2 C 5.8 -13.5 4 -7.5 0 -2 Z"
-                          fill="#f43f85"
-                          transform="rotate(144)"
-                        />
-                        <path
-                          d="M 0 -2 C -4 -7.5 -5.8 -13.5 -2.2 -16.2 L 0 -13.5 L 2.2 -16.2 C 5.8 -13.5 4 -7.5 0 -2 Z"
-                          fill="#fb7185"
-                          transform="rotate(216)"
-                        />
-                        <path
-                          d="M 0 -2 C -4 -7.5 -5.8 -13.5 -2.2 -16.2 L 0 -13.5 L 2.2 -16.2 C 5.8 -13.5 4 -7.5 0 -2 Z"
-                          fill="#f43f85"
-                          transform="rotate(288)"
-                        />
-                      </g>
-                      <circle cx="32" cy="32" r="3.6" fill="#fde68a" />
-                      <circle cx="19" cy="19" r="1.6" fill="#fde68a" />
-                      <circle cx="45" cy="19" r="1.6" fill="#fde68a" />
-                      <circle cx="19" cy="45" r="1.6" fill="#fde68a" />
-                      <circle cx="45" cy="45" r="1.6" fill="#fde68a" />
-                    </svg>
-                  } @else if (project.id === 'kaleidoscope') {
-                    <!-- Custom Sakura Kaleidoscope Octagonal Prism Logo -->
-                    <svg
-                      viewBox="0 0 64 64"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="project-svg"
-                    >
-                      <polygon
-                        points="32,3 52.5,11.5 61,32 52.5,52.5 32,61 11.5,52.5 3,32 11.5,11.5"
-                        fill="#13091c"
-                        stroke="#f43f85"
-                        stroke-width="2.2"
-                      />
-                      <g opacity="0.92">
-                        <polygon points="32,32 32,5 50.5,13.5" fill="#f43f85" opacity="0.88" />
-                        <polygon points="32,32 50.5,13.5 59,32" fill="#8b5cf6" opacity="0.88" />
-                        <polygon points="32,32 59,32 50.5,50.5" fill="#22d3ee" opacity="0.78" />
-                        <polygon points="32,32 50.5,50.5 32,59" fill="#f43f85" opacity="0.88" />
-                        <polygon points="32,32 32,59 13.5,50.5" fill="#8b5cf6" opacity="0.88" />
-                        <polygon points="32,32 13.5,50.5 5,32" fill="#22d3ee" opacity="0.78" />
-                        <polygon points="32,32 5,32 13.5,13.5" fill="#f43f85" opacity="0.88" />
-                        <polygon points="32,32 13.5,13.5 32,5" fill="#8b5cf6" opacity="0.88" />
-                      </g>
-                      <polygon
-                        points="32,11 46.8,17.2 53,32 46.8,46.8 32,53 17.2,46.8 11,32 17.2,17.2"
-                        fill="#190b28"
-                        fill-opacity="0.62"
-                        stroke="#ffffff"
-                        stroke-opacity="0.4"
-                        stroke-width="1.2"
-                      />
-                      <g transform="translate(32 32)">
-                        <path
-                          d="M 0 -2 C -4.5 -8 -6.5 -15 -2.6 -18.5 L 0 -15.2 L 2.6 -18.5 C 6.5 -15 4.5 -8 0 -2 Z"
-                          fill="#ffd6e7"
-                        />
-                        <path
-                          d="M 0 -2 C -4.5 -8 -6.5 -15 -2.6 -18.5 L 0 -15.2 L 2.6 -18.5 C 6.5 -15 4.5 -8 0 -2 Z"
-                          fill="#ffb3d1"
-                          transform="rotate(72)"
-                        />
-                        <path
-                          d="M 0 -2 C -4.5 -8 -6.5 -15 -2.6 -18.5 L 0 -15.2 L 2.6 -18.5 C 6.5 -15 4.5 -8 0 -2 Z"
-                          fill="#ffd6e7"
-                          transform="rotate(144)"
-                        />
-                        <path
-                          d="M 0 -2 C -4.5 -8 -6.5 -15 -2.6 -18.5 L 0 -15.2 L 2.6 -18.5 C 6.5 -15 4.5 -8 0 -2 Z"
-                          fill="#ffb3d1"
-                          transform="rotate(216)"
-                        />
-                        <path
-                          d="M 0 -2 C -4.5 -8 -6.5 -15 -2.6 -18.5 L 0 -15.2 L 2.6 -18.5 C 6.5 -15 4.5 -8 0 -2 Z"
-                          fill="#ffd6e7"
-                          transform="rotate(288)"
-                        />
-                      </g>
-                      <circle cx="32" cy="32" r="3.2" fill="#fffbeb" />
-                    </svg>
-                  } @else {
-                    <!-- Custom dmh.dev Sakura Blossom Logo -->
+            @if (project.externalUrl) {
+              <a
+                [href]="project.externalUrl"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="project-card-link"
+                [attr.aria-label]="project.name + ': ' + project.description"
+              >
+                <div class="logo-wrapper" aria-hidden="true">
+                  <div class="logo-glow"></div>
+                  <div class="logo-box">
                     <svg
                       viewBox="0 0 64 64"
                       fill="none"
@@ -248,28 +91,203 @@ interface ProjectCard {
                       </g>
                       <circle cx="32" cy="32" r="3.6" fill="var(--surface-card)" />
                     </svg>
-                  }
-                </div>
-              </div>
-
-              <div class="card-content">
-                <div class="card-title-row">
-                  <h3 class="project-name">{{ project.name }}</h3>
-                  <span class="project-url-badge">
-                    {{ project.urlLabel }}
-                    <span class="launch-arrow" aria-hidden="true">↗</span>
-                  </span>
+                  </div>
                 </div>
 
-                <p class="project-description">{{ project.description }}</p>
+                <div class="card-content">
+                  <div class="card-title-row">
+                    <h3 class="project-name">{{ project.name }}</h3>
+                    <span class="project-url-badge">
+                      {{ project.urlLabel }}
+                      <span class="launch-arrow" aria-hidden="true">↗</span>
+                    </span>
+                  </div>
 
-                <div class="project-tags" aria-label="Technologies">
-                  @for (tag of project.tags; track tag) {
-                    <span class="tag-pill">{{ tag }}</span>
-                  }
+                  <p class="project-description">{{ project.description }}</p>
+
+                  <div class="project-tags" aria-label="Technologies">
+                    @for (tag of project.tags; track tag) {
+                      <span class="tag-pill">{{ tag }}</span>
+                    }
+                  </div>
                 </div>
-              </div>
-            </a>
+              </a>
+            } @else {
+              <a
+                [routerLink]="project.path"
+                class="project-card-link"
+                [attr.aria-label]="project.name + ': ' + project.description"
+              >
+                <div class="logo-wrapper" aria-hidden="true">
+                  <div class="logo-glow logo-glow-prism"></div>
+                  <div class="logo-box">
+                    @if (project.id === 'voynich') {
+                      <svg
+                        viewBox="0 0 64 64"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="project-svg"
+                      >
+                        <rect
+                          x="4"
+                          y="4"
+                          width="56"
+                          height="56"
+                          rx="16"
+                          fill="#140d1e"
+                          stroke="#f43f85"
+                          stroke-width="2.2"
+                        />
+                        <circle
+                          cx="32"
+                          cy="32"
+                          r="22"
+                          stroke="#f59e0b"
+                          stroke-width="1.5"
+                          stroke-opacity="0.78"
+                          stroke-dasharray="3 2.5"
+                        />
+                        <circle
+                          cx="32"
+                          cy="32"
+                          r="16.5"
+                          fill="#1e132d"
+                          stroke="#f43f85"
+                          stroke-width="1.2"
+                          stroke-opacity="0.65"
+                        />
+                        <line
+                          x1="32"
+                          y1="10"
+                          x2="32"
+                          y2="54"
+                          stroke="#f59e0b"
+                          stroke-width="1.1"
+                          stroke-opacity="0.45"
+                        />
+                        <line
+                          x1="10"
+                          y1="32"
+                          x2="54"
+                          y2="32"
+                          stroke="#f59e0b"
+                          stroke-width="1.1"
+                          stroke-opacity="0.45"
+                        />
+                        <g transform="translate(32 32)">
+                          <path
+                            d="M 0 -2 C -4 -7.5 -5.8 -13.5 -2.2 -16.2 L 0 -13.5 L 2.2 -16.2 C 5.8 -13.5 4 -7.5 0 -2 Z"
+                            fill="#f43f85"
+                          />
+                          <path
+                            d="M 0 -2 C -4 -7.5 -5.8 -13.5 -2.2 -16.2 L 0 -13.5 L 2.2 -16.2 C 5.8 -13.5 4 -7.5 0 -2 Z"
+                            fill="#fb7185"
+                            transform="rotate(72)"
+                          />
+                          <path
+                            d="M 0 -2 C -4 -7.5 -5.8 -13.5 -2.2 -16.2 L 0 -13.5 L 2.2 -16.2 C 5.8 -13.5 4 -7.5 0 -2 Z"
+                            fill="#f43f85"
+                            transform="rotate(144)"
+                          />
+                          <path
+                            d="M 0 -2 C -4 -7.5 -5.8 -13.5 -2.2 -16.2 L 0 -13.5 L 2.2 -16.2 C 5.8 -13.5 4 -7.5 0 -2 Z"
+                            fill="#fb7185"
+                            transform="rotate(216)"
+                          />
+                          <path
+                            d="M 0 -2 C -4 -7.5 -5.8 -13.5 -2.2 -16.2 L 0 -13.5 L 2.2 -16.2 C 5.8 -13.5 4 -7.5 0 -2 Z"
+                            fill="#f43f85"
+                            transform="rotate(288)"
+                          />
+                        </g>
+                        <circle cx="32" cy="32" r="3.6" fill="#fde68a" />
+                        <circle cx="19" cy="19" r="1.6" fill="#fde68a" />
+                        <circle cx="45" cy="19" r="1.6" fill="#fde68a" />
+                        <circle cx="19" cy="45" r="1.6" fill="#fde68a" />
+                        <circle cx="45" cy="45" r="1.6" fill="#fde68a" />
+                      </svg>
+                    } @else if (project.id === 'kaleidoscope') {
+                      <svg
+                        viewBox="0 0 64 64"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="project-svg"
+                      >
+                        <polygon
+                          points="32,3 52.5,11.5 61,32 52.5,52.5 32,61 11.5,52.5 3,32 11.5,11.5"
+                          fill="#13091c"
+                          stroke="#f43f85"
+                          stroke-width="2.2"
+                        />
+                        <g opacity="0.92">
+                          <polygon points="32,32 32,5 50.5,13.5" fill="#f43f85" opacity="0.88" />
+                          <polygon points="32,32 50.5,13.5 59,32" fill="#8b5cf6" opacity="0.88" />
+                          <polygon points="32,32 59,32 50.5,50.5" fill="#22d3ee" opacity="0.78" />
+                          <polygon points="32,32 50.5,50.5 32,59" fill="#f43f85" opacity="0.88" />
+                          <polygon points="32,32 32,59 13.5,50.5" fill="#8b5cf6" opacity="0.88" />
+                          <polygon points="32,32 13.5,50.5 5,32" fill="#22d3ee" opacity="0.78" />
+                          <polygon points="32,32 5,32 13.5,13.5" fill="#f43f85" opacity="0.88" />
+                          <polygon points="32,32 13.5,13.5 32,5" fill="#8b5cf6" opacity="0.88" />
+                        </g>
+                        <polygon
+                          points="32,11 46.8,17.2 53,32 46.8,46.8 32,53 17.2,46.8 11,32 17.2,17.2"
+                          fill="#190b28"
+                          fill-opacity="0.62"
+                          stroke="#ffffff"
+                          stroke-opacity="0.4"
+                          stroke-width="1.2"
+                        />
+                        <g transform="translate(32 32)">
+                          <path
+                            d="M 0 -2 C -4.5 -8 -6.5 -15 -2.6 -18.5 L 0 -15.2 L 2.6 -18.5 C 6.5 -15 4.5 -8 0 -2 Z"
+                            fill="#ffd6e7"
+                          />
+                          <path
+                            d="M 0 -2 C -4.5 -8 -6.5 -15 -2.6 -18.5 L 0 -15.2 L 2.6 -18.5 C 6.5 -15 4.5 -8 0 -2 Z"
+                            fill="#ffb3d1"
+                            transform="rotate(72)"
+                          />
+                          <path
+                            d="M 0 -2 C -4.5 -8 -6.5 -15 -2.6 -18.5 L 0 -15.2 L 2.6 -18.5 C 6.5 -15 4.5 -8 0 -2 Z"
+                            fill="#ffd6e7"
+                            transform="rotate(144)"
+                          />
+                          <path
+                            d="M 0 -2 C -4.5 -8 -6.5 -15 -2.6 -18.5 L 0 -15.2 L 2.6 -18.5 C 6.5 -15 4.5 -8 0 -2 Z"
+                            fill="#ffb3d1"
+                            transform="rotate(216)"
+                          />
+                          <path
+                            d="M 0 -2 C -4.5 -8 -6.5 -15 -2.6 -18.5 L 0 -15.2 L 2.6 -18.5 C 6.5 -15 4.5 -8 0 -2 Z"
+                            fill="#ffd6e7"
+                            transform="rotate(288)"
+                          />
+                        </g>
+                        <circle cx="32" cy="32" r="3.2" fill="#fffbeb" />
+                      </svg>
+                    }
+                  </div>
+                </div>
+
+                <div class="card-content">
+                  <div class="card-title-row">
+                    <h3 class="project-name">{{ project.name }}</h3>
+                    <span class="project-url-badge">
+                      {{ project.urlLabel }}
+                      <span class="launch-arrow" aria-hidden="true">→</span>
+                    </span>
+                  </div>
+
+                  <p class="project-description">{{ project.description }}</p>
+
+                  <div class="project-tags" aria-label="Technologies">
+                    @for (tag of project.tags; track tag) {
+                      <span class="tag-pill">{{ tag }}</span>
+                    }
+                  </div>
+                </div>
+              </a>
+            }
           </article>
         }
       </div>
@@ -320,6 +338,7 @@ interface ProjectCard {
 
     .projects-section {
       padding-top: 2.75rem;
+      scroll-margin-top: 5rem;
     }
 
     .projects-header {
@@ -491,7 +510,7 @@ interface ProjectCard {
     }
 
     .project-card-link:hover .launch-arrow {
-      transform: translate(2px, -2px);
+      transform: translateX(3px);
     }
 
     .project-description {
@@ -522,33 +541,5 @@ interface ProjectCard {
   `,
 })
 export class Home {
-  protected readonly projects = signal<readonly ProjectCard[]>([
-    {
-      id: 'voynich',
-      name: 'Voynich Manuscript Explorer',
-      url: 'https://voynich.dmh.dev',
-      urlLabel: 'voynich.dmh.dev',
-      description:
-        'Visual, linguistic, and computational research explorer for Beinecke MS 408 with a 3-step word analyzer, 16 page walkthroughs, 15 specimen cribs, and the full 227-folio corpus.',
-      tags: ['Research', 'Linguistics', 'Interactive Corpus'],
-    },
-    {
-      id: 'kaleidoscope',
-      name: 'Kaleidoscope',
-      url: 'https://kaleidoscope.dmh.dev',
-      urlLabel: 'kaleidoscope.dmh.dev',
-      description:
-        'Interactive WebGL shader kaleidoscope blending psychedelic fractal symmetry with sakura cherry blossom geometry and harmonic color palettes.',
-      tags: ['WebGL', 'GLSL Shader', 'Interactive'],
-    },
-    {
-      id: 'dmh-dev',
-      name: 'dmh.dev',
-      url: 'https://github.com/d2kx/dmh.dev',
-      urlLabel: 'github.com/d2kx/dmh.dev',
-      description:
-        'Personal website, blog, and monorepo platform featuring a custom Sakura-accented light and dark theme and accessible typography.',
-      tags: ['TypeScript', 'Angular', 'Material 3'],
-    },
-  ]);
+  protected readonly shell = inject(ShellContextService);
 }

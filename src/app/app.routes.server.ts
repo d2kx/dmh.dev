@@ -6,6 +6,27 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Prerender,
   },
   {
+    path: 'voynich',
+    renderMode: RenderMode.Prerender,
+  },
+  {
+    path: 'voynich/:section',
+    renderMode: RenderMode.Prerender,
+    async getPrerenderParams() {
+      return [
+        { section: 'walkthroughs' },
+        { section: 'identifications' },
+        { section: 'folios' },
+        { section: 'grammar' },
+        { section: 'library' },
+      ];
+    },
+  },
+  {
+    path: 'kaleidoscope',
+    renderMode: RenderMode.Prerender,
+  },
+  {
     path: 'blog',
     renderMode: RenderMode.Prerender,
   },

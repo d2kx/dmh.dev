@@ -1,62 +1,434 @@
 <a class="skip-link" href="#main-content">Skip to main content</a>
 
-<div class="site-wrapper">
-  <mat-toolbar role="banner" class="site-header">
-    <div class="header-inner">
-      <a routerLink="/" class="brand" aria-label="dmh.dev home">
-        <svg
-          class="sakura-logo"
-          aria-hidden="true"
-          viewBox="0 0 24 24"
-          width="22"
-          height="22"
-        >
-          <g class="sakura-petals" fill="currentColor">
-            <path
-              d="M 12 10.5 C 9.1 8.7 7.7 5.2 9.5 2.5 C 10.2 1.5 11.3 1.9 12 3.3 C 12.7 1.9 13.8 1.5 14.5 2.5 C 16.3 5.2 14.9 8.7 12 10.5 Z"
-            />
-            <path
-              d="M 12 10.5 C 9.1 8.7 7.7 5.2 9.5 2.5 C 10.2 1.5 11.3 1.9 12 3.3 C 12.7 1.9 13.8 1.5 14.5 2.5 C 16.3 5.2 14.9 8.7 12 10.5 Z"
-              transform="rotate(72 12 12)"
-            />
-            <path
-              d="M 12 10.5 C 9.1 8.7 7.7 5.2 9.5 2.5 C 10.2 1.5 11.3 1.9 12 3.3 C 12.7 1.9 13.8 1.5 14.5 2.5 C 16.3 5.2 14.9 8.7 12 10.5 Z"
-              transform="rotate(144 12 12)"
-            />
-            <path
-              d="M 12 10.5 C 9.1 8.7 7.7 5.2 9.5 2.5 C 10.2 1.5 11.3 1.9 12 3.3 C 12.7 1.9 13.8 1.5 14.5 2.5 C 16.3 5.2 14.9 8.7 12 10.5 Z"
-              transform="rotate(216 12 12)"
-            />
-            <path
-              d="M 12 10.5 C 9.1 8.7 7.7 5.2 9.5 2.5 C 10.2 1.5 11.3 1.9 12 3.3 C 12.7 1.9 13.8 1.5 14.5 2.5 C 16.3 5.2 14.9 8.7 12 10.5 Z"
-              transform="rotate(288 12 12)"
-            />
-          </g>
-          <circle class="sakura-center" cx="12" cy="12" r="1.75" />
-        </svg>
-        <span class="brand-text">
-          <span class="brand-monogram">dmh</span><span class="brand-domain">.dev</span>
-        </span>
-      </a>
+<div
+  class="site-wrapper"
+  [class.is-wide-layout]="shell.isWideLayout()"
+  [class.is-full-bleed]="shell.isFullBleed()"
+>
+  <mat-toolbar
+    role="banner"
+    class="site-header"
+    [class.header-floating]="shell.isFullBleed()"
+    [class.header-idle]="shell.isFullBleed() && shell.kaleidoscopeIdle()"
+  >
+    <div class="header-inner" [class.header-inner-wide]="shell.isWideLayout() || shell.isFullBleed()">
+      @if (shell.appMode() === 'main') {
+        <a routerLink="/" class="brand" aria-label="dmh.dev home">
+          <svg
+            class="sakura-logo"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            width="22"
+            height="22"
+          >
+            <g class="sakura-petals" fill="currentColor">
+              <path
+                d="M 12 10.5 C 9.1 8.7 7.7 5.2 9.5 2.5 C 10.2 1.5 11.3 1.9 12 3.3 C 12.7 1.9 13.8 1.5 14.5 2.5 C 16.3 5.2 14.9 8.7 12 10.5 Z"
+              />
+              <path
+                d="M 12 10.5 C 9.1 8.7 7.7 5.2 9.5 2.5 C 10.2 1.5 11.3 1.9 12 3.3 C 12.7 1.9 13.8 1.5 14.5 2.5 C 16.3 5.2 14.9 8.7 12 10.5 Z"
+                transform="rotate(72 12 12)"
+              />
+              <path
+                d="M 12 10.5 C 9.1 8.7 7.7 5.2 9.5 2.5 C 10.2 1.5 11.3 1.9 12 3.3 C 12.7 1.9 13.8 1.5 14.5 2.5 C 16.3 5.2 14.9 8.7 12 10.5 Z"
+                transform="rotate(144 12 12)"
+              />
+              <path
+                d="M 12 10.5 C 9.1 8.7 7.7 5.2 9.5 2.5 C 10.2 1.5 11.3 1.9 12 3.3 C 12.7 1.9 13.8 1.5 14.5 2.5 C 16.3 5.2 14.9 8.7 12 10.5 Z"
+                transform="rotate(216 12 12)"
+              />
+              <path
+                d="M 12 10.5 C 9.1 8.7 7.7 5.2 9.5 2.5 C 10.2 1.5 11.3 1.9 12 3.3 C 12.7 1.9 13.8 1.5 14.5 2.5 C 16.3 5.2 14.9 8.7 12 10.5 Z"
+                transform="rotate(288 12 12)"
+              />
+            </g>
+            <circle class="sakura-center" cx="12" cy="12" r="1.75" />
+          </svg>
+          <span class="brand-text">
+            <span class="brand-monogram">dmh</span><span class="brand-domain">.dev</span>
+          </span>
+        </a>
+      } @else if (shell.appMode() === 'voynich') {
+        <div class="project-brand-group">
+          <a routerLink="/" class="back-home-pill" aria-label="Back to dmh.dev home">
+            <span aria-hidden="true">←</span>&nbsp;dmh.dev
+          </a>
+          <span class="brand-divider" aria-hidden="true"></span>
+          <a routerLink="/voynich" class="brand" aria-label="Voynich Manuscript Explorer home">
+            <svg
+              viewBox="0 0 64 64"
+              width="24"
+              height="24"
+              fill="none"
+              aria-hidden="true"
+              class="project-brand-icon"
+            >
+              <rect
+                x="4"
+                y="4"
+                width="56"
+                height="56"
+                rx="16"
+                fill="#140d1e"
+                stroke="#f43f85"
+                stroke-width="2.5"
+              />
+              <circle
+                cx="32"
+                cy="32"
+                r="21"
+                stroke="#f59e0b"
+                stroke-width="1.8"
+                stroke-dasharray="3 2.5"
+              />
+              <g transform="translate(32 32)">
+                <path
+                  d="M 0 -2 C -4 -7.5 -5.8 -13.5 -2.2 -16.2 L 0 -13.5 L 2.2 -16.2 C 5.8 -13.5 4 -7.5 0 -2 Z"
+                  fill="#f43f85"
+                />
+                <path
+                  d="M 0 -2 C -4 -7.5 -5.8 -13.5 -2.2 -16.2 L 0 -13.5 L 2.2 -16.2 C 5.8 -13.5 4 -7.5 0 -2 Z"
+                  fill="#fb7185"
+                  transform="rotate(72)"
+                />
+                <path
+                  d="M 0 -2 C -4 -7.5 -5.8 -13.5 -2.2 -16.2 L 0 -13.5 L 2.2 -16.2 C 5.8 -13.5 4 -7.5 0 -2 Z"
+                  fill="#f43f85"
+                  transform="rotate(144)"
+                />
+                <path
+                  d="M 0 -2 C -4 -7.5 -5.8 -13.5 -2.2 -16.2 L 0 -13.5 L 2.2 -16.2 C 5.8 -13.5 4 -7.5 0 -2 Z"
+                  fill="#fb7185"
+                  transform="rotate(216)"
+                />
+                <path
+                  d="M 0 -2 C -4 -7.5 -5.8 -13.5 -2.2 -16.2 L 0 -13.5 L 2.2 -16.2 C 5.8 -13.5 4 -7.5 0 -2 Z"
+                  fill="#f43f85"
+                  transform="rotate(288)"
+                />
+              </g>
+              <circle cx="32" cy="32" r="3.6" fill="#fde68a" />
+            </svg>
+            <span class="brand-text">
+              <span class="brand-monogram">voynich</span><span class="brand-domain">.dmh.dev</span>
+            </span>
+          </a>
+          <a
+            [href]="shell.voynichVersion.repoUrl + '/commit/' + shell.voynichVersion.commitSha"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="commit-pill"
+            [attr.title]="'Pinned to voynich-research: ' + shell.voynichVersion.commitSubject"
+          >
+            <span class="commit-dot" aria-hidden="true"></span>
+            <code>{{ shell.voynichVersion.shortSha }}</code>
+            <span class="commit-date">· {{ shell.voynichVersion.commitDate }}</span>
+          </a>
+        </div>
+      } @else if (shell.appMode() === 'kaleidoscope') {
+        <div class="project-brand-group">
+          <a routerLink="/" class="back-home-pill" aria-label="Back to dmh.dev home">
+            <span aria-hidden="true">←</span>&nbsp;dmh.dev
+          </a>
+          <span class="brand-divider" aria-hidden="true"></span>
+          <a routerLink="/kaleidoscope" class="brand" aria-label="Kaleidoscope home">
+            <svg
+              viewBox="0 0 64 64"
+              width="24"
+              height="24"
+              fill="none"
+              aria-hidden="true"
+              class="project-brand-icon"
+            >
+              <polygon
+                points="32,3 52.5,11.5 61,32 52.5,52.5 32,61 11.5,52.5 3,32 11.5,11.5"
+                fill="#13091c"
+                stroke="#f43f85"
+                stroke-width="2.5"
+              />
+              <g transform="translate(32 32)">
+                <path
+                  d="M 0 -2 C -4.5 -8 -6.5 -15 -2.6 -18.5 L 0 -15.2 L 2.6 -18.5 C 6.5 -15 4.5 -8 0 -2 Z"
+                  fill="#ffd6e7"
+                />
+                <path
+                  d="M 0 -2 C -4.5 -8 -6.5 -15 -2.6 -18.5 L 0 -15.2 L 2.6 -18.5 C 6.5 -15 4.5 -8 0 -2 Z"
+                  fill="#ffb3d1"
+                  transform="rotate(72)"
+                />
+                <path
+                  d="M 0 -2 C -4.5 -8 -6.5 -15 -2.6 -18.5 L 0 -15.2 L 2.6 -18.5 C 6.5 -15 4.5 -8 0 -2 Z"
+                  fill="#ffd6e7"
+                  transform="rotate(144)"
+                />
+                <path
+                  d="M 0 -2 C -4.5 -8 -6.5 -15 -2.6 -18.5 L 0 -15.2 L 2.6 -18.5 C 6.5 -15 4.5 -8 0 -2 Z"
+                  fill="#ffb3d1"
+                  transform="rotate(216)"
+                />
+                <path
+                  d="M 0 -2 C -4.5 -8 -6.5 -15 -2.6 -18.5 L 0 -15.2 L 2.6 -18.5 C 6.5 -15 4.5 -8 0 -2 Z"
+                  fill="#ffd6e7"
+                  transform="rotate(288)"
+                />
+              </g>
+              <circle cx="32" cy="32" r="3.2" fill="#fffbeb" />
+            </svg>
+            <span class="brand-text">
+              <span class="brand-monogram">kaleidoscope</span><span class="brand-domain">.dmh.dev</span>
+            </span>
+          </a>
+        </div>
+      }
 
       <div class="header-actions">
-        <nav aria-label="Primary">
-          <ul class="nav-list">
-            @for (item of navItems(); track item.path) {
+        @if (shell.appMode() === 'main') {
+          <nav aria-label="Primary">
+            <ul class="nav-list">
               <li>
                 <a
                   mat-button
-                  [routerLink]="item.path"
+                  routerLink="/"
                   routerLinkActive="active-nav"
-                  [routerLinkActiveOptions]="{ exact: item.exact }"
+                  [routerLinkActiveOptions]="{ exact: true }"
                   class="nav-link"
                 >
-                  {{ item.label }}
+                  Home
                 </a>
               </li>
+
+              <li
+                #projectsNavItem
+                class="projects-nav-item"
+                (mouseenter)="openProjectsMenu()"
+                (mouseleave)="scheduleCloseProjectsMenu()"
+              >
+                <button
+                  mat-button
+                  type="button"
+                  class="nav-link projects-trigger"
+                  [class.active-nav]="projectsMenuOpen()"
+                  [attr.aria-expanded]="projectsMenuOpen()"
+                  aria-controls="projects-flyout-panel"
+                  (click)="toggleProjectsMenu($event)"
+                >
+                  <span>Projects</span>
+                  <svg
+                    class="flyout-chevron"
+                    [class.chevron-open]="projectsMenuOpen()"
+                    aria-hidden="true"
+                    viewBox="0 0 16 16"
+                    width="14"
+                    height="14"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="m4 6 4 4 4-4" />
+                  </svg>
+                </button>
+
+                @if (projectsMenuOpen()) {
+                  <div
+                    id="projects-flyout-panel"
+                    class="projects-flyout"
+                    role="region"
+                    aria-label="Projects menu"
+                  >
+                    <div class="flyout-list">
+                      @for (proj of shell.menuProjects(); track proj.id) {
+                        <a
+                          [routerLink]="proj.path"
+                          class="flyout-item"
+                          (click)="closeProjectsMenu()"
+                        >
+                          <div class="flyout-icon-box" aria-hidden="true">
+                            @if (proj.id === 'voynich') {
+                              <svg viewBox="0 0 64 64" width="24" height="24" fill="none">
+                                <rect
+                                  x="4"
+                                  y="4"
+                                  width="56"
+                                  height="56"
+                                  rx="14"
+                                  fill="#140d1e"
+                                  stroke="#f43f85"
+                                  stroke-width="2.5"
+                                />
+                                <circle
+                                  cx="32"
+                                  cy="32"
+                                  r="20"
+                                  stroke="#f59e0b"
+                                  stroke-width="1.8"
+                                  stroke-dasharray="3 2.5"
+                                />
+                                <g transform="translate(32 32)">
+                                  <path
+                                    d="M 0 -2 C -4 -7.5 -5.8 -13.5 -2.2 -16.2 L 0 -13.5 L 2.2 -16.2 C 5.8 -13.5 4 -7.5 0 -2 Z"
+                                    fill="#f43f85"
+                                  />
+                                  <path
+                                    d="M 0 -2 C -4 -7.5 -5.8 -13.5 -2.2 -16.2 L 0 -13.5 L 2.2 -16.2 C 5.8 -13.5 4 -7.5 0 -2 Z"
+                                    fill="#fb7185"
+                                    transform="rotate(72)"
+                                  />
+                                  <path
+                                    d="M 0 -2 C -4 -7.5 -5.8 -13.5 -2.2 -16.2 L 0 -13.5 L 2.2 -16.2 C 5.8 -13.5 4 -7.5 0 -2 Z"
+                                    fill="#f43f85"
+                                    transform="rotate(144)"
+                                  />
+                                  <path
+                                    d="M 0 -2 C -4 -7.5 -5.8 -13.5 -2.2 -16.2 L 0 -13.5 L 2.2 -16.2 C 5.8 -13.5 4 -7.5 0 -2 Z"
+                                    fill="#fb7185"
+                                    transform="rotate(216)"
+                                  />
+                                  <path
+                                    d="M 0 -2 C -4 -7.5 -5.8 -13.5 -2.2 -16.2 L 0 -13.5 L 2.2 -16.2 C 5.8 -13.5 4 -7.5 0 -2 Z"
+                                    fill="#f43f85"
+                                    transform="rotate(288)"
+                                  />
+                                </g>
+                                <circle cx="32" cy="32" r="3.6" fill="#fde68a" />
+                              </svg>
+                            } @else {
+                              <svg viewBox="0 0 64 64" width="24" height="24" fill="none">
+                                <polygon
+                                  points="32,3 52.5,11.5 61,32 52.5,52.5 32,61 11.5,52.5 3,32 11.5,11.5"
+                                  fill="#13091c"
+                                  stroke="#f43f85"
+                                  stroke-width="2.5"
+                                />
+                                <g transform="translate(32 32)">
+                                  <path
+                                    d="M 0 -2 C -4.5 -8 -6.5 -15 -2.6 -18.5 L 0 -15.2 L 2.6 -18.5 C 6.5 -15 4.5 -8 0 -2 Z"
+                                    fill="#ffd6e7"
+                                  />
+                                  <path
+                                    d="M 0 -2 C -4.5 -8 -6.5 -15 -2.6 -18.5 L 0 -15.2 L 2.6 -18.5 C 6.5 -15 4.5 -8 0 -2 Z"
+                                    fill="#ffb3d1"
+                                    transform="rotate(72)"
+                                  />
+                                  <path
+                                    d="M 0 -2 C -4.5 -8 -6.5 -15 -2.6 -18.5 L 0 -15.2 L 2.6 -18.5 C 6.5 -15 4.5 -8 0 -2 Z"
+                                    fill="#ffd6e7"
+                                    transform="rotate(144)"
+                                  />
+                                  <path
+                                    d="M 0 -2 C -4.5 -8 -6.5 -15 -2.6 -18.5 L 0 -15.2 L 2.6 -18.5 C 6.5 -15 4.5 -8 0 -2 Z"
+                                    fill="#ffb3d1"
+                                    transform="rotate(216)"
+                                  />
+                                  <path
+                                    d="M 0 -2 C -4.5 -8 -6.5 -15 -2.6 -18.5 L 0 -15.2 L 2.6 -18.5 C 6.5 -15 4.5 -8 0 -2 Z"
+                                    fill="#ffd6e7"
+                                    transform="rotate(288)"
+                                  />
+                                </g>
+                                <circle cx="32" cy="32" r="3.2" fill="#fffbeb" />
+                              </svg>
+                            }
+                          </div>
+                          <div class="flyout-text">
+                            <span class="flyout-title">{{ proj.menuTitle }}</span>
+                            <span class="flyout-subtitle">{{ proj.menuSubtitle }}</span>
+                          </div>
+                        </a>
+                      }
+                    </div>
+                    <div class="flyout-footer">
+                      <a
+                        routerLink="/"
+                        fragment="projects"
+                        class="flyout-footer-link"
+                        (click)="closeProjectsMenu()"
+                      >
+                        <span>Explore all projects</span>
+                        <span class="flyout-arrow" aria-hidden="true">→</span>
+                      </a>
+                    </div>
+                  </div>
+                }
+              </li>
+
+              <li>
+                <a
+                  mat-button
+                  routerLink="/blog"
+                  routerLinkActive="active-nav"
+                  class="nav-link"
+                >
+                  Blog
+                </a>
+              </li>
+            </ul>
+          </nav>
+        } @else if (shell.appMode() === 'voynich') {
+          <nav aria-label="Voynich sections">
+            <ul class="nav-list">
+              @for (item of shell.voynichNavItems; track item.path) {
+                <li>
+                  <a
+                    mat-button
+                    [routerLink]="item.path"
+                    routerLinkActive="active-nav"
+                    [routerLinkActiveOptions]="{ exact: item.exact }"
+                    class="nav-link"
+                  >
+                    {{ item.label }}
+                  </a>
+                </li>
+              }
+            </ul>
+          </nav>
+        } @else if (shell.appMode() === 'kaleidoscope') {
+          <div class="kaleidoscope-toolbar-controls">
+            @if (shell.kaleidoscopeStatsVisible()) {
+              <div class="perf-readout" aria-live="off">
+                <span class="perf-fps">{{ shell.kaleidoscopeFps() }} FPS</span>
+                <span class="perf-ms">{{ shell.kaleidoscopeFrameTimeMs() }} ms</span>
+                <svg
+                  class="perf-sparkline"
+                  viewBox="0 0 64 20"
+                  width="64"
+                  height="20"
+                  aria-hidden="true"
+                >
+                  <polyline
+                    class="perf-sparkline-fill"
+                    [attr.points]="shell.kaleidoscopeSparklineFill()"
+                  />
+                  <polyline
+                    class="perf-sparkline-line"
+                    [attr.points]="shell.kaleidoscopeSparklineLine()"
+                  />
+                </svg>
+              </div>
             }
-          </ul>
-        </nav>
+
+            <button
+              mat-button
+              type="button"
+              class="nav-link"
+              [class.active-nav]="shell.kaleidoscopeStatsVisible()"
+              [attr.aria-pressed]="shell.kaleidoscopeStatsVisible()"
+              (click)="shell.toggleKaleidoscopeStats()"
+            >
+              Stats
+            </button>
+
+            <button
+              mat-button
+              type="button"
+              class="nav-link"
+              (click)="shell.toggleFullscreen()"
+            >
+              {{ shell.kaleidoscopeFullscreen() ? 'Exit Fullscreen' : 'Fullscreen' }}
+            </button>
+          </div>
+        }
 
         <button
           mat-icon-button
@@ -108,12 +480,18 @@
     </div>
   </mat-toolbar>
 
-  <main id="main-content" class="site-main" tabindex="-1">
+  <main
+    id="main-content"
+    class="site-main"
+    [class.site-main-wide]="shell.isWideLayout()"
+    [class.site-main-full-bleed]="shell.isFullBleed()"
+    tabindex="-1"
+  >
     <router-outlet />
   </main>
 
-  <footer class="site-footer">
-    <div class="footer-inner">
+  <footer class="site-footer" [class.footer-floating]="shell.isFullBleed()">
+    <div class="footer-inner" [class.footer-inner-wide]="shell.isWideLayout()">
       <p class="footer-brand">
         <strong>{{ title() }}</strong> · Dennis Martin Herbers
       </p>
