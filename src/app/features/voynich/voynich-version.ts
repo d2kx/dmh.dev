@@ -2,22 +2,22 @@
 export const VOYNICH_VERSION = {
   "repo": "d2kx/voynich-research",
   "repoUrl": "https://github.com/d2kx/voynich-research",
-  "commitSha": "91aa82dcfb0dd0281d7266b926d073070e029243",
-  "shortSha": "91aa82d",
+  "commitSha": "6f474bfde38cc4e7dec6b3972b648d1aeadbab7e",
+  "shortSha": "6f474bf",
   "commitDate": "2026-10-12",
-  "commitIso": "2026-10-12 17:20:14 +0200",
-  "commitSubject": "Complete Wave 46 (Attacks 193-196, Discoveries 210-213): Zodiac @Cc-@Lz Syntactic Split, f80r/f82r Balneo Galleries & Rare -g Label Stop, Quire 20 32.12-Word Star-Unit Invariant (2.36x SD Collapse) & v12.0 Explorer",
-  "syncedAt": "2026-10-12T17:02:01.921Z",
+  "commitIso": "2026-10-12 20:03:08 +0200",
+  "commitSubject": "Milestone 200 & Explorer v14.0: Complete Waves 47-48 (Attacks 197-204 / Discoveries 214-221)",
+  "syncedAt": "2026-10-12T18:20:40.345Z",
   "stats": {
     "transcribedFolios": 227,
     "totalWords": 38949,
     "totalLabels": 1029,
     "totalDrawingIntrusions": 758,
-    "walkthroughFolios": 59,
-    "flagshipSpecimens": 65,
-    "highResScans": 255,
-    "markdownGuides": 51,
-    "dataFiles": 218
+    "walkthroughFolios": 66,
+    "flagshipSpecimens": 75,
+    "highResScans": 267,
+    "markdownGuides": 53,
+    "dataFiles": 226
   },
   "books": [
     {
@@ -31,8 +31,8 @@ export const VOYNICH_VERSION = {
       "sourceName": "Yale University Beinecke Rare Book & Manuscript Library (MS 408)",
       "sourceUrl": "https://collections.library.yale.edu/catalog/2002046",
       "license": "Public Domain (CC0 1.0 · Yale University Library Digital Collections)",
-      "downloadUrl": "https://media.githubusercontent.com/media/d2kx/voynich-research/91aa82dcfb0dd0281d7266b926d073070e029243/books/voynich-yale-beinecke-2026-highres-214p.pdf",
-      "githubBlobUrl": "https://github.com/d2kx/voynich-research/blob/91aa82dcfb0dd0281d7266b926d073070e029243/books/voynich-yale-beinecke-2026-highres-214p.pdf"
+      "downloadUrl": "https://media.githubusercontent.com/media/d2kx/voynich-research/6f474bfde38cc4e7dec6b3972b648d1aeadbab7e/books/voynich-yale-beinecke-2026-highres-214p.pdf",
+      "githubBlobUrl": "https://github.com/d2kx/voynich-research/blob/6f474bfde38cc4e7dec6b3972b648d1aeadbab7e/books/voynich-yale-beinecke-2026-highres-214p.pdf"
     },
     {
       "id": "tcpdf-2014",
@@ -45,8 +45,8 @@ export const VOYNICH_VERSION = {
       "sourceName": "Internet Archive (TheVoynichManuscript · Yale Beinecke MS 408 scans)",
       "sourceUrl": "https://archive.org/details/TheVoynichManuscript",
       "license": "Public Domain (Underlying 15th-century manuscript MS 408 & Beinecke scans)",
-      "downloadUrl": "https://media.githubusercontent.com/media/d2kx/voynich-research/91aa82dcfb0dd0281d7266b926d073070e029243/books/voynich-tcpdf-2014-bookmarked-210p.pdf",
-      "githubBlobUrl": "https://github.com/d2kx/voynich-research/blob/91aa82dcfb0dd0281d7266b926d073070e029243/books/voynich-tcpdf-2014-bookmarked-210p.pdf"
+      "downloadUrl": "https://media.githubusercontent.com/media/d2kx/voynich-research/6f474bfde38cc4e7dec6b3972b648d1aeadbab7e/books/voynich-tcpdf-2014-bookmarked-210p.pdf",
+      "githubBlobUrl": "https://github.com/d2kx/voynich-research/blob/6f474bfde38cc4e7dec6b3972b648d1aeadbab7e/books/voynich-tcpdf-2014-bookmarked-210p.pdf"
     }
   ]
 } as const;
