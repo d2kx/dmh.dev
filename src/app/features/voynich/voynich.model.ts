@@ -1,52 +1,48 @@
-export interface WalkthroughLine {
+export interface WalkthroughClause {
   readonly locus: string;
-  readonly role: string;
   readonly eva: string;
-  readonly gloss: string;
-  readonly plain: string;
-}
-
-export interface WalkthroughLabel {
-  readonly word: string;
-  readonly locus: string;
-  readonly gloss: string;
+  readonly english: string;
 }
 
 export interface WalkthroughFolio {
-  readonly id: string;
+  readonly folio: string;
   readonly title: string;
-  readonly badge: string;
   readonly section: string;
+  readonly pdf_page: number;
   readonly image: string;
   readonly secondary_image?: string;
-  readonly caption: string;
   readonly summary: string;
-  readonly labels: readonly WalkthroughLabel[];
-  readonly lines: readonly WalkthroughLine[];
+  readonly clauses: readonly WalkthroughClause[];
+  readonly labels: readonly string[];
 }
 
 export interface SpecimenEntry {
+  readonly id: string;
   readonly folio: string;
-  readonly species: string;
-  readonly common: string;
-  readonly family: string;
-  readonly headword: string;
-  readonly headword_gloss: string;
-  readonly labels: string;
-  readonly cues: string;
-  readonly use: string;
-  readonly cross_ref: string;
-  readonly confidence: string;
+  readonly section: string;
+  readonly pdf_page: number;
+  readonly category: string;
+  readonly common_name: string;
+  readonly latin_candidates: readonly string[];
+  readonly medieval_herbal_parallels: readonly string[];
+  readonly visual_diagnostics: readonly string[];
+  readonly voynich_stems: {
+    readonly opening_word: string;
+    readonly dominant_roots: readonly string[];
+    readonly cross_section_echoes: readonly string[];
+  };
+  readonly plain_english_dossier: string;
+  readonly confidence_tier: string;
   readonly imageUrl: string;
 }
 
 export interface LexiconEntry {
-  readonly word: string;
-  readonly morph: string;
+  readonly stem: string;
   readonly category: string;
-  readonly count: number;
   readonly meaning: string;
-  readonly evidence: string;
+  readonly examples: string;
+  readonly sections: string;
+  readonly grounding: string;
 }
 
 export interface ParadigmCase {
@@ -54,6 +50,7 @@ export interface ParadigmCase {
   readonly suffix: string;
   readonly form: string;
   readonly count: number;
+  readonly pct: number;
   readonly gloss: string;
 }
 
@@ -68,22 +65,29 @@ export interface ParadigmRoot {
 export interface ZodiacEntry {
   readonly folio: string;
   readonly sign: string;
-  readonly month: string;
-  readonly lang: string;
-  readonly nymphs: number;
-  readonly sample_labels: string;
-  readonly gloss: string;
+  readonly european_month_gloss: string;
+  readonly triplicity: string;
+  readonly season: string;
+  readonly scan_image: string;
+  readonly ring_token_count: number;
+  readonly nymph_label_count: number;
+  readonly top_ring_words: readonly string[];
+  readonly top_nymph_labels: readonly string[];
+  readonly o_prefix_rate: number;
+  readonly y_prefix_rate: number;
+  readonly liquid_ol_or_rate: number;
+  readonly essence_al_ar_rate: number;
 }
 
 export interface BalneoEntry {
   readonly folio: string;
-  readonly title: string;
-  readonly words: number;
-  readonly qok_rate: string;
-  readonly ol_rate: string;
-  readonly labels_count: number;
-  readonly key_labels: string;
-  readonly summary: string;
+  readonly prose_tokens: number;
+  readonly nymph_labels: readonly string[];
+  readonly tube_labels: readonly string[];
+  readonly thermal_boil_rate: number;
+  readonly wash_bathe_rate: number;
+  readonly pool_vessel_rate: number;
+  readonly top_prose_words: readonly string[];
 }
 
 export interface WordConcordanceEntry {
@@ -175,6 +179,9 @@ export interface BookCatalogItem {
   readonly resolution: string;
   readonly sizeMB: number;
   readonly description: string;
+  readonly sourceName: string;
+  readonly sourceUrl: string;
+  readonly license: string;
   readonly downloadUrl: string;
   readonly githubBlobUrl: string;
 }

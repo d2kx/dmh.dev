@@ -372,6 +372,112 @@ for (const docEntry of rawDocs) {
   );
 }
 
+// 7b. Enrich walkthrough folios with object/margin labels from folio_index.json
+for (const f of explorerData.folios) {
+  const primaryId = String(f.folio || '').split(/\s+/)[0].trim();
+  const idxEntry = folioIndexRaw.folios?.[primaryId];
+  f.labels = Array.isArray(idxEntry?.labels) ? idxEntry.labels.slice(0, 24) : [];
+}
+
+// 7c. Populate 8-case morphological paradigm matrix from attack149 if explorerData.paradigms is empty
+const STEM_DOMAIN_META = {
+  ch: {
+    domain: 'Herbal Infusion Stem',
+    base_meaning: 'Steeped herbal liquid / strained plant decoction',
+  },
+  ol: {
+    domain: 'Vessel & Bath Medium Stem',
+    base_meaning: 'Liquid container, bath pool, or pipe conduit',
+  },
+  aiin: {
+    domain: 'Measured Dose Stem',
+    base_meaning: 'Counted minim unit ("one measured portion / dose")',
+  },
+  ar: {
+    domain: 'Botanical Root / Earth Stem',
+    base_meaning: 'Root base, earth source, or stellar sector',
+  },
+  iin: {
+    domain: 'Partitive Minim Stem',
+    base_meaning: 'Counted parts / measured drops or portions',
+  },
+  or: {
+    domain: 'Golden Oil / Dye-Root Stem',
+    base_meaning: 'Oil extract, golden essence, or red dye-root base',
+  },
+  eey: {
+    domain: 'Prepared Extract Stem',
+    base_meaning: 'Cooked / steeped herbal extract',
+  },
+  al: {
+    domain: 'Star / Volatile Essence Stem',
+    base_meaning: 'Star sector, winged seed, or distilled essence',
+  },
+  ey: {
+    domain: 'Infused State Stem',
+    base_meaning: 'Processed / steeped botanical state',
+  },
+  ke: {
+    domain: 'Thermal Boiling Stem',
+    base_meaning: 'Boil, simmer, or decoct with heat',
+  },
+  sh: {
+    domain: 'Washing / Bathing Stem',
+    base_meaning: 'Wash, bathe, or flush with liquid',
+  },
+  ain: {
+    domain: 'Single Portion Stem',
+    base_meaning: 'One measured draught or dose',
+  },
+};
+
+const CASE_SLOT_META = [
+  ['C1_CIT_BARE', '1. Citation / Bare', '∅ / -y', 'Base ingredient or label noun'],
+  ['C2_NOM_O', '2. Nominal Ingredient', 'o- / ok- / ot-', 'Named ingredient ("the [stem]")'],
+  ['C3_DEIC_DS', '3. Imperative / Source', 'd- / s-', 'Take / draw from source'],
+  ['C4_ACT_QO', '4. Active Step', 'qo-', 'Active procedural step ("then process")'],
+  ['C5_PROC_EDY', '5. Process Verb', '-edy / -dy', 'Boiled, washed, or steeped state'],
+  ['C6_APPL_L', '6. Vessel / Bath Locative', 'l- / ol-', 'Inside the bath, pipe, or vessel'],
+  ['C7_LIQ_CONT', '7. Liquid / Oil Medium', '-ol / -or', 'Dissolved in liquid or oil medium'],
+  ['C8_QUANT_TERM', '8. Dose / Terminal Stop', '-aiin / -am', 'Measured dose or recipe completion'],
+];
+
+const attack149Path = path.join(
+  VOYNICH_REPO,
+  'data',
+  'attack149_eight_case_inflectional_paradigm_matrix.json',
+);
+let paradigmsList = explorerData.paradigms || [];
+if ((!Array.isArray(paradigmsList) || paradigmsList.length === 0) && fs.existsSync(attack149Path)) {
+  const attack149 = JSON.parse(fs.readFileSync(attack149Path, 'utf-8'));
+  paradigmsList = (attack149.top_60_full_paradigm_stems || []).slice(0, 8).map((item) => {
+    const meta = STEM_DOMAIN_META[item.stem] || {
+      domain: 'Core Manuscript Stem',
+      base_meaning: `Canonical root stem (${item.stem})`,
+    };
+    const cells = item.paradigm_cells || {};
+    const cases = CASE_SLOT_META.map(([slotKey, caseLabel, suffixHint, roleHint]) => {
+      const cell = cells[slotKey] || { count: 0, pct: 0, top_form: '' };
+      const rawForm = String(cell.top_form || '').split(/\s+/)[0].trim();
+      return {
+        case: caseLabel,
+        suffix: suffixHint,
+        form: rawForm || item.stem,
+        count: cell.count || 0,
+        pct: cell.pct || 0,
+        gloss: roleHint,
+      };
+    });
+    return {
+      root: item.stem,
+      domain: meta.domain,
+      base_meaning: meta.base_meaning,
+      total: item.total_tokens || 0,
+      cases,
+    };
+  });
+}
+
 // 8. Write version metadata & bundled content files
 const versionMeta = {
   repo: 'd2kx/voynich-research',
@@ -403,6 +509,9 @@ const versionMeta = {
       sizeMB: 138.4,
       description:
         'Primary visual forensics scan with 2x sharper pixel density, printed Beinecke Image IDs (1006076 to 1006283), and 4 physical fore-edge and spine scans (p210 to p213).',
+      sourceName: 'Yale University Beinecke Rare Book & Manuscript Library (MS 408)',
+      sourceUrl: 'https://collections.library.yale.edu/catalog/2002046',
+      license: 'Public Domain (CC0 1.0 · Yale University Library Digital Collections)',
       downloadUrl: `https://media.githubusercontent.com/media/d2kx/voynich-research/${commitSha}/books/voynich-yale-beinecke-2026-highres-214p.pdf`,
       githubBlobUrl: `https://github.com/d2kx/voynich-research/blob/${commitSha}/books/voynich-yale-beinecke-2026-highres-214p.pdf`,
     },
@@ -415,6 +524,9 @@ const versionMeta = {
       sizeMB: 75.2,
       description:
         'Fast navigation edition featuring a 210-entry clickable PDF bookmark sidebar (1r through 116v) that maps 1:1 to pages 1 to 209 of the Yale PDF.',
+      sourceName: 'Internet Archive (TheVoynichManuscript · Yale Beinecke MS 408 scans)',
+      sourceUrl: 'https://archive.org/details/TheVoynichManuscript',
+      license: 'Public Domain (Underlying 15th-century manuscript MS 408 & Beinecke scans)',
       downloadUrl: `https://media.githubusercontent.com/media/d2kx/voynich-research/${commitSha}/books/voynich-tcpdf-2014-bookmarked-210p.pdf`,
       githubBlobUrl: `https://github.com/d2kx/voynich-research/blob/${commitSha}/books/voynich-tcpdf-2014-bookmarked-210p.pdf`,
     },
@@ -436,7 +548,7 @@ fs.writeFileSync(
     folios: explorerData.folios,
     specimens: explorerData.specimens,
     lexicon: explorerData.lexicon,
-    paradigms: explorerData.paradigms,
+    paradigms: paradigmsList,
     zodiac: explorerData.zodiac,
     balneo: explorerData.balneo,
     wordConcordance,

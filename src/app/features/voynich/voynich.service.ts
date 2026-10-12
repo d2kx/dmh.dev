@@ -5,6 +5,11 @@ import { renderMarkdownToHtml } from './voynich-decoder';
 import { VOYNICH_VERSION } from './voynich-version';
 import { CatalogData, CorpusData, DocFull, ExplorerData } from './voynich.model';
 
+export interface CachedDocResult {
+  readonly doc: DocFull;
+  readonly html: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class VoynichService {
   private readonly http = inject(HttpClient);
@@ -13,7 +18,6 @@ export class VoynichService {
   readonly explorerData = signal<ExplorerData | null>(null);
   readonly catalogData = signal<CatalogData | null>(null);
   readonly corpusData = signal<CorpusData | null>(null);
-  readonly readersGuideHtml = signal<string>('');
   readonly lightboxUrl = signal<string | null>(null);
 
   // Shared active word for the interactive morphological decoder
@@ -21,7 +25,8 @@ export class VoynichService {
 
   private initPromise: Promise<void> | null = null;
   private corpusPromise: Promise<CorpusData> | null = null;
-  private readonly docCache = new Map<string, DocFull>();
+  private readonly docCache = new Map<string, CachedDocResult>();
+  private readonly dataTextCache = new Map<string, string>();
 
   ensureInitialized(): Promise<void> {
     if (this.initPromise) {
@@ -31,12 +36,10 @@ export class VoynichService {
     this.initPromise = Promise.all([
       firstValueFrom(this.http.get<ExplorerData>('/content/voynich/explorer-data.json')),
       firstValueFrom(this.http.get<CatalogData>('/content/voynich/catalog.json')),
-      this.loadDoc('plain-english-visual-readers-guide'),
     ])
-      .then(([explorer, catalog, guideDoc]) => {
+      .then(([explorer, catalog]) => {
         this.explorerData.set(explorer);
         this.catalogData.set(catalog);
-        this.readersGuideHtml.set(renderMarkdownToHtml(guideDoc.markdown));
       })
       .catch(() => {
         this.initPromise = null;
@@ -61,7 +64,7 @@ export class VoynichService {
     return this.corpusPromise;
   }
 
-  async loadDoc(slug: string): Promise<DocFull> {
+  async loadDoc(slug: string): Promise<CachedDocResult> {
     const cached = this.docCache.get(slug);
     if (cached) {
       return cached;
@@ -69,12 +72,22 @@ export class VoynichService {
     const doc = await firstValueFrom(
       this.http.get<DocFull>(`/content/voynich/docs/${encodeURIComponent(slug)}.json`),
     );
-    this.docCache.set(slug, doc);
-    return doc;
+    const entry: CachedDocResult = {
+      doc,
+      html: renderMarkdownToHtml(doc.markdown),
+    };
+    this.docCache.set(slug, entry);
+    return entry;
   }
 
   async loadDataFileText(url: string): Promise<string> {
-    return firstValueFrom(this.http.get(url, { responseType: 'text' }));
+    const cached = this.dataTextCache.get(url);
+    if (cached !== undefined) {
+      return cached;
+    }
+    const text = await firstValueFrom(this.http.get(url, { responseType: 'text' }));
+    this.dataTextCache.set(url, text);
+    return text;
   }
 
   openLightbox(url: string): void {

@@ -51,9 +51,9 @@ export class ShellContextService {
     { path: '/voynich', label: 'Overview', exact: true },
     { path: '/voynich/walkthroughs', label: 'Walkthroughs', exact: false },
     { path: '/voynich/identifications', label: 'Identifications', exact: false },
+    { path: '/voynich/library', label: 'Library', exact: false },
     { path: '/voynich/folios', label: 'Folios', exact: false },
     { path: '/voynich/grammar', label: 'Grammar', exact: false },
-    { path: '/voynich/library', label: 'Library', exact: false },
   ];
 
   readonly projects: readonly ProjectCatalogItem[] = [

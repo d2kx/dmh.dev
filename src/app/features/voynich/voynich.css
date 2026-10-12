@@ -99,6 +99,177 @@
   letter-spacing: -0.02em;
 }
 
+/* Overview Primer Cards ("What Is the Voynich Manuscript?") */
+.primer-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.35rem;
+}
+
+@media (max-width: 900px) {
+  .primer-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.primer-card {
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.95rem;
+  padding: 1.15rem 1.25rem;
+}
+
+.primer-card h3 {
+  margin: 0 0 0.45rem;
+  font-size: 0.98rem;
+  font-weight: 700;
+}
+
+.primer-card p {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+/* Overview 4-Card Visual Showcase */
+.showcase-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 1080px) {
+  .showcase-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 580px) {
+  .showcase-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.showcase-card {
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.95rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.showcase-img-wrap {
+  position: relative;
+  height: 210px;
+  background: #f5efe6;
+  border-bottom: 1px solid var(--border-subtle);
+  overflow: hidden;
+}
+
+.showcase-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+  cursor: zoom-in;
+  transition: transform 220ms ease;
+}
+
+.showcase-img-wrap:hover img {
+  transform: scale(1.03);
+}
+
+.showcase-zoom-hint {
+  position: absolute;
+  right: 0.55rem;
+  bottom: 0.55rem;
+  background: rgba(15, 17, 23, 0.76);
+  color: #ffffff;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.18rem 0.5rem;
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+.showcase-body {
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex: 1;
+}
+
+.showcase-body h3 {
+  margin: 0.1rem 0 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.showcase-body p {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.showcase-link-btn {
+  margin-top: auto;
+  padding-top: 0.45rem;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding-left: 0;
+  padding-right: 0;
+  color: var(--accent);
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 650;
+  text-align: left;
+  cursor: pointer;
+}
+
+.showcase-link-btn:hover {
+  text-decoration: underline;
+}
+
+/* Plain-English Explainer Banner (Folios & Grammar) */
+.explainer-banner {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.95rem;
+  margin-bottom: 1.35rem;
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.95rem;
+  padding: 1.1rem 1.25rem;
+}
+
+@media (max-width: 900px) {
+  .explainer-banner {
+    grid-template-columns: 1fr;
+  }
+}
+
+.explainer-item strong {
+  display: block;
+  font-size: 0.88rem;
+  margin-bottom: 0.3rem;
+  color: var(--text-primary);
+}
+
+.explainer-item p {
+  margin: 0;
+  font-size: 0.81rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
 /* Recognizable Search Field */
 .search-field {
   position: relative;
@@ -184,7 +355,13 @@
   cursor: pointer;
   display: inline-flex;
   align-items: center;
+  gap: 0.3rem;
   transition: border-color 140ms ease, background 140ms ease, color 140ms ease;
+}
+
+.chip-hint {
+  font-size: 0.72rem;
+  opacity: 0.85;
 }
 
 .chip-btn code {
@@ -690,8 +867,14 @@
 /* Specimen Identifications Grid */
 .specimen-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(460px, 1fr));
+  gap: 1.15rem;
+}
+
+@media (max-width: 640px) {
+  .specimen-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .specimen-card {
@@ -700,7 +883,13 @@
   border-radius: 0.95rem;
   overflow: hidden;
   display: grid;
-  grid-template-columns: 125px 1fr;
+  grid-template-columns: 155px 1fr;
+}
+
+@media (max-width: 560px) {
+  .specimen-card {
+    grid-template-columns: 1fr;
+  }
 }
 
 .specimen-img-wrap {
@@ -711,32 +900,51 @@
 .specimen-img-wrap img {
   width: 100%;
   height: 100%;
+  min-height: 220px;
   object-fit: cover;
+  object-position: center top;
   display: block;
   cursor: zoom-in;
 }
 
 .specimen-body {
-  padding: 0.95rem 1.05rem;
+  padding: 1.05rem 1.2rem;
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.45rem;
+}
+
+.specimen-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
 }
 
 .specimen-body h3 {
-  margin: 0;
-  font-size: 1rem;
+  margin: 0.1rem 0 0;
+  font-size: 1.05rem;
 }
 
 .specimen-latin {
-  font-size: 0.8rem;
+  font-size: 0.81rem;
   font-style: italic;
   color: var(--text-muted);
 }
 
+.specimen-dossier {
+  margin: 0.15rem 0;
+  font-size: 0.86rem;
+  line-height: 1.55;
+  color: var(--text-primary);
+}
+
+.specimen-chips {
+  margin-top: 0.2rem;
+}
+
 .specimen-row {
-  font-size: 0.82rem;
-  line-height: 1.45;
+  font-size: 0.81rem;
+  line-height: 1.48;
 }
 
 .muted-inline,
@@ -784,17 +992,31 @@
   flex-wrap: wrap;
 }
 
-/* Paradigm Grid */
+/* Paradigm Grid & Grammar Tables */
+.table-intro {
+  margin-bottom: 0.9rem;
+}
+
 .paradigm-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
   gap: 1rem;
   margin-bottom: 1.5rem;
 }
 
+@media (max-width: 560px) {
+  .paradigm-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .paradigm-grid h3 {
   margin: 0;
-  font-size: 1.05rem;
+  font-size: 1.02rem;
+}
+
+.paradigm-sub {
+  margin: 0.25rem 0 0.75rem;
 }
 
 /* Library Subtabs & Views */
@@ -843,9 +1065,14 @@
 
 .books-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
   gap: 1rem;
   margin-bottom: 1.5rem;
+}
+
+.book-card {
+  display: flex;
+  flex-direction: column;
 }
 
 .book-title {
@@ -853,11 +1080,25 @@
   font-size: 1.12rem;
 }
 
+.book-provenance {
+  margin-top: 0.65rem;
+  padding: 0.7rem 0.85rem;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.65rem;
+  font-size: 0.8rem;
+  line-height: 1.55;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
 .book-actions {
   display: flex;
   gap: 0.55rem;
   flex-wrap: wrap;
-  margin-top: 0.85rem;
+  margin-top: 0.95rem;
 }
 
 .scans-grid {
@@ -936,6 +1177,12 @@
   font-size: 0.9rem;
 }
 
+.lightbox-filename {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+
 .lightbox-actions {
   display: flex;
   gap: 0.5rem;
@@ -954,11 +1201,21 @@
   text-decoration: none;
 }
 
+.lightbox-close:hover {
+  background: rgba(255, 255, 255, 0.24);
+  color: #ffffff;
+  text-decoration: none;
+}
+
 .lightbox-img {
   position: relative;
   z-index: 1;
-  max-width: 95vw;
-  max-height: 85vh;
+  width: auto;
+  height: auto;
+  max-width: min(94vw, 1100px);
+  max-height: 82vh;
+  object-fit: contain;
+  display: block;
   border-radius: 0.65rem;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.65);
   background: #f5efe6;

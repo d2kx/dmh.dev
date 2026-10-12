@@ -1,6 +1,6 @@
 import {
   Component,
-   afterNextRender,
+  afterNextRender,
   computed,
   inject,
   signal,
@@ -11,9 +11,9 @@ import {
   ParsedVoynichWord,
   glossEvaLine,
   parseVoynichWord,
-  renderMarkdownToHtml,
 } from './voynich-decoder';
 import {
+  BalneoEntry,
   CorpusFolio,
   DocMeta,
   WalkthroughFolio,
@@ -24,19 +24,27 @@ export type VoynichSection =
   | 'overview'
   | 'walkthroughs'
   | 'identifications'
+  | 'library'
   | 'folios'
-  | 'grammar'
-  | 'library';
+  | 'grammar';
 
 export type LibrarySubtab = 'docs' | 'datasets' | 'scans';
+
+export interface OverviewShowcaseCard {
+  readonly folioId: string;
+  readonly badge: string;
+  readonly title: string;
+  readonly image: string;
+  readonly description: string;
+}
 
 const VALID_SECTIONS = new Set<VoynichSection>([
   'overview',
   'walkthroughs',
   'identifications',
+  'library',
   'folios',
   'grammar',
-  'library',
 ]);
 
 @Component({
@@ -58,6 +66,42 @@ export class Voynich {
   protected readonly activeSection = signal<VoynichSection>('overview');
   protected readonly librarySubtab = signal<LibrarySubtab>('docs');
 
+  // Visual showcase cards on Overview introducing the manuscript's key sections
+  protected readonly overviewShowcase: readonly OverviewShowcaseCard[] = [
+    {
+      folioId: 'f9v',
+      badge: 'Herbal Section · f9v',
+      title: 'Wild Pansy / Heartsease (Viola tricolor)',
+      image: '/pages/f9v_viola_full_enh.png',
+      description:
+        'Full-page botanical paintings occupy the first half of the manuscript, pairing painted roots, leaves, and blossoms with structured preparation notes.',
+    },
+    {
+      folioId: 'f68v3',
+      badge: 'Astronomical Section · f68v3',
+      title: '8-Arm Spiral Star Wheel & Zodiac Dials',
+      image: '/pages/f68v3_spiral_star_wheel_enh.png',
+      description:
+        'Foldout star charts and 30-degree Zodiac wheels containing 15th-century European month names (mars through decembre) act as a seasonal timing calendar.',
+    },
+    {
+      folioId: 'f75r',
+      badge: 'Balneological Section · f75r',
+      title: 'Waterfall Bathing Pool & Medicated Pipes',
+      image: '/pages/f75r_waterfall_pool_enh.png',
+      description:
+        'Twenty pages of chutes, pipes, and immersion basins where painted conduits carry vessel labels (olkol, okoldy) and surrounding recipes prescribe boiling and bathing.',
+    },
+    {
+      folioId: 'f89r2',
+      badge: 'Pharmaceutical Section · f89r2',
+      title: 'Apothecary Jar With Labeled Cut Roots',
+      image: '/pages/f89r2_full_enh.png',
+      description:
+        'Painted storage jars sit beside dissected root and leaf cuttings (darary, okar, oror) that bridge the botanical herbals to the final starred recipe pages.',
+    },
+  ];
+
   // Word decoder state
   protected readonly quickChips: readonly { word: string; hint: string }[] = [
     { word: 'qokeedy', hint: 'boil thoroughly' },
@@ -78,10 +122,6 @@ export class Voynich {
     if (!exp || !w) return null;
     return exp.wordConcordance[w] ?? null;
   });
-
-  protected readonly safeReadersGuideHtml = computed<SafeHtml>(() =>
-    this.sanitizer.bypassSecurityTrustHtml(this.voynich.readersGuideHtml()),
-  );
 
   // Walkthroughs master-detail state
   protected readonly selectedWalkthroughIdx = signal<number>(0);
@@ -190,6 +230,9 @@ export class Voynich {
       if (section === 'folios') {
         void this.voynich.ensureCorpusLoaded();
       }
+      if (section === 'library' && !this.activeDocHtml()) {
+        void this.selectDoc(this.activeDocSlug());
+      }
     });
 
     this.route.queryParamMap.subscribe((qParams) => {
@@ -206,21 +249,46 @@ export class Voynich {
         this.selectedCorpusFolioId.set(folio);
         void this.voynich.ensureCorpusLoaded();
       }
+      const wt = qParams.get('walkthrough');
+      if (wt) {
+        this.selectWalkthroughByFolio(wt);
+      }
     });
 
     afterNextRender(() => {
       void this.voynich.ensureInitialized().then(() => {
-        if (!this.activeDocHtml()) {
-          this.activeDocHtml.set(this.safeReadersGuideHtml());
+        const wt = this.route.snapshot.queryParamMap.get('walkthrough');
+        if (wt) {
+          this.selectWalkthroughByFolio(wt);
+        }
+        if (this.activeSection() === 'library' && !this.activeDocHtml()) {
+          void this.selectDoc(this.activeDocSlug());
         }
       });
     });
   }
 
   protected setWord(word: string): void {
-    this.voynich.activeWord.set(word);
+    const cleaned = this.cleanToken(word);
+    if (!cleaned) return;
+    this.voynich.activeWord.set(cleaned);
     if (this.activeSection() !== 'overview') {
       void this.router.navigate(['/voynich']);
+    }
+  }
+
+  protected openWalkthroughFolio(folioId: string): void {
+    this.selectWalkthroughByFolio(folioId);
+    void this.router.navigate(['/voynich/walkthroughs'], {
+      queryParams: { walkthrough: folioId },
+    });
+  }
+
+  private selectWalkthroughByFolio(folioId: string): void {
+    const folios = this.voynich.explorerData()?.folios ?? [];
+    const idx = folios.findIndex((f) => f.folio === folioId || f.folio.startsWith(folioId));
+    if (idx >= 0) {
+      this.selectedWalkthroughIdx.set(idx);
     }
   }
 
@@ -268,7 +336,16 @@ export class Voynich {
   }
 
   protected cleanToken(tok: string): string {
-    return tok.replace(/[^a-zA-Z0-9]/g, '');
+    const firstPart = (tok || '').trim().split(/[\s(/]+/)[0] || '';
+    return firstPart.replace(/[^a-zA-Z0-9]/g, '');
+  }
+
+  protected formatPercent(rate: number): string {
+    return `${((rate || 0) * 100).toFixed(1)}%`;
+  }
+
+  protected combineBalneoLabels(b: BalneoEntry): string[] {
+    return [...(b.nymph_labels ?? []), ...(b.tube_labels ?? [])].slice(0, 6);
   }
 
   protected formatLineGloss(eva: string): string {
@@ -276,20 +353,19 @@ export class Voynich {
   }
 
   protected jumpToCorpusFolio(folioId: string): void {
-    this.selectedCorpusFolioId.set(folioId);
-    void this.router.navigate(['/voynich/folios'], { queryParams: { folio: folioId } });
+    const primaryId = (folioId || '').split(/\s+/)[0].trim();
+    this.selectedCorpusFolioId.set(primaryId);
+    void this.router.navigate(['/voynich/folios'], { queryParams: { folio: primaryId } });
   }
 
   protected async selectDoc(slug: string): Promise<void> {
     this.activeDocSlug.set(slug);
     this.librarySubtab.set('docs');
     try {
-      const doc = await this.voynich.loadDoc(slug);
+      const { doc, html } = await this.voynich.loadDoc(slug);
       this.activeDocTitle.set(doc.title);
       this.activeDocMeta.set(`${doc.sourcePath} · ${doc.category} · ${doc.sizeKB} KB`);
-      this.activeDocHtml.set(
-        this.sanitizer.bypassSecurityTrustHtml(renderMarkdownToHtml(doc.markdown)),
-      );
+      this.activeDocHtml.set(this.sanitizer.bypassSecurityTrustHtml(html));
     } catch {
       // Ignore missing doc slug
     }

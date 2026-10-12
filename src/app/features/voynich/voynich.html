@@ -9,9 +9,8 @@
         balneological recipe compendium.
       </p>
       <p class="hero-lead hero-lead-secondary">
-        Explore the 227-folio EVA transcription (38,949 words), 30 botanical and celestial specimen
-        identifications, and {{ voynich.version.stats.markdownGuides }} plain-English and technical
-        research guides.
+        Start with the visual introduction below, browse step-by-step page walkthroughs and
+        botanical identifications, or read the plain-English research guides.
       </p>
       <div class="hero-actions">
         <a
@@ -27,19 +26,216 @@
       </div>
     </section>
 
-    <section class="overview-section" aria-labelledby="decoder-heading">
+    <section class="overview-section" aria-labelledby="about-ms-heading">
       <div class="section-divider-label" aria-hidden="true">
         <span class="section-dot"></span>
-        <span class="section-title">Interactive Decoder</span>
+        <span class="section-title">About the Manuscript</span>
         <span class="section-line"></span>
       </div>
 
       <div class="section-intro">
-        <h2 id="decoder-heading">3-Step Word Analyzer</h2>
+        <h2 id="about-ms-heading">What Is the Voynich Manuscript?</h2>
         <p class="section-sub">
-          Every Voynich word combines three parts: a <strong>prefix</strong> (action or role), a
-          <strong>root stem</strong> (ingredient, star, or vessel), and a <strong>suffix</strong>
-          (grammatical case or dose).
+          Preserved at Yale University’s Beinecke Rare Book and Manuscript Library as
+          <strong>MS 408</strong>, the Voynich Manuscript is an illustrated codex handwritten on
+          early 15th-century vellum (radiocarbon-dated to <strong>1404–1438 CE</strong>).
+        </p>
+      </div>
+
+      <div class="primer-grid">
+        <article class="primer-card">
+          <h3>227 Surviving Folios &amp; 6 Sections</h3>
+          <p>
+            The book spans 227 parchment leaves (~240 pages) and 38,949 words written in an
+            unidentified script by five scribes. Its illustrations divide the codex into six domains:
+            <strong>Botanical Herbs</strong>, <strong>Astronomical Dials</strong>,
+            <strong>Zodiac Calendars</strong>, <strong>Balneological (Bathing) Pools</strong>,
+            <strong>Cosmological Foldouts</strong>, and <strong>Pharmaceutical Jars &amp; Recipes</strong>.
+          </p>
+        </article>
+
+        <article class="primer-card">
+          <h3>Painted First, Written Second</h3>
+          <p>
+            Across the manuscript, scribes broke their lines <strong>758 times</strong> to jump
+            around pre-existing plant stems, roots, and bathing figures. Statistical comparison of
+            words before and after drawing splits confirms the illustrations were painted before the
+            surrounding paragraphs were inscribed.
+          </p>
+        </article>
+
+        <article class="primer-card">
+          <h3>From Visual Labels to Recipes</h3>
+          <p>
+            Rather than an arbitrary cipher or hoax, short labels written directly onto painted
+            roots (such as <code>oror</code> for blood-red Alkanet root or <code>darary</code> for
+            main taproots), storage jars (<code>okol</code>), and Zodiac star-nymphs reappear
+            verbatim inside the medical recipe paragraphs.
+          </p>
+        </article>
+      </div>
+
+      <div class="showcase-grid" aria-label="Sample illustrated pages from the Voynich Manuscript">
+        @for (item of overviewShowcase; track item.folioId) {
+          <article class="showcase-card">
+            <div class="showcase-img-wrap">
+              <img
+                [src]="item.image"
+                [alt]="item.title"
+                width="320"
+                height="420"
+                loading="lazy"
+                decoding="async"
+                [attr.data-zoom]="item.image"
+              />
+              <span class="showcase-zoom-hint">Click scan to zoom</span>
+            </div>
+            <div class="showcase-body">
+              <span class="badge">{{ item.badge }}</span>
+              <h3>{{ item.title }}</h3>
+              <p>{{ item.description }}</p>
+              <button
+                type="button"
+                class="showcase-link-btn"
+                (click)="openWalkthroughFolio(item.folioId)"
+              >
+                Open {{ item.folioId }} Walkthrough →
+              </button>
+            </div>
+          </article>
+        }
+      </div>
+    </section>
+
+    <section aria-labelledby="hub-sections-heading" class="overview-section">
+      <div class="section-divider-label" aria-hidden="true">
+        <span class="section-dot"></span>
+        <span class="section-title">Explore the Sections</span>
+        <span class="section-line"></span>
+      </div>
+
+      <div class="section-intro">
+        <h2 id="hub-sections-heading">Where to Go Next</h2>
+        <p class="section-sub">
+          Start with the visual walkthroughs, specimen identifications, and plain-English guides in
+          the library, or dive into the full 227-folio transcription and grammar tables.
+        </p>
+      </div>
+
+      <div class="hub-grid">
+        <a routerLink="/voynich/walkthroughs" class="hub-card">
+          <div class="hub-card-top">
+            <span class="hub-title">1. Page Walkthroughs</span>
+            <span class="hub-badge">{{ voynich.version.stats.walkthroughFolios }} Folios →</span>
+          </div>
+          <p class="hub-desc">
+            Step-by-step annotated readings of key manuscript pages with high-resolution scans,
+            object labels, and clause-by-clause plain-English readings.
+          </p>
+          <div class="hub-examples">
+            <span class="example-pill">f1r Opening</span>
+            <span class="example-pill">f68r3 Pleiades</span>
+            <span class="example-pill">f75r Bathing Pool</span>
+          </div>
+        </a>
+
+        <a routerLink="/voynich/identifications" class="hub-card">
+          <div class="hub-card-top">
+            <span class="hub-title">2. Botanical &amp; Astro Identifications</span>
+            <span class="hub-badge">{{ voynich.version.stats.flagshipSpecimens }} Specimens →</span>
+          </div>
+          <p class="hub-desc">
+            Illustrated plants, roots, and star clusters matched against 15th-century European
+            herbals, pigment cues, and apothecary jars.
+          </p>
+          <div class="hub-examples">
+            <span class="example-pill">f1v Belladonna</span>
+            <span class="example-pill">f9v Heartsease</span>
+            <span class="example-pill">f102v2 Alkanet</span>
+          </div>
+        </a>
+
+        <a routerLink="/voynich/library" [queryParams]="{ subtab: 'docs' }" class="hub-card">
+          <div class="hub-card-top">
+            <span class="hub-title">3. Research Library &amp; Guides</span>
+            <span class="hub-badge">{{ voynich.version.stats.markdownGuides }} Guides →</span>
+          </div>
+          <p class="hub-desc">
+            Read the Plain-English Visual Reader’s Guide and thematic dossiers, or inspect all
+            {{ voynich.version.stats.dataFiles }} raw JSON and TXT verification datasets.
+          </p>
+          <div class="hub-examples">
+            <span class="example-pill">Visual Reader’s Guide</span>
+            <span class="example-pill">Research Log</span>
+            <span class="example-pill">190 JSON Datasets</span>
+          </div>
+        </a>
+
+        <a routerLink="/voynich/library" [queryParams]="{ subtab: 'scans' }" class="hub-card">
+          <div class="hub-card-top">
+            <span class="hub-title">4. High-Resolution Scans &amp; PDFs</span>
+            <span class="hub-badge">{{ voynich.version.stats.highResScans }} Scans →</span>
+          </div>
+          <p class="hub-desc">
+            Browse all {{ voynich.version.stats.highResScans }} Yale Beinecke manuscript page scans
+            in the zoomable gallery or download the full Public Domain PDF books.
+          </p>
+          <div class="hub-examples">
+            <span class="example-pill">208 Folio PNGs</span>
+            <span class="example-pill">Yale &amp; Archive.org PDFs</span>
+          </div>
+        </a>
+
+        <a routerLink="/voynich/folios" class="hub-card">
+          <div class="hub-card-top">
+            <span class="hub-title">5. All 227 Folios Corpus</span>
+            <span class="hub-badge">38,949 Words →</span>
+          </div>
+          <p class="hub-desc">
+            Search and filter every transcribed page of Beinecke MS 408 by section, scribal hand, or
+            Currier dialect with interlinear stem glosses.
+          </p>
+          <div class="hub-examples">
+            <span class="example-pill">Herbal (H)</span>
+            <span class="example-pill">Balneological (B)</span>
+            <span class="example-pill">Starred Recipes (S)</span>
+          </div>
+        </a>
+
+        <a routerLink="/voynich/grammar" class="hub-card">
+          <div class="hub-card-top">
+            <span class="hub-title">6. Grammar, Lexicon &amp; Atlases</span>
+            <span class="hub-badge">8-Case Matrix →</span>
+          </div>
+          <p class="hub-desc">
+            Reference tables for the decoded root stem dictionary, the 8-case morphological matrix,
+            the 12 Zodiac wheels, and the 20 hydrotherapy pages.
+          </p>
+          <div class="hub-examples">
+            <span class="example-pill">Root Dictionary</span>
+            <span class="example-pill">8-Case Matrix</span>
+            <span class="example-pill">12 Zodiac Wheels</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <section class="overview-section" aria-labelledby="decoder-heading">
+      <div class="section-divider-label" aria-hidden="true">
+        <span class="section-dot"></span>
+        <span class="section-title">Interactive Word Tool</span>
+        <span class="section-line"></span>
+      </div>
+
+      <div class="section-intro">
+        <h2 id="decoder-heading">3-Step Morphological Word Analyzer</h2>
+        <p class="section-sub">
+          Curious how individual Voynich words are structured? In the European Voynich Alphabet
+          (EVA) transcription, words snap together like building blocks from three slots: a
+          <strong>1. Prefix</strong> (procedural action or role), a <strong>2. Root Stem</strong>
+          (botanical ingredient, star cluster, or vessel), and a <strong>3. Suffix</strong>
+          (grammatical case, liquid medium, or measured dose). Click any sample word below or type
+          your own.
         </p>
       </div>
 
@@ -84,6 +280,7 @@
                 (click)="setWord(chip.word)"
               >
                 <code>{{ chip.word }}</code>
+                <span class="chip-hint">({{ chip.hint }})</span>
               </button>
             }
           </div>
@@ -126,119 +323,6 @@
         }
       </div>
     </section>
-
-    <section aria-labelledby="hub-sections-heading" class="overview-section">
-      <div class="section-divider-label" aria-hidden="true">
-        <span class="section-dot"></span>
-        <span class="section-title">Explore the Sections</span>
-        <span class="section-line"></span>
-      </div>
-
-      <div class="section-intro">
-        <h2 id="hub-sections-heading">Inside the Research</h2>
-        <p class="section-sub">
-          Jump into the annotated folio walkthroughs, visual identifications, full manuscript
-          transcription, or the research library.
-        </p>
-      </div>
-
-      <div class="hub-grid">
-        <a routerLink="/voynich/walkthroughs" class="hub-card">
-          <div class="hub-card-top">
-            <span class="hub-title">Page Walkthroughs</span>
-            <span class="hub-badge">{{ voynich.version.stats.walkthroughFolios }} Folios →</span>
-          </div>
-          <p class="hub-desc">
-            Step-by-step annotated readings of key manuscript pages with high-resolution scans,
-            object labels, and line-by-line translations.
-          </p>
-          <div class="hub-examples">
-            <span class="example-pill">f1r Master Preface</span>
-            <span class="example-pill">f68r3 Pleiades Map</span>
-            <span class="example-pill">f75r Balneology</span>
-          </div>
-        </a>
-
-        <a routerLink="/voynich/identifications" class="hub-card">
-          <div class="hub-card-top">
-            <span class="hub-title">Botanical &amp; Astro Identifications</span>
-            <span class="hub-badge">{{ voynich.version.stats.flagshipSpecimens }} Specimens →</span>
-          </div>
-          <p class="hub-desc">
-            Illustrated plants, roots, and star clusters matched against historical herbals, pigment
-            notes, and pharmaceutical jars.
-          </p>
-          <div class="hub-examples">
-            <span class="example-pill">f2v Morning Glory</span>
-            <span class="example-pill">f9r Greater Celandine</span>
-            <span class="example-pill">f17r Alkanet</span>
-          </div>
-        </a>
-
-        <a routerLink="/voynich/folios" class="hub-card">
-          <div class="hub-card-top">
-            <span class="hub-title">All 227 Folios Corpus</span>
-            <span class="hub-badge">38,949 Words →</span>
-          </div>
-          <p class="hub-desc">
-            Search and filter every transcribed page of Beinecke MS 408 by section, scribal hand, or
-            Currier dialect with interlinear stem glosses.
-          </p>
-          <div class="hub-examples">
-            <span class="example-pill">Herbal (H)</span>
-            <span class="example-pill">Balneological (B)</span>
-            <span class="example-pill">Starred Recipes (S)</span>
-          </div>
-        </a>
-
-        <a routerLink="/voynich/grammar" class="hub-card">
-          <div class="hub-card-top">
-            <span class="hub-title">Grammar, Lexicon &amp; Atlases</span>
-            <span class="hub-badge">8-Case Matrix →</span>
-          </div>
-          <p class="hub-desc">
-            Browse the decoded root stem dictionary, the 8-case suffix paradigm table, the 12 Zodiac
-            wheels, and the 20 hydrotherapy pages.
-          </p>
-          <div class="hub-examples">
-            <span class="example-pill">qok- (boil/process)</span>
-            <span class="example-pill">oror (alkanet)</span>
-            <span class="example-pill">12 Zodiac Wheels</span>
-          </div>
-        </a>
-
-        <a routerLink="/voynich/library" [queryParams]="{ subtab: 'docs' }" class="hub-card">
-          <div class="hub-card-top">
-            <span class="hub-title">Research Guides &amp; Datasets</span>
-            <span class="hub-badge">{{ voynich.version.stats.markdownGuides }} Guides →</span>
-          </div>
-          <p class="hub-desc">
-            Read the Plain-English Visual Reader’s Guide and technical dossiers, or inspect all
-            {{ voynich.version.stats.dataFiles }} raw JSON and TXT verification datasets.
-          </p>
-          <div class="hub-examples">
-            <span class="example-pill">Visual Reader’s Guide</span>
-            <span class="example-pill">Research Log</span>
-            <span class="example-pill">190 JSON Datasets</span>
-          </div>
-        </a>
-
-        <a routerLink="/voynich/library" [queryParams]="{ subtab: 'scans' }" class="hub-card">
-          <div class="hub-card-top">
-            <span class="hub-title">High-Resolution Scans &amp; PDFs</span>
-            <span class="hub-badge">{{ voynich.version.stats.highResScans }} Scans →</span>
-          </div>
-          <p class="hub-desc">
-            Browse all {{ voynich.version.stats.highResScans }} Yale Beinecke manuscript page scans
-            in the zoomable gallery or download the full 214-page PDF editions.
-          </p>
-          <div class="hub-examples">
-            <span class="example-pill">208 Folio PNGs</span>
-            <span class="example-pill">2 Full PDF Books</span>
-          </div>
-        </a>
-      </div>
-    </section>
   }
 
   @case ('walkthroughs') {
@@ -247,27 +331,30 @@
         <h1>Annotated Folio Walkthroughs</h1>
         <p class="section-sub">
           Select a manuscript folio on the left to inspect its high-resolution Yale Beinecke scan,
-          object labels, and line-by-line plain-English translation.
+          object labels, and clause-by-clause plain-English reading. Click any scan to zoom or any
+          Voynich word chip to inspect it in the word analyzer.
         </p>
       </div>
     </div>
 
     <div class="split-layout">
       <aside class="sidebar-list" aria-label="Walkthrough folios">
-        @for (f of voynich.explorerData()?.folios ?? []; track f.id; let i = $index) {
-          <button
-            type="button"
-            class="list-item-btn"
-            [class.active-list-item]="selectedWalkthroughIdx() === i"
-            (click)="selectedWalkthroughIdx.set(i)"
-          >
-            <div class="item-top">
-              <strong>{{ f.id }}</strong>
-              <span class="badge">{{ f.badge }}</span>
-            </div>
-            <div class="item-sub">{{ f.title.replace(f.id + ' · ', '') }}</div>
-          </button>
-        }
+        <div class="folio-btn-list">
+          @for (f of voynich.explorerData()?.folios ?? []; track f.folio + '-' + $index; let i = $index) {
+            <button
+              type="button"
+              class="list-item-btn"
+              [class.active-list-item]="selectedWalkthroughIdx() === i"
+              (click)="selectedWalkthroughIdx.set(i)"
+            >
+              <div class="item-top">
+                <strong>{{ f.folio }}</strong>
+                <span class="badge">p.{{ f.pdf_page }}</span>
+              </div>
+              <div class="item-sub">{{ f.title }}</div>
+            </button>
+          }
+        </div>
       </aside>
 
       <div class="detail-pane">
@@ -275,11 +362,11 @@
           <div class="card">
             <div class="walkthrough-head">
               <div>
-                <span class="badge">{{ f.section }} · {{ f.badge }}</span>
-                <h2 class="walkthrough-title">{{ f.title }}</h2>
+                <span class="badge">{{ f.section }} · Yale PDF p. {{ f.pdf_page }}</span>
+                <h2 class="walkthrough-title">Folio {{ f.folio }} · {{ f.title }}</h2>
               </div>
-              <button type="button" class="btn-outline" (click)="jumpToCorpusFolio(f.id)">
-                Open Full {{ f.id }} Transcription in 227-Folio Corpus →
+              <button type="button" class="btn-outline" (click)="jumpToCorpusFolio(f.folio)">
+                Open {{ f.folio }} in 227-Folio Corpus →
               </button>
             </div>
             <p class="walkthrough-summary">{{ f.summary }}</p>
@@ -288,7 +375,7 @@
               <div class="scan-card">
                 <img
                   [src]="f.image"
-                  [alt]="f.title"
+                  [alt]="'Folio ' + f.folio + ' · ' + f.title"
                   width="640"
                   height="860"
                   decoding="async"
@@ -297,77 +384,65 @@
                 @if (f.secondary_image) {
                   <img
                     [src]="f.secondary_image"
-                    [alt]="f.title + ' detail'"
+                    [alt]="'Folio ' + f.folio + ' detail crop'"
                     width="640"
                     height="420"
+                    loading="lazy"
                     decoding="async"
                     [attr.data-zoom]="f.secondary_image"
                     class="secondary-scan"
                   />
                 }
                 <div class="scan-caption">
-                  {{ f.caption }} (Click scan to zoom full resolution)
+                  Folio {{ f.folio }} (Yale PDF p. {{ f.pdf_page }}) · Click scan to zoom full
+                  resolution
                 </div>
               </div>
 
               <div>
-                @if (f.labels.length > 0) {
-                  <h3 class="subhead">Object &amp; Margin Labels on {{ f.id }}</h3>
-                  <div class="table-wrap labels-table-wrap">
-                    <table>
-                      <thead>
-                        <tr>
-                          <th>Label Word</th>
-                          <th>Locus</th>
-                          <th>Plain-English Identification</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        @for (l of f.labels; track l.locus + l.word) {
-                          <tr>
-                            <td>
-                              <button
-                                type="button"
-                                class="word-chip"
-                                (click)="setWord(cleanToken(l.word))"
-                              >
-                                {{ l.word }}
-                              </button>
-                            </td>
-                            <td><code>{{ l.locus }}</code></td>
-                            <td>{{ l.gloss }}</td>
-                          </tr>
-                        }
-                      </tbody>
-                    </table>
+                @if (f.labels && f.labels.length > 0) {
+                  <div class="labels-box">
+                    <strong class="labels-box-title">
+                      Object &amp; Diagram Labels on {{ f.folio }} ({{ f.labels.length }}):
+                    </strong>
+                    <div class="chips-wrap">
+                      @for (lbl of f.labels; track $index) {
+                        <button type="button" class="word-chip" (click)="setWord(lbl)">
+                          {{ lbl }}
+                        </button>
+                      }
+                    </div>
                   </div>
                 }
 
-                <h3 class="subhead">Line-by-Line Annotated Reading</h3>
-                @for (ln of f.lines; track ln.locus) {
+                <h3 class="subhead">Line-by-Line Interactive Clause Breakdown</h3>
+                @for (c of f.clauses; track c.locus) {
                   <div class="line-card">
                     <div class="line-meta">
-                      <code>{{ ln.locus }}</code>
-                      <span class="badge">{{ ln.role }}</span>
+                      <code>{{ c.locus }}</code>
+                      <span class="badge">Click any word to analyze</span>
                     </div>
                     <div class="line-eva">
-                      @for (tok of splitTokens(ln.eva); track $index) {
+                      @for (tok of splitTokens(c.eva); track $index) {
                         <button
                           type="button"
                           class="word-chip"
-                          (click)="setWord(cleanToken(tok))"
+                          (click)="setWord(tok)"
                         >
                           {{ tok }}
                         </button>
                       }
                     </div>
-                    <div class="line-gloss"><strong>Literal:</strong>&nbsp;{{ ln.gloss }}</div>
-                    <div class="line-plain">{{ ln.plain }}</div>
+                    <div class="line-plain">
+                      <strong>Plain-English Reading:</strong>&nbsp;{{ c.english }}
+                    </div>
                   </div>
                 }
               </div>
             </div>
           </div>
+        } @else {
+          <div class="card">Loading folio walkthroughs…</div>
         }
       </div>
     </div>
@@ -378,20 +453,21 @@
       <div>
         <h1>Visual Botanical &amp; Astronomical Identifications</h1>
         <p class="section-sub">
-          Flagship illustrated specimens matched via independent pigment cues, root/leaf morphology,
-          astrological emblem geometry, and pharmaceutical container cross-references. Click any
-          scan to zoom or any Voynich headword to decode it.
+          {{ voynich.version.stats.flagshipSpecimens }} flagship illustrated specimens matched via
+          15th-century European herbal iconography, root and leaf anatomy, pigment cues, and
+          apothecary jar cross-references. Click any scan to zoom or any Voynich stem chip to
+          analyze it.
         </p>
       </div>
     </div>
 
     <div class="specimen-grid">
-      @for (s of voynich.explorerData()?.specimens ?? []; track s.folio + s.species) {
+      @for (s of voynich.explorerData()?.specimens ?? []; track s.id) {
         <article class="specimen-card">
           <div class="specimen-img-wrap">
             <img
               [src]="s.imageUrl"
-              [alt]="s.folio + ' ' + s.common"
+              [alt]="s.folio + ' ' + s.common_name"
               width="320"
               height="430"
               loading="lazy"
@@ -400,33 +476,64 @@
             />
           </div>
           <div class="specimen-body">
-            <div>
-              <span class="badge">{{ s.folio }} · {{ s.confidence }}</span>
+            <div class="specimen-badges">
+              <span class="badge">{{ s.id }} · Folio {{ s.folio }} (p.{{ s.pdf_page }})</span>
+              <span class="badge">{{ s.confidence_tier }}</span>
             </div>
-            <h3>{{ s.common }}</h3>
-            <div class="specimen-latin">{{ s.species }} ({{ s.family }})</div>
-            <div class="specimen-row">
-              <strong>Headword:</strong>&nbsp;
-              <button type="button" class="word-chip" (click)="setWord(cleanToken(s.headword))">
-                {{ s.headword }}
-              </button>
-              <span class="muted-inline">({{ s.headword_gloss }})</span>
+            <h3>{{ s.common_name }}</h3>
+            <div class="specimen-latin">
+              {{ s.latin_candidates.join(' · ') }} ({{ s.category }})
             </div>
-            @if (s.labels && s.labels !== '—' && s.labels !== '·') {
+            <p class="specimen-dossier">{{ s.plain_english_dossier }}</p>
+
+            @if (s.voynich_stems?.opening_word) {
               <div class="specimen-row">
-                <strong>Labels:</strong>&nbsp;
-                @for (tok of splitTokens(s.labels); track $index) {
-                  <button type="button" class="word-chip" (click)="setWord(cleanToken(tok))">
-                    {{ tok }}
-                  </button>
-                }
+                <strong>Opening Headword:</strong>&nbsp;
+                <button
+                  type="button"
+                  class="word-chip"
+                  (click)="setWord(s.voynich_stems.opening_word)"
+                >
+                  {{ cleanToken(s.voynich_stems.opening_word) }}
+                </button>
+                <span class="muted-inline">{{ s.voynich_stems.opening_word }}</span>
               </div>
             }
-            <div class="specimen-row"><strong>Visual Cues:</strong>&nbsp;{{ s.cues }}</div>
-            <div class="specimen-row"><strong>Function / Use:</strong>&nbsp;{{ s.use }}</div>
-            <div class="specimen-row muted-inline">
-              <strong>Cross-Ref:</strong>&nbsp;{{ s.cross_ref }}
-            </div>
+
+            @if (s.voynich_stems?.dominant_roots?.length) {
+              <div class="specimen-row">
+                <strong>Key Voynich Stems:</strong>
+                <div class="chips-wrap specimen-chips">
+                  @for (rootItem of s.voynich_stems.dominant_roots; track $index) {
+                    <button type="button" class="word-chip" (click)="setWord(rootItem)">
+                      {{ rootItem }}
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+
+            @if (s.visual_diagnostics?.length) {
+              <div class="specimen-row">
+                <strong>Visual Cues:</strong>&nbsp;{{ s.visual_diagnostics.join(' · ') }}
+              </div>
+            }
+
+            @if (s.medieval_herbal_parallels?.length) {
+              <div class="specimen-row">
+                <strong>15th-c. Herbal Parallels:</strong>&nbsp;{{
+                  s.medieval_herbal_parallels.join(' · ')
+                }}
+              </div>
+            }
+
+            @if (s.voynich_stems?.cross_section_echoes?.length) {
+              <div class="specimen-row muted-inline">
+                <strong>Cross-Section Links:</strong>&nbsp;{{
+                  s.voynich_stems.cross_section_echoes.join(' · ')
+                }}
+              </div>
+            }
           </div>
         </article>
       }
@@ -438,9 +545,39 @@
       <div>
         <h1>Complete 227-Folio Manuscript Corpus Browser</h1>
         <p class="section-sub">
-          Explore every transcribed folio of the Voynich Manuscript (38,949 words from
-          <code>data/ZL3b-n.txt</code> + <code>data/folio_index.json</code>). Filter by section,
-          Currier language, or search by folio ID / label word.
+          Explore every transcribed page of the Voynich Manuscript (38,949 words across 227 folios).
+          Filter by manuscript section or Currier dialect, inspect the original page scans, and view
+          line-by-line interlinear glosses.
+        </p>
+      </div>
+    </div>
+
+    <div class="explainer-banner" aria-label="How to read the 227-folio corpus">
+      <div class="explainer-item">
+        <strong>What is a Folio (e.g. <code>f1r</code>, <code>f75v</code>)?</strong>
+        <p>
+          Medieval manuscripts are numbered by parchment leaf (<em>folio</em>) rather than modern
+          page numbers: <code>r</code> stands for <em>recto</em> (front side) and <code>v</code>
+          stands for <em>verso</em> (back side). Multi-panel foldout sheets include a panel number
+          such as <code>f70v2</code> or <code>f85r2</code>.
+        </p>
+      </div>
+      <div class="explainer-item">
+        <strong>What is EVA Transcription?</strong>
+        <p>
+          Because the manuscript uses its own glyph alphabet, scholars transcribe each symbol into
+          Latin letters using the standard <strong>European Voynich Alphabet (EVA)</strong>
+          (Zandbergen-Landini <code>ZL3b-n</code> corpus). Click any EVA word chip below to analyze
+          its prefix, stem, and suffix.
+        </p>
+      </div>
+      <div class="explainer-item">
+        <strong>Currier Languages A &amp; B and Hands 1–5</strong>
+        <p>
+          Prescott Currier identified two distinct spelling and statistical dialects:
+          <strong>Currier A</strong> (used in most Herbal monographs) and <strong>Currier B</strong>
+          (used in Balneological, Zodiac, and Starred Recipe pages), written across five distinct
+          scribal hands (<code>Hand 1</code> to <code>Hand 5</code>).
         </p>
       </div>
     </div>
@@ -542,7 +679,7 @@
           <div class="card">
             <div class="walkthrough-head">
               <div>
-                <span class="badge">{{ f.section }} ({{ f.sectionCode || '—' }})</span>
+                <span class="badge">{{ f.section }} ({{ f.sectionCode || '·' }})</span>
                 @if (f.quire) {
                   <span class="badge">Quire {{ f.quire }}</span>
                 }
@@ -594,7 +731,7 @@
                 </strong>
                 <div class="chips-wrap">
                   @for (w of f.labels; track $index) {
-                    <button type="button" class="word-chip" (click)="setWord(cleanToken(w))">
+                    <button type="button" class="word-chip" (click)="setWord(w)">
                       {{ w }}
                     </button>
                   }
@@ -615,7 +752,7 @@
                 </div>
                 <div class="line-eva">
                   @for (tok of splitTokens(ln.eva); track $index) {
-                    <button type="button" class="word-chip" (click)="setWord(cleanToken(tok))">
+                    <button type="button" class="word-chip" (click)="setWord(tok)">
                       {{ tok }}
                     </button>
                   }
@@ -636,39 +773,80 @@
       <div>
         <h1>Grammar, Root Lexicon &amp; Section Atlases</h1>
         <p class="section-sub">
-          High-confidence decoded vocabulary, the 8-case morphological suffix matrix across the top
-          root families, the 12 Zodiac calendar wheels, and the 20 Balneological hydrotherapy pages.
+          Reference tables showing how Voynich words are built from recurring root stems, how those
+          stems inflect across 8 grammatical roles, and how labels on the Zodiac and Bathing
+          diagrams connect to the recipe text.
+        </p>
+      </div>
+    </div>
+
+    <div class="explainer-banner" aria-label="How to read the grammar and atlas tables">
+      <div class="explainer-item">
+        <strong>1. Root Stems &amp; Physical Grounding</strong>
+        <p>
+          Voynich words are built around a core root stem (such as <code>ke/kee</code> for boiling,
+          <code>ch</code> for herbal infusion, <code>oror</code> for red Alkanet root, or
+          <code>kol</code> for a storage vessel). We ground each stem by checking what physical
+          objects it labels in the manuscript drawings.
+        </p>
+      </div>
+      <div class="explainer-item">
+        <strong>2. The 8-Case Inflectional Matrix</strong>
+        <p>
+          Just like Latin or German, a single Voynich root stem changes its prefix and suffix
+          depending on its role in a sentence: <code>o-</code> marks a named ingredient,
+          <code>d-/s-</code> marks taking from a source, <code>qo-</code> + <code>-edy</code> marks
+          an active boiling or washing step, and <code>-aiin</code> / <code>-am</code> marks a
+          measured dose or recipe stop.
+        </p>
+      </div>
+      <div class="explainer-item">
+        <strong>3. Zodiac &amp; Bathing Label Polarity</strong>
+        <p>
+          Labels written directly onto painted Zodiac star-nymphs and Balneological water pipes
+          overwhelmingly use nominal <code>o-/ol-</code> ingredient and vessel forms
+          (<code>olkol</code>, <code>okoldy</code>, <code>otar</code>), whereas active
+          <code>qo-</code> boiling commands (<code>qokeedy</code>) appear in the surrounding recipe
+          paragraphs.
         </p>
       </div>
     </div>
 
     <div class="card section-block">
-      <h2>Decoded Root Lexicon</h2>
+      <h2>1. Core Root Stem Dictionary (Physically Grounded Stems)</h2>
+      <p class="section-sub table-intro">
+        Click any inflected example word chip below to inspect its prefix, root stem, and suffix in
+        the word analyzer.
+      </p>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>EVA Word / Stem</th>
-              <th>Morphology</th>
-              <th>Category</th>
-              <th>Corpus Count</th>
+              <th>Root Stem</th>
+              <th>Semantic Category</th>
               <th>Plain-English Meaning</th>
-              <th>Key Manuscript Evidence</th>
+              <th>Common Inflected Forms (Click to Analyze)</th>
+              <th>Primary Sections</th>
+              <th>Visual &amp; Physical Grounding in the Manuscript</th>
             </tr>
           </thead>
           <tbody>
-            @for (item of voynich.explorerData()?.lexicon ?? []; track item.word) {
+            @for (item of voynich.explorerData()?.lexicon ?? []; track item.stem) {
               <tr>
                 <td>
-                  <button type="button" class="word-chip" (click)="setWord(cleanToken(item.word))">
-                    {{ item.word }}
-                  </button>
+                  <strong><code>{{ item.stem }}</code></strong>
                 </td>
-                <td><code>{{ item.morph }}</code></td>
                 <td><span class="badge">{{ item.category }}</span></td>
-                <td><strong>{{ item.count }}</strong></td>
                 <td><strong>{{ item.meaning }}</strong></td>
-                <td class="muted-cell">{{ item.evidence }}</td>
+                <td>
+                  @for (ex of splitTokens(item.examples); track $index) {
+                    <button type="button" class="word-chip" (click)="setWord(ex)">
+                      {{ ex }}
+                    </button>
+                  }
+                </td>
+                <td class="muted-cell">{{ item.sections }}</td>
+                <td class="muted-cell">{{ item.grounding }}</td>
               </tr>
             }
           </tbody>
@@ -676,39 +854,47 @@
       </div>
     </div>
 
-    <h2 class="subhead-lg">8-Case Morphological Paradigm Matrix</h2>
+    <h2 class="subhead-lg">2. 8-Case Morphological Paradigm Matrix (Top Full-Paradigm Stems)</h2>
+    <p class="section-sub table-intro">
+      Each card below shows one of the manuscript’s highest-frequency root stems and how it inflects
+      across all 8 grammatical slots across the 227-folio corpus.
+    </p>
     <div class="paradigm-grid">
       @for (p of voynich.explorerData()?.paradigms ?? []; track p.root) {
         <div class="card">
           <div class="item-top">
-            <h3>{{ p.root }}</h3>
-            <span class="badge">{{ p.domain }} · {{ p.total }} tokens</span>
+            <h3>
+              Root Stem <code>{{ p.root }}</code> · {{ p.domain }}
+            </h3>
+            <span class="badge">{{ p.total }} corpus tokens</span>
           </div>
-          <p class="muted-cell">{{ p.base_meaning }}</p>
+          <p class="muted-cell paradigm-sub">{{ p.base_meaning }}</p>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>Case</th>
-                  <th>Form</th>
-                  <th>Count</th>
-                  <th>Contextual Gloss</th>
+                  <th>Grammatical Slot</th>
+                  <th>Affix</th>
+                  <th>Top Form</th>
+                  <th>Hits</th>
+                  <th>Role in Recipes</th>
                 </tr>
               </thead>
               <tbody>
-                @for (c of p.cases; track c.case + c.form) {
+                @for (c of p.cases; track c.case) {
                   <tr>
-                    <td><strong>{{ c.case }}</strong> (<code>{{ c.suffix }}</code>)</td>
+                    <td><strong>{{ c.case }}</strong></td>
+                    <td><code>{{ c.suffix }}</code></td>
                     <td>
                       <button
                         type="button"
                         class="word-chip"
-                        (click)="setWord(cleanToken(c.form))"
+                        (click)="setWord(c.form)"
                       >
                         {{ c.form }}
                       </button>
                     </td>
-                    <td>{{ c.count }}</td>
+                    <td>{{ c.count }} ({{ c.pct }}%)</td>
                     <td class="muted-cell">{{ c.gloss }}</td>
                   </tr>
                 }
@@ -720,18 +906,24 @@
     </div>
 
     <div class="card section-block">
-      <h2>The 12 Zodiac Wheels (f70v2 to f73v)</h2>
+      <h2>3. The 12 Zodiac Wheels (f70v2 to f73v) &amp; Bilingual Month Glosses</h2>
+      <p class="section-sub table-intro">
+        Each Zodiac wheel features a 15th-century European month name written in its center
+        (<code>mars</code> = March through <code>decembre</code> = December) and is ringed by ~30
+        star-holding nymphs whose degree labels reappear across the Herbal and Recipe sections.
+      </p>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
               <th>Folio</th>
-              <th>Zodiac Sign</th>
-              <th>Month Crib</th>
-              <th>Currier Lang</th>
-              <th>Star Nymphs</th>
-              <th>Sample Star / Nymph Labels</th>
-              <th>Plain-English Gloss &amp; Cues</th>
+              <th>Zodiac Medallion</th>
+              <th>European Month Crib</th>
+              <th>Element &amp; Season</th>
+              <th>Ring Words</th>
+              <th>Nymph Labels</th>
+              <th><code>o-</code> Nominal Rate</th>
+              <th>Sample Star-Nymph Labels (Click to Analyze)</th>
             </tr>
           </thead>
           <tbody>
@@ -741,23 +933,24 @@
                   <button
                     type="button"
                     class="folio-jump-chip"
-                    (click)="jumpToCorpusFolio(z.folio.split(' ')[0])"
+                    (click)="jumpToCorpusFolio(z.folio)"
                   >
                     {{ z.folio }}
                   </button>
                 </td>
                 <td><strong>{{ z.sign }}</strong></td>
-                <td><span class="badge">{{ z.month }}</span></td>
-                <td>{{ z.lang }}</td>
-                <td>{{ z.nymphs }}</td>
+                <td><span class="badge">{{ z.european_month_gloss }}</span></td>
+                <td class="muted-cell">{{ z.triplicity }} ({{ z.season }})</td>
+                <td>{{ z.ring_token_count }}</td>
+                <td>{{ z.nymph_label_count }}</td>
+                <td><strong>{{ formatPercent(z.o_prefix_rate) }}</strong></td>
                 <td>
-                  @for (tok of splitTokens(z.sample_labels); track $index) {
-                    <button type="button" class="word-chip" (click)="setWord(cleanToken(tok))">
-                      {{ tok }}
+                  @for (lbl of z.top_nymph_labels.slice(0, 5); track $index) {
+                    <button type="button" class="word-chip" (click)="setWord(lbl)">
+                      {{ lbl }}
                     </button>
                   }
                 </td>
-                <td class="muted-cell">{{ z.gloss }}</td>
               </tr>
             }
           </tbody>
@@ -766,19 +959,23 @@
     </div>
 
     <div class="card section-block">
-      <h2>The 20 Balneological Pages (Quire 13: f75r to f84v)</h2>
+      <h2>4. The 20 Balneological Pages (Quire 13: f75r to f84v)</h2>
+      <p class="section-sub table-intro">
+        Compares the painted pipe and bather labels (dominated by <code>o-/ol-</code> vessel nouns
+        like <code>olkol</code> and <code>okoldy</code>) against the surrounding recipe paragraphs
+        (dominated by active <code>qokeedy</code> boiling and <code>shedy</code> washing verbs).
+      </p>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
               <th>Folio</th>
-              <th>Apparatus / Scene</th>
-              <th>Words</th>
-              <th><code>qok-</code> Rate</th>
-              <th><code>ol-</code> Rate</th>
-              <th>Labels</th>
-              <th>Key Pipe &amp; Pool Labels</th>
-              <th>Functional Summary</th>
+              <th>Prose Words</th>
+              <th>Boil Rate (<code>qokeedy</code>)</th>
+              <th>Wash Rate (<code>shedy</code>)</th>
+              <th>Vessel Rate (<code>ol-</code>)</th>
+              <th>Pipe &amp; Nymph Labels</th>
+              <th>Top Prose Recipe Words</th>
             </tr>
           </thead>
           <tbody>
@@ -789,19 +986,28 @@
                     {{ b.folio }}
                   </button>
                 </td>
-                <td><strong>{{ b.title }}</strong></td>
-                <td>{{ b.words }}</td>
-                <td><code>{{ b.qok_rate }}</code></td>
-                <td><code>{{ b.ol_rate }}</code></td>
-                <td>{{ b.labels_count }}</td>
+                <td><strong>{{ b.prose_tokens }}</strong></td>
+                <td><code>{{ formatPercent(b.thermal_boil_rate) }}</code></td>
+                <td><code>{{ formatPercent(b.wash_bathe_rate) }}</code></td>
+                <td><code>{{ formatPercent(b.pool_vessel_rate) }}</code></td>
                 <td>
-                  @for (tok of splitTokens(b.key_labels); track $index) {
-                    <button type="button" class="word-chip" (click)="setWord(cleanToken(tok))">
-                      {{ tok }}
+                  @if (combineBalneoLabels(b).length > 0) {
+                    @for (lbl of combineBalneoLabels(b); track $index) {
+                      <button type="button" class="word-chip" (click)="setWord(lbl)">
+                        {{ lbl }}
+                      </button>
+                    }
+                  } @else {
+                    <span class="muted-inline">Unlabeled pool / pure text</span>
+                  }
+                </td>
+                <td>
+                  @for (pw of b.top_prose_words.slice(0, 4); track $index) {
+                    <button type="button" class="word-chip" (click)="setWord(pw)">
+                      {{ pw }}
                     </button>
                   }
                 </td>
-                <td class="muted-cell">{{ b.summary }}</td>
               </tr>
             }
           </tbody>
@@ -818,7 +1024,7 @@
           Browse all {{ voynich.version.stats.markdownGuides }} research guides,
           {{ voynich.version.stats.dataFiles }} raw JSON and TXT datasets,
           {{ voynich.version.stats.highResScans }} high-resolution folio scans, and the 2 full
-          manuscript PDF books.
+          Public Domain manuscript PDF books.
         </p>
       </div>
     </div>
@@ -1002,10 +1208,26 @@
       @case ('scans') {
         <div class="books-grid">
           @for (b of voynich.version.books; track b.id) {
-            <div class="card">
-              <span class="badge">{{ b.pages }} Pages · {{ b.resolution }} · {{ b.sizeMB }} MB</span>
+            <div class="card book-card">
+              <div>
+                <span class="badge">{{ b.pages }} Pages · {{ b.resolution }} · {{ b.sizeMB }} MB</span>
+                <span class="badge">Public Domain</span>
+              </div>
               <h2 class="book-title">{{ b.name }}</h2>
               <p class="muted-cell">{{ b.description }}</p>
+
+              <div class="book-provenance">
+                <div>
+                  <strong>Archival Source:</strong>&nbsp;<a
+                    [href]="b.sourceUrl"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    >{{ b.sourceName }} ↗</a
+                  >
+                </div>
+                <div><strong>License &amp; Rights:</strong>&nbsp;{{ b.license }}</div>
+              </div>
+
               <div class="book-actions">
                 <a
                   [href]="b.downloadUrl"
@@ -1014,6 +1236,14 @@
                   class="btn-primary"
                 >
                   Download Full PDF ({{ b.sizeMB }} MB) ↗
+                </a>
+                <a
+                  [href]="b.sourceUrl"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="btn-outline"
+                >
+                  Original Catalog Page ↗
                 </a>
                 <a
                   [href]="b.githubBlobUrl"
@@ -1035,7 +1265,9 @@
                 High-Resolution Folio Scan Gallery ({{ voynich.version.stats.highResScans }} PNGs)
               </h2>
               <p class="muted-cell">
-                Click any folio scan to open it in the full-resolution zoom lightbox.
+                Public Domain digital surrogates courtesy of Yale University’s Beinecke Rare Book
+                and Manuscript Library (MS 408). Click any scan to open it in the full-resolution
+                lightbox.
               </p>
             </div>
             <div>
@@ -1107,7 +1339,7 @@
       (click)="voynich.closeLightbox()"
     ></button>
     <div class="lightbox-toolbar">
-      <span>{{ imgUrl.split('/').pop() }}</span>
+      <span class="lightbox-filename">{{ imgUrl.split('/').pop() }}</span>
       <div class="lightbox-actions">
         <a
           [href]="imgUrl"
@@ -1125,7 +1357,7 @@
     <img
       [src]="imgUrl"
       class="lightbox-img"
-      alt="Full-resolution Voynich manuscript scan"
+      [alt]="'Full-resolution Voynich manuscript scan (' + (imgUrl.split('/').pop() || '') + ')'"
     />
   </div>
 }

@@ -7,7 +7,7 @@ export const VOYNICH_VERSION = {
   "commitDate": "2026-10-12",
   "commitIso": "2026-10-12 10:34:28 +0200",
   "commitSubject": "feat(wave39): add Attacks 165-168 (Drawing Intrusions, Right Titles, 25-Paragraph Reader) & sync v5.0 Explorer and human-readable guides",
-  "syncedAt": "2026-10-12T08:59:22.544Z",
+  "syncedAt": "2026-10-12T10:34:42.170Z",
   "stats": {
     "transcribedFolios": 227,
     "totalWords": 38949,
@@ -28,6 +28,9 @@ export const VOYNICH_VERSION = {
       "resolution": "~1500 × 2000 px",
       "sizeMB": 138.4,
       "description": "Primary visual forensics scan with 2x sharper pixel density, printed Beinecke Image IDs (1006076 to 1006283), and 4 physical fore-edge and spine scans (p210 to p213).",
+      "sourceName": "Yale University Beinecke Rare Book & Manuscript Library (MS 408)",
+      "sourceUrl": "https://collections.library.yale.edu/catalog/2002046",
+      "license": "Public Domain (CC0 1.0 · Yale University Library Digital Collections)",
       "downloadUrl": "https://media.githubusercontent.com/media/d2kx/voynich-research/75c1c09e1215a3d0f32f301b6a95b0db87a1a817/books/voynich-yale-beinecke-2026-highres-214p.pdf",
       "githubBlobUrl": "https://github.com/d2kx/voynich-research/blob/75c1c09e1215a3d0f32f301b6a95b0db87a1a817/books/voynich-yale-beinecke-2026-highres-214p.pdf"
     },
@@ -39,6 +42,9 @@ export const VOYNICH_VERSION = {
       "resolution": "~1082 × 1500 px",
       "sizeMB": 75.2,
       "description": "Fast navigation edition featuring a 210-entry clickable PDF bookmark sidebar (1r through 116v) that maps 1:1 to pages 1 to 209 of the Yale PDF.",
+      "sourceName": "Internet Archive (TheVoynichManuscript · Yale Beinecke MS 408 scans)",
+      "sourceUrl": "https://archive.org/details/TheVoynichManuscript",
+      "license": "Public Domain (Underlying 15th-century manuscript MS 408 & Beinecke scans)",
       "downloadUrl": "https://media.githubusercontent.com/media/d2kx/voynich-research/75c1c09e1215a3d0f32f301b6a95b0db87a1a817/books/voynich-tcpdf-2014-bookmarked-210p.pdf",
       "githubBlobUrl": "https://github.com/d2kx/voynich-research/blob/75c1c09e1215a3d0f32f301b6a95b0db87a1a817/books/voynich-tcpdf-2014-bookmarked-210p.pdf"
     }
