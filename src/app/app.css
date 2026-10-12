@@ -28,13 +28,13 @@
   top: 0;
   left: 0;
   right: 0;
-  background-color: color-mix(in srgb, var(--surface-card) 82%, transparent);
+  background-color: color-mix(in srgb, var(--surface-card) 92%, transparent);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 }
 
 .site-header.header-idle {
-  opacity: 0.28;
+  opacity: 0.85;
 }
 
 .site-header.header-idle:hover,
@@ -68,7 +68,7 @@
 .back-home-pill {
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--text-muted);
+  color: var(--text-primary);
   text-decoration: none;
   padding: 0.25rem 0.65rem;
   border-radius: 999px;

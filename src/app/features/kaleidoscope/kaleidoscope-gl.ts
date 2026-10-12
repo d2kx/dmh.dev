@@ -183,6 +183,10 @@ export class KaleidoscopeEngine {
   private simTime = 3.2;
   private lastFrameTimestamp = 0;
   private rafId = 0;
+  private timerId: ReturnType<typeof setTimeout> | null = null;
+  private destroyed = false;
+  private isSoftwareRenderer = false;
+  private resolutionScale = 1.0;
   private readonly onStatsCallback?: (stats: FrameStats) => void;
   private frameCount = 0;
   private statsAccumMs = 0;
@@ -211,6 +215,17 @@ export class KaleidoscopeEngine {
       (canvas.getContext('webgl', contextAttributes) as WebGLRenderingContext | null);
 
     if (this.gl) {
+      const rendererStr = String(this.gl.getParameter(this.gl.RENDERER) || '');
+      const debugExt = this.gl.getExtension('WEBGL_debug_renderer_info');
+      const unmaskedRenderer = debugExt
+        ? String(this.gl.getParameter(debugExt.UNMASKED_RENDERER_WEBGL) || '')
+        : '';
+      this.isSoftwareRenderer = /SwiftShader|llvmpipe|Basic Render|Software/i.test(
+        `${rendererStr} ${unmaskedRenderer}`,
+      );
+      if (this.isSoftwareRenderer) {
+        this.resolutionScale = 0.35;
+      }
       this.initWebGL(this.gl);
     }
 
@@ -218,7 +233,9 @@ export class KaleidoscopeEngine {
   }
 
   resize(): void {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const isMobileViewport = window.innerWidth < 768;
+    const maxDpr = isMobileViewport ? 1.25 : 2;
+    const dpr = Math.min(window.devicePixelRatio || 1, maxDpr) * this.resolutionScale;
     const width = Math.max(1, Math.floor(window.innerWidth * dpr));
     const height = Math.max(1, Math.floor(window.innerHeight * dpr));
 
@@ -235,21 +252,31 @@ export class KaleidoscopeEngine {
   }
 
   start(): void {
-    if (this.rafId) return;
+    if (this.rafId || this.timerId) return;
+    this.destroyed = false;
     this.lastFrameTimestamp = performance.now();
     const tick = (now: number) => {
+      if (this.destroyed) return;
+      this.rafId = 0;
+
       const dtMs = Math.min(100, Math.max(0, now - this.lastFrameTimestamp));
       this.lastFrameTimestamp = now;
 
       this.frameCount++;
       this.statsAccumMs += dtMs;
-      if (this.statsAccumMs >= 250 && this.onStatsCallback) {
+      if (this.statsAccumMs >= 250) {
         const avgMs = this.statsAccumMs / this.frameCount;
-        const fps = avgMs > 0 ? Math.round(1000 / avgMs) : 60;
-        this.onStatsCallback({
-          fps: Math.min(240, fps),
-          frameTimeMs: Number(avgMs.toFixed(1)),
-        });
+        if (avgMs > 32 && this.resolutionScale > 0.5) {
+          this.resolutionScale = Math.max(0.5, this.resolutionScale * 0.8);
+          this.resize();
+        }
+        if (this.onStatsCallback) {
+          const fps = avgMs > 0 ? Math.round(1000 / avgMs) : 60;
+          this.onStatsCallback({
+            fps: Math.min(240, fps),
+            frameTimeMs: Number(avgMs.toFixed(1)),
+          });
+        }
         this.frameCount = 0;
         this.statsAccumMs = 0;
       }
@@ -257,14 +284,36 @@ export class KaleidoscopeEngine {
       const tempoMod = 0.92 + 0.16 * Math.sin(this.simTime * 0.07);
       this.simTime += (dtMs / 1000) * this.timeScale * tempoMod;
 
+      const drawStart = performance.now();
       this.draw();
-      this.rafId = requestAnimationFrame(tick);
+      const drawDuration = performance.now() - drawStart;
+
+      if (this.isSoftwareRenderer || drawDuration > 10) {
+        this.timerId = setTimeout(() => {
+          this.timerId = null;
+          if (!this.destroyed) {
+            this.rafId = requestAnimationFrame(tick);
+          }
+        }, this.isSoftwareRenderer ? 64 : 24);
+      } else {
+        this.rafId = requestAnimationFrame(tick);
+      }
     };
 
-    this.rafId = requestAnimationFrame(tick);
+    this.timerId = setTimeout(() => {
+      this.timerId = null;
+      if (!this.destroyed) {
+        this.rafId = requestAnimationFrame(tick);
+      }
+    }, 80);
   }
 
   destroy(): void {
+    this.destroyed = true;
+    if (this.timerId) {
+      clearTimeout(this.timerId);
+      this.timerId = null;
+    }
     if (this.rafId) {
       cancelAnimationFrame(this.rafId);
       this.rafId = 0;

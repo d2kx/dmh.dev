@@ -227,6 +227,9 @@ export class Voynich {
       const raw = (params.get('section') || 'overview').toLowerCase() as VoynichSection;
       const section: VoynichSection = VALID_SECTIONS.has(raw) ? raw : 'overview';
       this.activeSection.set(section);
+      if (section !== 'overview') {
+        void this.voynich.ensureInitialized();
+      }
       if (section === 'folios') {
         void this.voynich.ensureCorpusLoaded();
       }
@@ -256,15 +259,25 @@ export class Voynich {
     });
 
     afterNextRender(() => {
-      void this.voynich.ensureInitialized().then(() => {
-        const wt = this.route.snapshot.queryParamMap.get('walkthrough');
-        if (wt) {
-          this.selectWalkthroughByFolio(wt);
-        }
-        if (this.activeSection() === 'library' && !this.activeDocHtml()) {
-          void this.selectDoc(this.activeDocSlug());
-        }
-      });
+      const initExplorer = () => {
+        void this.voynich.ensureInitialized().then(() => {
+          const wt = this.route.snapshot.queryParamMap.get('walkthrough');
+          if (wt) {
+            this.selectWalkthroughByFolio(wt);
+          }
+          if (this.activeSection() === 'library' && !this.activeDocHtml()) {
+            void this.selectDoc(this.activeDocSlug());
+          }
+        });
+      };
+
+      if (this.activeSection() !== 'overview' || this.route.snapshot.queryParamMap.has('walkthrough')) {
+        initExplorer();
+      } else if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+        window.requestIdleCallback(() => initExplorer(), { timeout: 1200 });
+      } else {
+        setTimeout(() => initExplorer(), 400);
+      }
     });
   }
 
