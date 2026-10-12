@@ -55,13 +55,13 @@
 }
 
 .header-inner.header-inner-wide {
-  max-width: 68rem;
+  max-width: 74rem;
 }
 
 .project-brand-group {
   display: flex;
   align-items: center;
-  gap: 0.7rem;
+  gap: 0.55rem;
   flex-wrap: wrap;
 }
 
@@ -416,7 +416,7 @@
 }
 
 .site-main.site-main-wide {
-  max-width: 68rem;
+  max-width: 74rem;
   padding: 2.25rem 1.25rem 3.5rem;
 }
 
@@ -471,7 +471,7 @@
 }
 
 .footer-inner.footer-inner-wide {
-  max-width: 68rem;
+  max-width: 74rem;
 }
 
 .footer-brand {
