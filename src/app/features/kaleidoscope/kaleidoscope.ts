@@ -34,6 +34,12 @@ import { KaleidoscopeEngine } from './kaleidoscope-gl';
       width: 100%;
       height: 100%;
       position: relative;
+      background: radial-gradient(
+        circle at 50% 50%,
+        rgba(244, 63, 133, 0.22) 0%,
+        rgba(126, 34, 206, 0.14) 40%,
+        #090514 80%
+      );
     }
 
     .kaleidoscope-canvas {

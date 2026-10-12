@@ -170,7 +170,7 @@ void main() {
 
 export class KaleidoscopeEngine {
   private readonly canvas: HTMLCanvasElement;
-  private readonly gl: WebGLRenderingContext | WebGL2RenderingContext | null;
+  private gl: WebGLRenderingContext | WebGL2RenderingContext | null = null;
   private program: WebGLProgram | null = null;
   private uniformLocations: {
     time: WebGLUniformLocation | null;
@@ -200,36 +200,6 @@ export class KaleidoscopeEngine {
       typeof window.matchMedia === 'function' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     this.timeScale = prefersReducedMotion ? 0.25 : 1.0;
-
-    const contextAttributes: WebGLContextAttributes = {
-      alpha: false,
-      antialias: false,
-      depth: false,
-      stencil: false,
-      powerPreference: 'high-performance',
-      preserveDrawingBuffer: false,
-    };
-
-    this.gl =
-      (canvas.getContext('webgl2', contextAttributes) as WebGL2RenderingContext | null) ||
-      (canvas.getContext('webgl', contextAttributes) as WebGLRenderingContext | null);
-
-    if (this.gl) {
-      const rendererStr = String(this.gl.getParameter(this.gl.RENDERER) || '');
-      const debugExt = this.gl.getExtension('WEBGL_debug_renderer_info');
-      const unmaskedRenderer = debugExt
-        ? String(this.gl.getParameter(debugExt.UNMASKED_RENDERER_WEBGL) || '')
-        : '';
-      this.isSoftwareRenderer = /SwiftShader|llvmpipe|Basic Render|Software/i.test(
-        `${rendererStr} ${unmaskedRenderer}`,
-      );
-      if (this.isSoftwareRenderer) {
-        this.resolutionScale = 0.35;
-      }
-      this.initWebGL(this.gl);
-    }
-
-    this.resize();
   }
 
   resize(): void {
@@ -244,17 +214,71 @@ export class KaleidoscopeEngine {
       this.canvas.height = height;
     }
 
-    if (this.gl) {
+    if (this.gl && this.program) {
       this.gl.viewport(0, 0, width, height);
+      this.draw();
     }
-
-    this.draw();
   }
 
   start(): void {
     if (this.rafId || this.timerId) return;
     this.destroyed = false;
-    this.lastFrameTimestamp = performance.now();
+
+    // Step 1: Acquire WebGL context and kick off shader compilation + linking in a separate macrotask
+    this.timerId = setTimeout(() => {
+      if (this.destroyed) return;
+      const contextAttributes: WebGLContextAttributes = {
+        alpha: false,
+        antialias: false,
+        depth: false,
+        stencil: false,
+        powerPreference: 'high-performance',
+        preserveDrawingBuffer: false,
+      };
+
+      this.gl =
+        (this.canvas.getContext('webgl2', contextAttributes) as WebGL2RenderingContext | null) ||
+        (this.canvas.getContext('webgl', contextAttributes) as WebGLRenderingContext | null);
+
+      if (!this.gl) {
+        this.resize();
+        this.drawFallback2D();
+        return;
+      }
+
+      const gl = this.gl;
+      const rendererStr = String(gl.getParameter(gl.RENDERER) || '');
+      const debugExt = gl.getExtension('WEBGL_debug_renderer_info');
+      const unmaskedRenderer = debugExt
+        ? String(gl.getParameter(debugExt.UNMASKED_RENDERER_WEBGL) || '')
+        : '';
+      this.isSoftwareRenderer = /SwiftShader|llvmpipe|Basic Render|Software/i.test(
+        `${rendererStr} ${unmaskedRenderer}`,
+      );
+      if (this.isSoftwareRenderer) {
+        this.resolutionScale = 0.35;
+      }
+
+      const pendingProgram = this.beginShaderCompileAndLink(gl);
+      if (!pendingProgram) return;
+
+      // Step 2: Finalize program link in next macrotask so ANGLE/driver links off the main thread
+      this.timerId = setTimeout(() => {
+        if (this.destroyed) return;
+        this.finalizeWebGLProgram(gl, pendingProgram);
+        this.resize();
+
+        // Step 3: Start continuous animation loop in subsequent macrotask
+        this.timerId = setTimeout(() => {
+          this.timerId = null;
+          if (!this.destroyed) {
+            this.lastFrameTimestamp = performance.now();
+            this.rafId = requestAnimationFrame(tick);
+          }
+        }, 32);
+      }, 24);
+    }, 16);
+
     const tick = (now: number) => {
       if (this.destroyed) return;
       this.rafId = 0;
@@ -299,13 +323,6 @@ export class KaleidoscopeEngine {
         this.rafId = requestAnimationFrame(tick);
       }
     };
-
-    this.timerId = setTimeout(() => {
-      this.timerId = null;
-      if (!this.destroyed) {
-        this.rafId = requestAnimationFrame(tick);
-      }
-    }, 80);
   }
 
   destroy(): void {
@@ -324,18 +341,31 @@ export class KaleidoscopeEngine {
     }
   }
 
-  private initWebGL(gl: WebGLRenderingContext | WebGL2RenderingContext): void {
-    const vert = this.compileShader(gl, gl.VERTEX_SHADER, VERTEX_SHADER_SOURCE);
-    const frag = this.compileShader(gl, gl.FRAGMENT_SHADER, FRAGMENT_SHADER_SOURCE);
-    if (!vert || !frag) return;
+  private beginShaderCompileAndLink(
+    gl: WebGLRenderingContext | WebGL2RenderingContext,
+  ): WebGLProgram | null {
+    const vert = gl.createShader(gl.VERTEX_SHADER);
+    const frag = gl.createShader(gl.FRAGMENT_SHADER);
+    if (!vert || !frag) return null;
+
+    gl.shaderSource(vert, VERTEX_SHADER_SOURCE);
+    gl.compileShader(vert);
+    gl.shaderSource(frag, FRAGMENT_SHADER_SOURCE);
+    gl.compileShader(frag);
 
     const program = gl.createProgram();
-    if (!program) return;
+    if (!program) return null;
 
     gl.attachShader(program, vert);
     gl.attachShader(program, frag);
     gl.linkProgram(program);
+    return program;
+  }
 
+  private finalizeWebGLProgram(
+    gl: WebGLRenderingContext | WebGL2RenderingContext,
+    program: WebGLProgram,
+  ): void {
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
       console.error('Shader program link error:', gl.getProgramInfoLog(program));
       return;
@@ -360,23 +390,6 @@ export class KaleidoscopeEngine {
       time: gl.getUniformLocation(program, 'u_time'),
       resolution: gl.getUniformLocation(program, 'u_resolution'),
     };
-  }
-
-  private compileShader(
-    gl: WebGLRenderingContext | WebGL2RenderingContext,
-    type: number,
-    source: string,
-  ): WebGLShader | null {
-    const shader = gl.createShader(type);
-    if (!shader) return null;
-    gl.shaderSource(shader, source);
-    gl.compileShader(shader);
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-      console.error('Shader compile error:', gl.getShaderInfoLog(shader));
-      gl.deleteShader(shader);
-      return null;
-    }
-    return shader;
   }
 
   private draw(): void {
