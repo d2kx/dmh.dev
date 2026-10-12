@@ -477,7 +477,7 @@ export function renderMarkdownToHtml(md: string): string {
       flushTable();
       flushList();
       html.push(
-        `<p class="formula-line"><code>PREFIX (Action / Role)</code> + <code>ROOT STEM (Plant / Star / Vessel)</code> + <code>SUFFIX (Case / Dose)</code></p>`,
+        `<div class="callout-box"><strong>Prefix</strong> (Action / Role) &nbsp;+&nbsp; <strong>Root Stem</strong> (Plant / Star / Vessel) &nbsp;+&nbsp; <strong>Suffix</strong> (Case / Dose)</div>`,
       );
       continue;
     }
@@ -502,21 +502,21 @@ export function renderMarkdownToHtml(md: string): string {
 
     if (/^---+$/.test(trimmed)) {
       flushList();
-      html.push('<hr style="border:0;border-top:1px solid var(--border-subtle);margin:1.5rem 0;" />');
       continue;
     }
 
     const headingMatch = trimmed.match(/^(#{1,4})\s+(.+)$/);
     if (headingMatch) {
       flushList();
-      const level = headingMatch[1].length;
+      const rawLevel = headingMatch[1].length;
+      const level = rawLevel === 1 ? 1 : rawLevel === 2 ? 2 : 3;
       html.push(`<h${level}>${formatInlineMarkdown(headingMatch[2])}</h${level}>`);
       continue;
     }
 
     if (trimmed.startsWith('>')) {
       flushList();
-      html.push(`<blockquote>${formatInlineMarkdown(trimmed.replace(/^>\s*/, ''))}</blockquote>`);
+      html.push(`<p>${formatInlineMarkdown(trimmed.replace(/^>\s*/, ''))}</p>`);
       continue;
     }
 

@@ -8,13 +8,13 @@ Personal website, interactive projects, and blog for **Dennis Martin Herbers** (
   - **Build-Time Prerendering (SSG)** (`RenderMode.Prerender`) for static content and project routes (`/`, `/voynich`, `/voynich/:section`, `/kaleidoscope`, `/blog`, `/impressum`, `/privacy`).
   - **Server-Side Rendering (SSR)** (`RenderMode.Server`) via Express 5 & `AngularNodeAppEngine` (`src/server.ts`) for dynamic routes and server endpoints (`/healthz`, `/api/legal-info`, `/pages/:filename`, `/data/:filename`).
 - **Context-Aware App Shell**:
-  - Top toolbar dynamically adapts between the main `dmh.dev` header (with a Prisma-inspired `Projects` flyout menu), the **Voynich Manuscript Explorer** (`/voynich`), and the full-bleed **Kaleidoscope** WebGL shader (`/kaleidoscope`).
+  - Top toolbar dynamically adapts between the main `dmh.dev` header (with a Prisma-inspired `Projects` flyout menu), **Voynich** (`/voynich`), and the full-bleed **Kaleidoscope** WebGL shader (`/kaleidoscope`).
 - **UI & Design**: `@angular/material` & `@angular/cdk` with a custom Sakura / Cherry-Blossom Pink Light & Dark theme (`light-dark()`) and self-hosted `Google Sans Flex Variable` typography (`@fontsource-variable/google-sans-flex`, SIL Open Font License 1.1).
 - **Hosting & Deployment**: [Railway](https://railway.com) (`dmh.dev` project, single `web` service) with Railpack build caching, Edge CDN, and Serverless (App Sleep) enabled for low-cost operation.
 
 ## Voynich Manuscript Digital Surrogates & Licensing
 
-The high-resolution manuscript scans (`/pages/*`) and full PDF editions linked in the **Voynich Manuscript Explorer** (`/voynich/library?subtab=scans`) are **Public Domain** digital surrogates of the 15th-century Voynich Manuscript (**Beinecke MS 408**):
+The high-resolution manuscript scans (`/pages/*`) and full PDF editions linked in **Voynich** (`/voynich/library?subtab=scans`) are **Public Domain** digital surrogates of the 15th-century Voynich Manuscript (**Beinecke MS 408**):
 
 1. **Yale Beinecke High-Resolution Export (`voynich-yale-beinecke-2026-highres-214p.pdf`, 214 pages, 138.4 MB)**:
    - **Source**: Yale University Library, Beinecke Rare Book and Manuscript Library Digital Collections · [Voynich Manuscript, MS 408](https://collections.library.yale.edu/catalog/2002046).

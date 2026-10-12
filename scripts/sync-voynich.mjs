@@ -43,6 +43,32 @@ function cleanDashes(str) {
   return String(str).replace(/\s*—\s*/g, ' · ');
 }
 
+// Helper to flatten label/title objects ({ locus, type, words: string[] }) into clean string tokens
+function extractWordsList(rawArr, limit = 32) {
+  if (!Array.isArray(rawArr)) return [];
+  const out = [];
+  const seen = new Set();
+  for (const item of rawArr) {
+    const words =
+      typeof item === 'string'
+        ? item.split(/\s+/)
+        : Array.isArray(item?.words)
+          ? item.words
+          : typeof item?.text === 'string'
+            ? item.text.split(/\s+/)
+            : [];
+    for (const w of words) {
+      const clean = String(w).replace(/`/g, '').trim();
+      if (clean && !seen.has(clean)) {
+        seen.add(clean);
+        out.push(clean);
+        if (out.length >= limit) return out;
+      }
+    }
+  }
+  return out;
+}
+
 // 2. Extract embedded DATA JSON from explorer/index.html
 const explorerHtml = fs.readFileSync(path.join(VOYNICH_REPO, 'explorer', 'index.html'), 'utf-8');
 const dataMatch = explorerHtml.match(/const DATA = (\{[\s\S]*?\});\s*\n\s*const PREFIX_RULES/);
@@ -51,14 +77,24 @@ if (!dataMatch) {
 }
 const explorerData = JSON.parse(cleanDashes(dataMatch[1]));
 
-// Normalize image paths in explorerData.folios and explorerData.specimens to `/pages/...`
+// Normalize image paths and strip raw markdown backticks in explorerData.folios and explorerData.specimens
 for (const f of explorerData.folios) {
   if (f.image) f.image = '/pages/' + path.basename(f.image);
   if (f.secondary_image) f.secondary_image = '/pages/' + path.basename(f.secondary_image);
+  if (f.title) f.title = String(f.title).replace(/`/g, '');
+  if (f.summary) f.summary = String(f.summary).replace(/`/g, '');
+  if (Array.isArray(f.clauses)) {
+    for (const c of f.clauses) {
+      if (c.english) c.english = String(c.english).replace(/`/g, '');
+    }
+  }
 }
 for (const s of explorerData.specimens) {
   const img = s.image_rel_notes || s.image || '';
   s.imageUrl = img ? '/pages/' + path.basename(img) : '';
+  if (s.plain_english_dossier) {
+    s.plain_english_dossier = String(s.plain_english_dossier).replace(/`/g, '');
+  }
 }
 
 // 3. Scan all git-tracked images in pages/
@@ -172,8 +208,8 @@ const foliosList = Object.values(folioIndexRaw.folios).map((f) => {
     pdfPage: pdfInfo.pdf1_page || null,
     beineckeId: pdfInfo.beinecke_image_id || '',
     comments: f.comments || [],
-    labels: (f.labels || []).slice(0, 40),
-    titles: f.right_justified_titles || [],
+    labels: extractWordsList(f.labels, 40),
+    titles: extractWordsList(f.right_justified_titles, 24),
     scans: directScans,
     lines: (linesByFolio.get(f.folio) ?? []).slice(0, 80),
   };
@@ -376,7 +412,7 @@ for (const docEntry of rawDocs) {
 for (const f of explorerData.folios) {
   const primaryId = String(f.folio || '').split(/\s+/)[0].trim();
   const idxEntry = folioIndexRaw.folios?.[primaryId];
-  f.labels = Array.isArray(idxEntry?.labels) ? idxEntry.labels.slice(0, 24) : [];
+  f.labels = extractWordsList(idxEntry?.labels, 24);
 }
 
 // 7c. Populate 8-case morphological paradigm matrix from attack149 if explorerData.paradigms is empty

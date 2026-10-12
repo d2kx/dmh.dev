@@ -11,12 +11,12 @@
 
 ## Apps & Projects
 
-- [Voynich Manuscript Explorer](https://www.dmh.dev/voynich): Interactive visual, linguistic, and computational explorer for the Voynich Manuscript (Beinecke MS 408) with a 3-step word decoder, 31 folio walkthroughs, 30 specimen cribs, 227-folio corpus, and 44 research guides.
+- [Voynich](https://www.dmh.dev/voynich): Exploratory visual, linguistic, and computational research into the Voynich Manuscript (Beinecke MS 408) with a 3-step word decoder, 39 folio walkthroughs, 40 specimen cribs, 227-folio corpus, and 47 research guides.
   - [Walkthroughs](https://www.dmh.dev/voynich/walkthroughs)
   - [Identifications](https://www.dmh.dev/voynich/identifications)
+  - [Research Library](https://www.dmh.dev/voynich/library)
   - [227-Folio Corpus](https://www.dmh.dev/voynich/folios)
   - [Grammar & Atlases](https://www.dmh.dev/voynich/grammar)
-  - [Research Library](https://www.dmh.dev/voynich/library)
 - [Kaleidoscope](https://www.dmh.dev/kaleidoscope): Interactive WebGL shader kaleidoscope blending psychedelic fractal symmetry with sakura cherry blossom geometry.
 - [dmh.dev Repository](https://github.com/d2kx/dmh.dev): Public repository for dmh.dev.
 

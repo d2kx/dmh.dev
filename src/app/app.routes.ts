@@ -19,7 +19,7 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        title: 'Voynich Manuscript Explorer | dmh.dev',
+        title: 'Voynich | dmh.dev',
         data: {
           seo: {
             description:
@@ -31,7 +31,7 @@ export const routes: Routes = [
       },
       {
         path: ':section',
-        title: 'Voynich Manuscript Explorer | dmh.dev',
+        title: 'Voynich | dmh.dev',
         data: {
           seo: {
             description:

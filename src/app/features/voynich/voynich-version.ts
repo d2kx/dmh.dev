@@ -2,22 +2,22 @@
 export const VOYNICH_VERSION = {
   "repo": "d2kx/voynich-research",
   "repoUrl": "https://github.com/d2kx/voynich-research",
-  "commitSha": "75c1c09e1215a3d0f32f301b6a95b0db87a1a817",
-  "shortSha": "75c1c09",
+  "commitSha": "0fc370c7808b4d94fbd22d70e2e82d7894b4c378",
+  "shortSha": "0fc370c",
   "commitDate": "2026-10-12",
-  "commitIso": "2026-10-12 10:34:28 +0200",
-  "commitSubject": "feat(wave39): add Attacks 165-168 (Drawing Intrusions, Right Titles, 25-Paragraph Reader) & sync v5.0 Explorer and human-readable guides",
-  "syncedAt": "2026-10-12T10:34:42.170Z",
+  "commitIso": "2026-10-12 14:27:23 +0200",
+  "commitSubject": "Wave 41 (Attacks 173-176 / Discoveries 190-193): Quire Signatures, Multi-Row Pharma Shelves, Weirdo Glyph Atlas & v7.0 Explorer",
+  "syncedAt": "2026-10-12T12:43:45.613Z",
   "stats": {
     "transcribedFolios": 227,
     "totalWords": 38949,
     "totalLabels": 1029,
     "totalDrawingIntrusions": 758,
-    "walkthroughFolios": 31,
-    "flagshipSpecimens": 30,
-    "highResScans": 208,
-    "markdownGuides": 44,
-    "dataFiles": 190
+    "walkthroughFolios": 39,
+    "flagshipSpecimens": 40,
+    "highResScans": 221,
+    "markdownGuides": 47,
+    "dataFiles": 198
   },
   "books": [
     {
@@ -31,8 +31,8 @@ export const VOYNICH_VERSION = {
       "sourceName": "Yale University Beinecke Rare Book & Manuscript Library (MS 408)",
       "sourceUrl": "https://collections.library.yale.edu/catalog/2002046",
       "license": "Public Domain (CC0 1.0 · Yale University Library Digital Collections)",
-      "downloadUrl": "https://media.githubusercontent.com/media/d2kx/voynich-research/75c1c09e1215a3d0f32f301b6a95b0db87a1a817/books/voynich-yale-beinecke-2026-highres-214p.pdf",
-      "githubBlobUrl": "https://github.com/d2kx/voynich-research/blob/75c1c09e1215a3d0f32f301b6a95b0db87a1a817/books/voynich-yale-beinecke-2026-highres-214p.pdf"
+      "downloadUrl": "https://media.githubusercontent.com/media/d2kx/voynich-research/0fc370c7808b4d94fbd22d70e2e82d7894b4c378/books/voynich-yale-beinecke-2026-highres-214p.pdf",
+      "githubBlobUrl": "https://github.com/d2kx/voynich-research/blob/0fc370c7808b4d94fbd22d70e2e82d7894b4c378/books/voynich-yale-beinecke-2026-highres-214p.pdf"
     },
     {
       "id": "tcpdf-2014",
@@ -45,8 +45,8 @@ export const VOYNICH_VERSION = {
       "sourceName": "Internet Archive (TheVoynichManuscript · Yale Beinecke MS 408 scans)",
       "sourceUrl": "https://archive.org/details/TheVoynichManuscript",
       "license": "Public Domain (Underlying 15th-century manuscript MS 408 & Beinecke scans)",
-      "downloadUrl": "https://media.githubusercontent.com/media/d2kx/voynich-research/75c1c09e1215a3d0f32f301b6a95b0db87a1a817/books/voynich-tcpdf-2014-bookmarked-210p.pdf",
-      "githubBlobUrl": "https://github.com/d2kx/voynich-research/blob/75c1c09e1215a3d0f32f301b6a95b0db87a1a817/books/voynich-tcpdf-2014-bookmarked-210p.pdf"
+      "downloadUrl": "https://media.githubusercontent.com/media/d2kx/voynich-research/0fc370c7808b4d94fbd22d70e2e82d7894b4c378/books/voynich-tcpdf-2014-bookmarked-210p.pdf",
+      "githubBlobUrl": "https://github.com/d2kx/voynich-research/blob/0fc370c7808b4d94fbd22d70e2e82d7894b4c378/books/voynich-tcpdf-2014-bookmarked-210p.pdf"
     }
   ]
 } as const;

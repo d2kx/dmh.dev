@@ -59,13 +59,13 @@ export class ShellContextService {
   readonly projects: readonly ProjectCatalogItem[] = [
     {
       id: 'voynich',
-      name: 'Voynich Manuscript Explorer',
-      menuTitle: 'Voynich Manuscript',
+      name: 'Voynich',
+      menuTitle: 'Voynich',
       menuSubtitle: 'Corpus explorer, word decoder, and research archive',
       path: '/voynich',
       urlLabel: 'dmh.dev/voynich',
       description:
-        'Visual, linguistic, and computational research explorer for Beinecke MS 408 with a 3-step word analyzer, folio walkthroughs, botanical and astronomical cribs, and the full 227-folio corpus.',
+        'Exploratory visual, linguistic, and computational research into the 15th-century Voynich Manuscript (Beinecke MS 408) with page walkthroughs, botanical and astronomical cribs, and the full 227-folio corpus.',
       tags: ['Research', 'Linguistics', 'Interactive Corpus'],
     },
     {
