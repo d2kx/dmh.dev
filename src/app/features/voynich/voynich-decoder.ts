@@ -366,8 +366,60 @@ export function escapeHtml(str: string): string {
     .replace(/"/g, '&quot;');
 }
 
+function splitMarkdownTableRow(trimmed: string): string[] {
+  const inner = trimmed.slice(1, -1);
+  const cells: string[] = [];
+  let cur = '';
+  let inCode = false;
+  let inMath = false;
+
+  for (let i = 0; i < inner.length; i++) {
+    const ch = inner[i];
+    if (ch === '\\' && i + 1 < inner.length) {
+      if (inner[i + 1] === '|') {
+        cur += '|';
+        i++;
+        continue;
+      }
+      cur += ch + inner[i + 1];
+      i++;
+      continue;
+    }
+    if (ch === '`') {
+      inCode = !inCode;
+      cur += ch;
+      continue;
+    }
+    if (ch === '$' && !inCode) {
+      inMath = !inMath;
+      cur += ch;
+      continue;
+    }
+    if (ch === '|' && !inCode && !inMath) {
+      if (inner[i + 1] === '|') {
+        cur += '||';
+        i++;
+        continue;
+      }
+      cells.push(cur.trim());
+      cur = '';
+      continue;
+    }
+    cur += ch;
+  }
+
+  cells.push(cur.trim());
+  return cells;
+}
+
 function formatInlineMarkdown(line: string): string {
-  let out = line.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_m, alt: string, rawSrc: string) => {
+  let out = line
+    .replace(/<->/g, '↔')
+    .replace(/\s+->\s+/g, ' → ')
+    .replace(/\(`?s_[a-z0-9_/\s]+`?\s+([^)]+)\)/g, '($1)')
+    .replace(/`?s_[a-z0-9_]+(?:\s*\/\s*s_[a-z0-9_]+)*`?\s+/g, '');
+
+  out = out.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_m, alt: string, rawSrc: string) => {
     const base = rawSrc.split('/').pop() || rawSrc;
     const resolved = rawSrc.includes('pages/') ? `/pages/${base}` : rawSrc;
     const displaySrc = resolved.startsWith('/pages/') ? `${resolved}?format=webp&w=960` : resolved;
@@ -401,6 +453,7 @@ function formatInlineMarkdown(line: string): string {
       .replace(/\\le/g, '≤')
       .replace(/\\ge/g, '≥')
       .replace(/\\pm/g, '±')
+      .replace(/\\to/g, '→')
       .replace(/\\text\{([^}]*)\}/g, '$1')
       .replace(/\\mathtt\{([^}]*)\}/g, '$1')
       .trim();
@@ -411,7 +464,7 @@ function formatInlineMarkdown(line: string): string {
     return `<code>${escapeHtml(codeText)}</code>`;
   });
 
-  out = out.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  out = out.replace(/\*\*((?:(?!\*\*).)+)\*\*/g, '<strong>$1</strong>');
   out = out.replace(/\*([^*]+)\*/g, '<em>$1</em>');
 
   return out;
@@ -430,15 +483,21 @@ export function renderMarkdownToHtml(md: string): string {
     if (!inTable || tableRows.length === 0) return;
     inTable = false;
     const header = tableRows[0];
+    const colCount = header.length;
     const body = tableRows.slice(1).filter((r) => !r.every((c) => /^[:\-\s]+$/.test(c)));
     html.push('<div class="table-wrap"><table><thead><tr>');
     for (const h of header) {
       html.push(`<th>${formatInlineMarkdown(h.trim())}</th>`);
     }
     html.push('</tr></thead><tbody>');
-    for (const row of body) {
+    for (const rawRow of body) {
+      const row =
+        rawRow.length > colCount
+          ? [...rawRow.slice(0, colCount - 1), rawRow.slice(colCount - 1).join(' · ')]
+          : rawRow;
       html.push('<tr>');
-      for (const cell of row) {
+      for (let c = 0; c < colCount; c++) {
+        const cell = row[c] ?? '';
         html.push(`<td>${formatInlineMarkdown(cell.trim())}</td>`);
       }
       html.push('</tr>');
@@ -486,10 +545,7 @@ export function renderMarkdownToHtml(md: string): string {
     if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
       flushList();
       inTable = true;
-      const cells = trimmed
-        .slice(1, -1)
-        .split('|')
-        .map((c) => c.trim());
+      const cells = splitMarkdownTableRow(trimmed);
       tableRows.push(cells);
       continue;
     } else if (inTable) {

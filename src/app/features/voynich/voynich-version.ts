@@ -7,7 +7,7 @@ export const VOYNICH_VERSION = {
   "commitDate": "2026-10-12",
   "commitIso": "2026-10-12 20:03:08 +0200",
   "commitSubject": "Milestone 200 & Explorer v14.0: Complete Waves 47-48 (Attacks 197-204 / Discoveries 214-221)",
-  "syncedAt": "2026-10-12T18:20:40.345Z",
+  "syncedAt": "2026-10-12T19:19:57.927Z",
   "stats": {
     "transcribedFolios": 227,
     "totalWords": 38949,
