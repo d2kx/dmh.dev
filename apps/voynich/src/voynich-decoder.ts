@@ -382,12 +382,23 @@ function formatInlineMarkdown(line: string): string {
     return `<a href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer">${label}</a>`;
   });
 
-  // Handle inline code `...` (clickable if single EVA word)
+  // Clean inline LaTeX math ($z$, $\chi^2$, etc.) so raw $ delimiters never appear in prose
+  out = out.replace(/\$([^$]+)\$/g, (_m, expr: string) => {
+    const cleaned = expr
+      .replace(/\\chi\^2/g, 'χ²')
+      .replace(/\\times/g, '×')
+      .replace(/\\approx/g, '≈')
+      .replace(/\\le/g, '≤')
+      .replace(/\\ge/g, '≥')
+      .replace(/\\pm/g, '±')
+      .replace(/\\text\{([^}]*)\}/g, '$1')
+      .replace(/\\mathtt\{([^}]*)\}/g, '$1')
+      .trim();
+    return `<em>${escapeHtml(cleaned)}</em>`;
+  });
+
+  // Handle inline code `...` as clean typographic code (no button pills in reading prose)
   out = out.replace(/`([^`]+)`/g, (_m, codeText: string) => {
-    const trimmed = codeText.trim();
-    if (/^[a-zA-Z]{2,14}$/.test(trimmed)) {
-      return `<button type="button" class="word-chip" data-word="${escapeHtml(trimmed)}">${escapeHtml(trimmed)}</button>`;
-    }
     return `<code>${escapeHtml(codeText)}</code>`;
   });
 
@@ -455,12 +466,12 @@ export function renderMarkdownToHtml(md: string): string {
 
     const trimmed = rawLine.trim();
 
-    // Skip standalone LaTeX display blocks ($$...$$) or render them cleanly
+    // Render standalone LaTeX display blocks ($$...$$) as a quiet typographic formula line
     if (trimmed.startsWith('$$') && trimmed.endsWith('$$')) {
       flushTable();
       flushList();
       html.push(
-        `<div class="clause-box"><strong>Word Structure Formula:</strong> <code>PREFIX (Grammar / Action Role)</code> + <code>ROOT STEM (Plant / Star / Liquid / Vessel)</code> + <code>SUFFIX (Case / Quantity / State)</code></div>`,
+        `<p class="formula-line"><code>PREFIX (Action / Role)</code> + <code>ROOT STEM (Plant / Star / Vessel)</code> + <code>SUFFIX (Case / Dose)</code></p>`,
       );
       continue;
     }

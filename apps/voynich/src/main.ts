@@ -204,11 +204,35 @@ function renderShell(): void {
   app.innerHTML = `
     <header class="site-header" role="banner">
       <div class="header-inner">
-        <div class="brand-group">
+        <div class="brand-nav-group">
           <a href="/" class="brand-link" aria-label="voynich.dmh.dev home">
-            <img src="/favicon.svg" alt="" width="32" height="32" class="brand-logo" />
+            <img src="/favicon.svg" alt="" width="30" height="30" class="brand-logo" />
             <span>voynich<span class="brand-domain">.dmh.dev</span></span>
           </a>
+
+          <nav class="primary-nav" role="tablist" aria-label="Voynich Explorer Navigation">
+            <button type="button" role="tab" class="nav-link-btn" aria-selected="true" data-tab="overview">
+              Overview
+            </button>
+            <button type="button" role="tab" class="nav-link-btn" aria-selected="false" data-tab="walkthrough">
+              Walkthroughs
+            </button>
+            <button type="button" role="tab" class="nav-link-btn" aria-selected="false" data-tab="specimens">
+              Identifications
+            </button>
+            <button type="button" role="tab" class="nav-link-btn" aria-selected="false" data-tab="corpus">
+              Folios
+            </button>
+            <button type="button" role="tab" class="nav-link-btn" aria-selected="false" data-tab="lexicon">
+              Grammar
+            </button>
+            <button type="button" role="tab" class="nav-link-btn" aria-selected="false" data-tab="library">
+              Library
+            </button>
+          </nav>
+        </div>
+
+        <div class="header-controls">
           <a
             href="${escapeHtml(commitUrl)}"
             target="_blank"
@@ -217,51 +241,24 @@ function renderShell(): void {
             title="Pinned to voynich-research commit ${escapeHtml(versionMeta.commitSha)} (${escapeHtml(versionMeta.commitDate)})"
           >
             <span class="version-dot" aria-hidden="true"></span>
-            <span>Research Snapshot: <code>${escapeHtml(versionMeta.shortSha)}</code> · ${escapeHtml(versionMeta.commitDate)} · Wave 36</span>
+            <span><code>${escapeHtml(versionMeta.shortSha)}</code> · ${escapeHtml(versionMeta.commitDate)}</span>
           </a>
-        </div>
-
-        <div class="header-controls">
           <a href="https://www.dmh.dev" class="parent-link">← dmh.dev</a>
           <button id="themeToggleBtn" type="button" class="theme-btn" aria-label="Toggle color theme"></button>
         </div>
       </div>
-
-      <nav class="tabs-bar" role="tablist" aria-label="Voynich Explorer Sections">
-        <button type="button" role="tab" class="tab-btn" aria-selected="true" data-tab="overview">
-          1. Overview &amp; Reader's Guide
-        </button>
-        <button type="button" role="tab" class="tab-btn" aria-selected="false" data-tab="walkthrough">
-          2. Page Walkthroughs (16)
-        </button>
-        <button type="button" role="tab" class="tab-btn" aria-selected="false" data-tab="specimens">
-          3. Visual Identifications (15)
-        </button>
-        <button type="button" role="tab" class="tab-btn" aria-selected="false" data-tab="corpus">
-          4. All 227 Folios &amp; Scans
-        </button>
-        <button type="button" role="tab" class="tab-btn" aria-selected="false" data-tab="lexicon">
-          5. Root Dictionary &amp; 8-Case Grammar
-        </button>
-        <button type="button" role="tab" class="tab-btn" aria-selected="false" data-tab="zodiac">
-          6. Zodiac Months &amp; Bath Plumbing
-        </button>
-        <button type="button" role="tab" class="tab-btn" aria-selected="false" data-tab="library">
-          7. Research Library &amp; Hard Data (${versionMeta.stats.markdownGuides} Guides · ${versionMeta.stats.dataFiles} Datasets)
-        </button>
-      </nav>
     </header>
 
     <main id="main-content" class="main-container" tabindex="-1">
-      <!-- Interactive 3-Step Lego Word Analyzer -->
+      <!-- Clean Monochrome Morphological Word Analyzer -->
       <section class="decoder-dock" aria-labelledby="decoder-heading">
         <div class="decoder-top">
-          <div class="decoder-title" id="decoder-heading">
-            <span>Interactive 3-Step "Lego" Word Analyzer</span>
+          <div class="decoder-title-group">
+            <span class="decoder-title" id="decoder-heading">Morphological Word Analyzer</span>
             <code>Prefix + Root Stem + Suffix</code>
           </div>
           <span class="decoder-subtitle">
-            Type any Voynich word or click any word chip on any page to decode it in plain English:
+            Type any EVA word or click any word token in the folios below to inspect its structure:
           </span>
         </div>
 
@@ -272,12 +269,12 @@ function renderShell(): void {
             class="decoder-input"
             type="text"
             value="qokeedy"
-            placeholder="Type EVA word, e.g. qokeedy, shedy, olkol, okar, darary, oror, doaro, daiin..."
+            placeholder="Type EVA word (e.g. qokeedy)..."
             autocomplete="off"
             spellcheck="false"
           />
           <div class="sample-chips" aria-label="Sample Voynich words">
-            <span>Try:</span>
+            <span>Examples:</span>
             ${[
               'qokeedy',
               'shedy',
@@ -300,11 +297,11 @@ function renderShell(): void {
           </div>
         </div>
 
-        <div id="legoOutput" class="lego-grid" aria-live="polite"></div>
+        <div id="legoOutput" class="morph-strip" aria-live="polite"></div>
         <div id="concordanceOutput" class="concordance-bar"></div>
       </section>
 
-      <!-- TAB 1: OVERVIEW & PLAIN-ENGLISH GUIDE -->
+      <!-- TAB 1: OVERVIEW & CABINET OF SECTIONS -->
       <section id="panel-overview" class="view-panel active" aria-labelledby="overview-heading">
         <div class="section-hero">
           <p class="eyebrow">Beinecke MS 408 · Empirical &amp; Visual Investigation</p>
@@ -312,9 +309,8 @@ function renderShell(): void {
           <p>
             Built directly from two complete digital scans of the codex and four cross-checked EVA
             transliterations (${versionMeta.stats.totalWords.toLocaleString('en-US')} word tokens across
-            ${versionMeta.stats.transcribedFolios} folios). Explore the plain-english reading guide,
-            16 interactive page walkthroughs, 15 visual identifications, the full 227-folio corpus,
-            and all ${versionMeta.stats.markdownGuides} research compendiums and ${versionMeta.stats.dataFiles} hard datasets.
+            ${versionMeta.stats.transcribedFolios} folios). Explore the interactive page walkthroughs,
+            visual identifications, the complete 227-folio corpus, or read the plain-English guide below.
           </p>
 
           <div class="stats-strip">
@@ -327,12 +323,12 @@ function renderShell(): void {
               <div class="stat-label">Machine-Readable Word Tokens</div>
             </div>
             <div class="stat-card">
-              <div class="stat-value">${versionMeta.stats.flagshipSpecimens}</div>
-              <div class="stat-label">Botanical, Star &amp; Bath Cribs</div>
+              <div class="stat-value">${versionMeta.stats.walkthroughFolios}</div>
+              <div class="stat-label">Interactive Page Walkthroughs</div>
             </div>
             <div class="stat-card">
-              <div class="stat-value">173</div>
-              <div class="stat-label">Logged Discoveries (156 Attacks)</div>
+              <div class="stat-value">${versionMeta.stats.flagshipSpecimens}</div>
+              <div class="stat-label">Botanical, Star &amp; Bath Cribs</div>
             </div>
             <div class="stat-card">
               <div class="stat-value">${versionMeta.stats.highResScans}</div>
@@ -341,28 +337,70 @@ function renderShell(): void {
           </div>
         </div>
 
-        <div class="detail-card">
-          <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:0.75rem;margin-bottom:1rem;padding-bottom:0.85rem;border-bottom:1px solid var(--border-subtle);">
-            <div>
-              <span class="pill-badge">Start Here · Plain-English Visual Reader's Guide</span>
-              <h2 style="margin:0;font-size:1.35rem;">The 3-Step "Lego" Cheat Sheet &amp; Landmark Page Walkthroughs</h2>
-            </div>
-            <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
-              <button type="button" class="tab-btn" data-jump-tab="walkthrough">Open 16 Interactive Walkthroughs →</button>
-              <button type="button" class="tab-btn" data-jump-tab="library">Browse All ${versionMeta.stats.markdownGuides} Guides →</button>
-            </div>
-          </div>
+        <!-- Curated Section Cards (dmh.dev + Cabinet of Wonders style) -->
+        <div class="hub-grid" aria-label="Explore Sections">
+          <button type="button" class="hub-card" data-jump-tab="walkthrough">
+            <span class="hub-card-eyebrow">${versionMeta.stats.walkthroughFolios} Landmark Pages</span>
+            <h2 class="hub-card-title">Page-by-Page Walkthroughs →</h2>
+            <p class="hub-card-desc">
+              Inspect high-resolution Yale Beinecke scans side-by-side with line-by-line EVA clauses and plain-English readings.
+            </p>
+          </button>
+
+          <button type="button" class="hub-card" data-jump-tab="specimens">
+            <span class="hub-card-eyebrow">${versionMeta.stats.flagshipSpecimens} Visual Cribs</span>
+            <h2 class="hub-card-title">Visual Identifications →</h2>
+            <p class="hub-card-desc">
+              Botanical species, apothecary jars, the Pleiades star cluster (doaro), Zodiac month wheels, and bath plumbing labels.
+            </p>
+          </button>
+
+          <button type="button" class="hub-card" data-jump-tab="corpus">
+            <span class="hub-card-eyebrow">${versionMeta.stats.transcribedFolios} Folios · ${versionMeta.stats.totalWords.toLocaleString('en-US')} Words</span>
+            <h2 class="hub-card-title">Complete Manuscript Corpus →</h2>
+            <p class="hub-card-desc">
+              Browse every folio from f1r to f116v, filter by manuscript section or Currier language (A/B), and inspect extracted scans.
+            </p>
+          </button>
+
+          <button type="button" class="hub-card" data-jump-tab="lexicon">
+            <span class="hub-card-eyebrow">Morphology &amp; Paradigms</span>
+            <h2 class="hub-card-title">Root Dictionary &amp; Grammar →</h2>
+            <p class="hub-card-desc">
+              Explore physically grounded root stems, the 8-case inflectional paradigm matrix, 12 Zodiac wheels, and 20 bath pages.
+            </p>
+          </button>
+
+          <button type="button" class="hub-card" data-jump-tab="library">
+            <span class="hub-card-eyebrow">${versionMeta.stats.markdownGuides} Dossiers &amp; NOTES.md</span>
+            <h2 class="hub-card-title">Research Library &amp; Datasets →</h2>
+            <p class="hub-card-desc">
+              Read all ${versionMeta.stats.markdownGuides} research compendiums and the chronological research log, or inspect ${versionMeta.stats.dataFiles} raw JSON/EVA datasets.
+            </p>
+          </button>
+
+          <button type="button" class="hub-card" data-jump-subtab="scans">
+            <span class="hub-card-eyebrow">${versionMeta.stats.highResScans} Extracted Plates</span>
+            <h2 class="hub-card-title">High-Res Scan Gallery &amp; PDFs →</h2>
+            <p class="hub-card-desc">
+              Search all ${versionMeta.stats.highResScans} contrast-enhanced folio crops and download the two complete manuscript PDF editions.
+            </p>
+          </button>
+        </div>
+
+        <!-- Constrained 66ch Editorial Reading Column -->
+        <article class="editorial-card">
           <div id="overviewGuideBody" class="markdown-body">
             <p>Loading Plain-English Visual Reader's Guide…</p>
           </div>
-        </div>
+        </article>
       </section>
 
-      <!-- TAB 2: 16 PAGE WALKTHROUGHS -->
+      <!-- TAB 2: PAGE WALKTHROUGHS -->
       <section id="panel-walkthrough" class="view-panel" aria-labelledby="walkthrough-heading">
         <div class="section-hero">
           <p class="eyebrow">Side-by-Side Scans &amp; Clause Breakdown</p>
-          <h2 id="walkthrough-heading">16 Iconic Manuscript Page Walkthroughs</h2>
+          <h2 id="walkthrough-heading">${versionMeta.stats.walkthroughFolios} Iconic Manuscript Page Walkthroughs</h2>
           <p>
             Select any landmark folio on the left to inspect its high-resolution Yale Beinecke scan
             alongside clickable EVA clauses and plain-English readings. Click any scan to zoom in full screen.
@@ -370,16 +408,16 @@ function renderShell(): void {
         </div>
 
         <div class="split-layout">
-          <div class="sidebar-card" id="walkthroughList" aria-label="16 Landmark Folios"></div>
+          <div class="sidebar-card" id="walkthroughList" aria-label="Landmark Folios"></div>
           <div class="detail-card" id="walkthroughViewer"></div>
         </div>
       </section>
 
-      <!-- TAB 3: 15 VISUAL IDENTIFICATIONS -->
+      <!-- TAB 3: VISUAL IDENTIFICATIONS -->
       <section id="panel-specimens" class="view-panel" aria-labelledby="specimens-heading">
         <div class="section-hero">
           <p class="eyebrow">Botanical, Astronomical, Balneological &amp; Apothecary Cribs</p>
-          <h2 id="specimens-heading">15 Flagship Visual Identifications (SPEC-01 to SPEC-15)</h2>
+          <h2 id="specimens-heading">${versionMeta.stats.flagshipSpecimens} Flagship Visual Identifications</h2>
           <p>
             Matching the manuscript's plant paintings, apothecary jars, star clusters (Pleiades = <code>doaro</code>),
             bilingual Zodiac month wheels (<code>mars..decembre</code>), and labelled bath pipes (<code>olkol/okoldy</code>)
@@ -393,9 +431,9 @@ function renderShell(): void {
       <section id="panel-corpus" class="view-panel" aria-labelledby="corpus-heading">
         <div class="section-hero">
           <p class="eyebrow">Complete Manuscript Transliteration &amp; Scan Index</p>
-          <h2 id="corpus-heading">All 227 Folios &amp; 38,949 Words Browser</h2>
+          <h2 id="corpus-heading">All ${versionMeta.stats.transcribedFolios} Folios &amp; ${versionMeta.stats.totalWords.toLocaleString('en-US')} Words Browser</h2>
           <p>
-            Filter by manuscript section, Currier language (A/B), or scribe hand (1 to 5), or search for any folio
+            Filter by manuscript section or Currier language (A/B), or search for any folio
             or EVA word across the entire Voynich Manuscript. Click any word on any line to decode it above.
           </p>
         </div>
@@ -434,20 +472,19 @@ function renderShell(): void {
         </div>
       </section>
 
-      <!-- TAB 5: ROOT DICTIONARY & 8-CASE GRAMMAR -->
+      <!-- TAB 5: ROOT DICTIONARY, 8-CASE GRAMMAR, ZODIAC & BATHS -->
       <section id="panel-lexicon" class="view-panel" aria-labelledby="lexicon-heading">
         <div class="section-hero">
-          <p class="eyebrow">Morphology &amp; Inflectional Paradigm</p>
-          <h2 id="lexicon-heading">Core Root Stem Dictionary &amp; 8-Case Grammar Matrix</h2>
+          <p class="eyebrow">Morphology, Inflectional Paradigm &amp; Structural Matrices</p>
+          <h2 id="lexicon-heading">Root Dictionary, 8-Case Grammar, Zodiac &amp; Bath Atlas</h2>
           <p>
-            How the same root stem takes different prefixes and suffixes depending on whether it acts as
-            a static ingredient, a measured portion (<code>-aiin</code>), a liquid medium (<code>-ol/-or</code>),
-            an active boiling/washing verb (<code>-edy</code>), or a terminal recipe stop (<code>-am</code>).
+            How the same root stem takes different prefixes and suffixes across the 8-case paradigm,
+            alongside the 12 Zodiac month wheels and the 20-page Balneological plumbing atlas.
           </p>
         </div>
 
         <div class="detail-card" style="margin-bottom:1.5rem;">
-          <h3 style="margin-top:0;">Physically Grounded Core Root Stems</h3>
+          <h3 style="margin-top:0;">1. Physically Grounded Core Root Stems</h3>
           <div class="table-wrap">
             <table id="lexiconTable">
               <thead>
@@ -463,7 +500,7 @@ function renderShell(): void {
             </table>
           </div>
 
-          <h3>The 8-Case Inflectional Paradigm Matrix (Top 20 Stems Across 38,949 Words)</h3>
+          <h3>2. The 8-Case Inflectional Paradigm Matrix (Top 20 Stems Across 38,949 Words)</h3>
           <div class="table-wrap">
             <table id="paradigmTable">
               <thead>
@@ -482,23 +519,8 @@ function renderShell(): void {
               <tbody></tbody>
             </table>
           </div>
-        </div>
-      </section>
 
-      <!-- TAB 6: ZODIAC MONTHS & BATH PLUMBING -->
-      <section id="panel-zodiac" class="view-panel" aria-labelledby="zodiac-heading">
-        <div class="section-hero">
-          <p class="eyebrow">Celestial Calendar &amp; Balneological Hydrotherapy</p>
-          <h2 id="zodiac-heading">12 Zodiac Medallions (mars..decembre) &amp; 20-Page Bath Plumbing Atlas</h2>
-          <p>
-            <strong>58.1% (202 / 348)</strong> of the star-nymph labels in the 12 Zodiac wheels appear verbatim inside
-            the Herbal, Pharmaceutical, and Recipe sections, while the 20 Balneological pages demonstrate the
-            <strong>Label-vs-Prose Polarity Law (z = +9.97)</strong>.
-          </p>
-        </div>
-
-        <div class="detail-card">
-          <h3 style="margin-top:0;">1. The 12 Zodiac Wheels (f70v2 to f73v) &amp; Bilingual Month Glosses</h3>
+          <h3>3. The 12 Zodiac Wheels (f70v2 to f73v) &amp; Bilingual Month Glosses</h3>
           <div class="table-wrap">
             <table id="zodiacTable">
               <thead>
@@ -517,7 +539,7 @@ function renderShell(): void {
             </table>
           </div>
 
-          <h3>2. The 20-Page Balneological Plumbing &amp; Label Atlas (f75r to f84v)</h3>
+          <h3>4. The 20-Page Balneological Plumbing &amp; Label Atlas (f75r to f84v)</h3>
           <div class="table-wrap">
             <table id="balneoTable">
               <thead>
@@ -537,22 +559,22 @@ function renderShell(): void {
         </div>
       </section>
 
-      <!-- TAB 7: COMPLETE RESEARCH LIBRARY & HARD DATA -->
+      <!-- TAB 6: COMPLETE RESEARCH LIBRARY & HARD DATA -->
       <section id="panel-library" class="view-panel" aria-labelledby="library-heading">
         <div class="section-hero">
-          <p class="eyebrow">Complete Dossiers, Chronological Research Log (NOTES.md), 182 Datasets &amp; 2 PDF Books</p>
+          <p class="eyebrow">Complete Dossiers, Chronological Research Log (NOTES.md), ${versionMeta.stats.dataFiles} Datasets &amp; 2 PDF Books</p>
           <h2 id="library-heading">Research Library, High-Res Scan Gallery &amp; Hard Data</h2>
           <p>
             Read all ${versionMeta.stats.markdownGuides} human-readable guides and synthesis compendiums (including the
-            complete chronological research log <code>NOTES.md</code> covering Discoveries 1 to 173), download the two full
+            complete chronological research log <code>NOTES.md</code>), download the two full
             manuscript PDFs, or inspect any of the ${versionMeta.stats.dataFiles} raw JSON/EVA datasets and ${versionMeta.stats.highResScans} extracted scans.
           </p>
-          <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:1rem;">
+          <div class="subtab-bar">
             <button type="button" class="tab-btn" aria-selected="true" data-subtab="docs">
               Markdown Research Library (${versionMeta.stats.markdownGuides} Docs)
             </button>
             <button type="button" class="tab-btn" aria-selected="false" data-subtab="datasets">
-              Hard Data, PDF Books &amp; 182 JSON Datasets
+              Hard Data, PDF Books &amp; ${versionMeta.stats.dataFiles} JSON Datasets
             </button>
             <button type="button" class="tab-btn" aria-selected="false" data-subtab="scans">
               All ${versionMeta.stats.highResScans} Extracted Folio &amp; Detail Scans
@@ -560,7 +582,7 @@ function renderShell(): void {
           </div>
         </div>
 
-        <!-- Subtab A: 42 Markdown Guides & NOTES.md -->
+        <!-- Subtab A: Markdown Guides & NOTES.md -->
         <div id="subpanel-docs" class="split-layout">
           <div class="sidebar-card">
             <label for="docSearchInput" class="skip-link">Search research guides</label>
@@ -568,17 +590,17 @@ function renderShell(): void {
               id="docSearchInput"
               type="search"
               class="sidebar-filter"
-              placeholder="Filter 42 guides &amp; NOTES.md..."
+              placeholder="Filter ${versionMeta.stats.markdownGuides} guides &amp; NOTES.md..."
             />
             <div id="docsSidebarList"></div>
           </div>
-          <div class="detail-card">
-            <div id="docViewerHeader" style="margin-bottom:1rem;padding-bottom:0.75rem;border-bottom:1px solid var(--border-subtle);"></div>
+          <div class="editorial-card">
+            <div id="docViewerHeader" style="max-width:66ch;margin:0 auto 1.25rem;padding-bottom:0.75rem;border-bottom:1px solid var(--border-subtle);"></div>
             <div id="docViewerBody" class="markdown-body"></div>
           </div>
         </div>
 
-        <!-- Subtab B: PDF Books & 182 JSON/EVA Datasets -->
+        <!-- Subtab B: PDF Books & JSON/EVA Datasets -->
         <div id="subpanel-datasets" style="display:none;">
           <div class="detail-card" style="margin-bottom:1.5rem;">
             <h3 style="margin-top:0;">Full Voynich Manuscript Digital PDF Editions (Git LFS)</h3>
@@ -587,12 +609,12 @@ function renderShell(): void {
 
           <div class="split-layout">
             <div class="sidebar-card">
-              <label for="dataSearchInput" class="skip-link">Search 182 data files</label>
+              <label for="dataSearchInput" class="skip-link">Search ${versionMeta.stats.dataFiles} data files</label>
               <input
                 id="dataSearchInput"
                 type="search"
                 class="sidebar-filter"
-                placeholder="Filter 182 JSON &amp; EVA files (e.g. attack154, ZL3b)..."
+                placeholder="Filter ${versionMeta.stats.dataFiles} JSON &amp; EVA files (e.g. attack154, ZL3b)..."
               />
               <div id="dataFilesList"></div>
             </div>
@@ -606,7 +628,7 @@ function renderShell(): void {
           </div>
         </div>
 
-        <!-- Subtab C: All 196 High-Res Folio Scans -->
+        <!-- Subtab C: All High-Res Folio Scans -->
         <div id="subpanel-scans" style="display:none;">
           <div class="detail-card">
             <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:1rem;margin-bottom:1rem;">
@@ -676,25 +698,25 @@ function updateDecoderUI(rawWord: string): void {
   }
 
   out.innerHTML = `
-    <div class="lego-box lego-prefix">
-      <div class="lego-step">1. Prefix (Left Role)</div>
-      <div class="lego-val">${escapeHtml(parsed.prefix)}</div>
-      <div class="lego-desc">${escapeHtml(parsed.prefixDesc)}</div>
+    <div class="morph-segment">
+      <div class="morph-role">1. Prefix (Left Role)</div>
+      <div class="morph-token">${escapeHtml(parsed.prefix)}</div>
+      <div class="morph-meaning">${escapeHtml(parsed.prefixDesc)}</div>
     </div>
-    <div class="lego-box lego-stem">
-      <div class="lego-step">2. Core Root Stem</div>
-      <div class="lego-val">${escapeHtml(parsed.stem)}</div>
-      <div class="lego-desc">${escapeHtml(parsed.stemDesc)}</div>
+    <div class="morph-segment">
+      <div class="morph-role">2. Core Root Stem</div>
+      <div class="morph-token">${escapeHtml(parsed.stem)}</div>
+      <div class="morph-meaning">${escapeHtml(parsed.stemDesc)}</div>
     </div>
-    <div class="lego-box lego-suffix">
-      <div class="lego-step">3. Suffix (Right Ending)</div>
-      <div class="lego-val">${escapeHtml(parsed.suffix)}</div>
-      <div class="lego-desc">${escapeHtml(parsed.suffixDesc)}</div>
+    <div class="morph-segment">
+      <div class="morph-role">3. Suffix (Right Ending)</div>
+      <div class="morph-token">${escapeHtml(parsed.suffix)}</div>
+      <div class="morph-meaning">${escapeHtml(parsed.suffixDesc)}</div>
     </div>
-    <div class="lego-box lego-gloss">
-      <div class="lego-step">Plain-English Reading of <code>${escapeHtml(parsed.word)}</code></div>
-      <div class="lego-val" style="font-family:var(--font-sans);font-size:0.98rem;">${escapeHtml(parsed.gloss)}</div>
-      <div class="lego-desc">Click any word token below to compare</div>
+    <div class="morph-segment">
+      <div class="morph-role">Plain-English Reading (${escapeHtml(parsed.word)})</div>
+      <div class="morph-token">${escapeHtml(parsed.gloss)}</div>
+      <div class="morph-meaning">Click any word token in the folios below to compare</div>
     </div>
   `;
 
@@ -708,7 +730,7 @@ function updateDecoderUI(rawWord: string): void {
       )
       .join('');
     concOut.innerHTML = `
-      <span><strong>Corpus Concordance:</strong> <code>${escapeHtml(cleanKey)}</code> appears <strong>${conc.c.toLocaleString('en-US')}×</strong> across the manuscript. Sample folios (click to open):</span>
+      <span><strong>Corpus Concordance:</strong> <code>${escapeHtml(cleanKey)}</code> appears <strong>${conc.c.toLocaleString('en-US')}×</strong> across the manuscript. Sample folios:</span>
       ${folioBtns}
     `;
   } else {
@@ -717,7 +739,7 @@ function updateDecoderUI(rawWord: string): void {
 }
 
 function switchTab(tabId: string): void {
-  document.querySelectorAll<HTMLButtonElement>('.tabs-bar .tab-btn').forEach((btn) => {
+  document.querySelectorAll<HTMLButtonElement>('.primary-nav .nav-link-btn').forEach((btn) => {
     const isMatch = btn.dataset.tab === tabId;
     btn.setAttribute('aria-selected', isMatch ? 'true' : 'false');
   });
@@ -737,6 +759,7 @@ function switchTab(tabId: string): void {
   if (tabId === 'library') {
     void loadAndRenderDoc(activeDocSlug);
   }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function renderWalkthroughs(): void {
@@ -1375,6 +1398,12 @@ async function bootstrap(): Promise<void> {
     const jumpTabBtn = target.closest<HTMLButtonElement>('[data-jump-tab]');
     if (jumpTabBtn?.dataset.jumpTab) {
       switchTab(jumpTabBtn.dataset.jumpTab);
+      if (jumpTabBtn.dataset.jumpSubtab) {
+        const subBtn = document.querySelector<HTMLButtonElement>(
+          `[data-subtab="${jumpTabBtn.dataset.jumpSubtab}"]`,
+        );
+        subBtn?.click();
+      }
       return;
     }
 
