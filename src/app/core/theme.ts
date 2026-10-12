@@ -1,5 +1,4 @@
 import { DOCUMENT, Injectable, computed, inject, signal } from '@angular/core';
-import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { MediaMatcher } from '@angular/cdk/layout';
 import { Platform } from '@angular/cdk/platform';
 
@@ -10,7 +9,6 @@ export class ThemeService {
   private readonly document = inject(DOCUMENT);
   private readonly mediaMatcher = inject(MediaMatcher);
   private readonly platform = inject(Platform);
-  private readonly liveAnnouncer = inject(LiveAnnouncer);
 
   private readonly storedOverride = signal<ColorSchemeOverride>(null);
   private readonly systemDark = signal(false);
@@ -67,8 +65,6 @@ export class ThemeService {
       this.writeStoredScheme(target);
       this.applyMetaContent(target);
     }
-
-    void this.liveAnnouncer.announce(`Switched to ${target} theme`, 'polite');
   }
 
   private readStoredScheme(): ColorSchemeOverride {
