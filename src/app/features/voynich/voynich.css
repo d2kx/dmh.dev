@@ -197,6 +197,7 @@
 
 .morph-segment {
   padding: 0.9rem 1.05rem;
+  min-height: 6.75rem;
   border-right: 1px solid var(--border-subtle);
   display: flex;
   flex-direction: column;

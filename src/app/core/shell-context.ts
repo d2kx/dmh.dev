@@ -109,7 +109,7 @@ export class ShellContextService {
   private readonly fpsHistory: number[] = new Array<number>(24).fill(60);
 
   constructor() {
-    this.currentPath.set(this.router.url || '/');
+    this.currentPath.set(this.location.path() || this.router.url || '/');
     this.router.events
       .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
       .subscribe((event) => {
