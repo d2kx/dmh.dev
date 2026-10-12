@@ -192,7 +192,9 @@ export class KaleidoscopeEngine {
     this.canvas = canvas;
     this.onStatsCallback = onStats;
 
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const prefersReducedMotion =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     this.timeScale = prefersReducedMotion ? 0.25 : 1.0;
 
     const contextAttributes: WebGLContextAttributes = {

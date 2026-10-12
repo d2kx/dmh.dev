@@ -70,9 +70,34 @@ describe('App', () => {
 
     expect(meta.getTag('property="og:title"')?.content).toBe('Blog | dmh.dev');
     expect(meta.getTag('property="og:url"')?.content).toBe('https://www.dmh.dev/blog');
+    expect(meta.getTag('property="og:image"')?.content).toBe('https://www.dmh.dev/og-image.png');
     expect(meta.getTag('name="twitter:card"')?.content).toBe('summary_large_image');
     expect(doc.querySelector<HTMLLinkElement>('link[rel="canonical"]')?.href).toBe(
       'https://www.dmh.dev/blog',
+    );
+
+    await router.navigateByUrl('/voynich');
+    await fixture.whenStable();
+
+    expect(meta.getTag('property="og:title"')?.content).toBe('Voynich | dmh.dev');
+    expect(meta.getTag('property="og:image"')?.content).toBe('https://www.dmh.dev/og-voynich.png');
+    expect(meta.getTag('name="twitter:image"')?.content).toBe('https://www.dmh.dev/og-voynich.png');
+
+    await router.navigateByUrl('/voynich/walkthroughs');
+    await fixture.whenStable();
+
+    expect(meta.getTag('property="og:title"')?.content).toBe('Voynich Walkthroughs | dmh.dev');
+    expect(meta.getTag('property="og:image"')?.content).toBe('https://www.dmh.dev/og-voynich.png');
+
+    await router.navigateByUrl('/kaleidoscope');
+    await fixture.whenStable();
+
+    expect(meta.getTag('property="og:title"')?.content).toBe('Kaleidoscope | dmh.dev');
+    expect(meta.getTag('property="og:image"')?.content).toBe(
+      'https://www.dmh.dev/og-kaleidoscope.png',
+    );
+    expect(meta.getTag('name="twitter:image"')?.content).toBe(
+      'https://www.dmh.dev/og-kaleidoscope.png',
     );
   });
 });

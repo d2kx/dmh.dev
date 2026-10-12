@@ -25,6 +25,8 @@ export const routes: Routes = [
             description:
               'Interactive visual reader, 3-step morphological word decoder, 227-folio EVA corpus, and research archive for the Voynich Manuscript (Beinecke MS 408).',
             ogType: 'website',
+            ogImage: 'https://www.dmh.dev/og-voynich.png',
+            ogImageAlt: 'dmh.dev Voynich · 15th-Century Illustrated Codex Explorer',
           } satisfies RouteSeoData,
         },
         loadComponent: () => import('./features/voynich/voynich').then((m) => m.Voynich),
@@ -37,6 +39,35 @@ export const routes: Routes = [
             description:
               'Explore annotated Voynich Manuscript walkthroughs, botanical and astronomical identifications, the 227-folio corpus, grammar paradigms, and research library.',
             ogType: 'website',
+            ogImage: 'https://www.dmh.dev/og-voynich.png',
+            ogImageAlt: 'dmh.dev Voynich · 15th-Century Illustrated Codex Explorer',
+            sectionSeo: {
+              walkthroughs: {
+                title: 'Voynich Walkthroughs | dmh.dev',
+                description:
+                  'Step-by-step annotated folio walkthroughs of the Voynich Manuscript with inline transliterations, translations, and high-resolution scan overlays.',
+              },
+              identifications: {
+                title: 'Voynich Identifications | dmh.dev',
+                description:
+                  'Proposed botanical, astronomical, and pharmaceutical identifications from the Voynich Manuscript (Beinecke MS 408) with confidence scores and visual cribs.',
+              },
+              library: {
+                title: 'Voynich Library | dmh.dev',
+                description:
+                  'Plain-English reading guides, complete Beinecke MS 408 PDF editions, and structured JSON research datasets for the Voynich Manuscript.',
+              },
+              folios: {
+                title: 'Voynich Folios | dmh.dev',
+                description:
+                  'Browse all 227 folios of the Voynich Manuscript (Beinecke MS 408) with EVA transliterations, interlinear structural glosses, and quire metadata.',
+              },
+              grammar: {
+                title: 'Voynich Grammar | dmh.dev',
+                description:
+                  'Explore the morphological grammar of Voynichese: prefixes, gallows roots, suffixes, and positional slot distribution across the 37,000-token corpus.',
+              },
+            },
           } satisfies RouteSeoData,
         },
         loadComponent: () => import('./features/voynich/voynich').then((m) => m.Voynich),
@@ -51,6 +82,8 @@ export const routes: Routes = [
         description:
           'Interactive WebGL shader kaleidoscope blending psychedelic fractal symmetry with sakura cherry blossom geometry and harmonic color palettes.',
         ogType: 'website',
+        ogImage: 'https://www.dmh.dev/og-kaleidoscope.png',
+        ogImageAlt: 'dmh.dev Kaleidoscope · Generative Fractal & Sakura Kaleidoscope',
       } satisfies RouteSeoData,
     },
     loadComponent: () =>
