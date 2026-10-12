@@ -54,7 +54,7 @@
             <span aria-hidden="true">←</span>&nbsp;dmh.dev
           </a>
           <span class="brand-divider" aria-hidden="true"></span>
-          <a routerLink="/voynich" class="brand" aria-label="voynich.dmh.dev home">
+          <a routerLink="/voynich" class="brand">
             <svg
               viewBox="0 0 64 64"
               width="24"
@@ -110,15 +110,15 @@
               <circle cx="32" cy="32" r="3.6" fill="#fde68a" />
             </svg>
             <span class="brand-text">
-              <span class="brand-monogram">voynich</span><span class="brand-domain">.dmh.dev</span>
+              <span class="brand-monogram">dmh</span><span class="brand-domain">.dev</span>&nbsp;<span class="brand-project">Voynich Manuscript</span>
             </span>
           </a>
           <a
-            [href]="shell.voynichVersion.repoUrl + '/commit/' + shell.voynichVersion.commitSha"
+            [href]="shell.voynichVersion.repoUrl"
             target="_blank"
             rel="noopener noreferrer"
             class="commit-pill"
-            [attr.title]="'Pinned to voynich-research: ' + shell.voynichVersion.commitSubject"
+            [attr.title]="'voynich-research repository (' + shell.voynichVersion.shortSha + ' · ' + shell.voynichVersion.commitDate + ')'"
           >
             <span class="commit-dot" aria-hidden="true"></span>
             <code>{{ shell.voynichVersion.shortSha }}</code>
@@ -131,7 +131,7 @@
             <span aria-hidden="true">←</span>&nbsp;dmh.dev
           </a>
           <span class="brand-divider" aria-hidden="true"></span>
-          <a routerLink="/kaleidoscope" class="brand" aria-label="kaleidoscope.dmh.dev home">
+          <a routerLink="/kaleidoscope" class="brand">
             <svg
               viewBox="0 0 64 64"
               width="24"
@@ -175,7 +175,7 @@
               <circle cx="32" cy="32" r="3.2" fill="#fffbeb" />
             </svg>
             <span class="brand-text">
-              <span class="brand-monogram">kaleidoscope</span><span class="brand-domain">.dmh.dev</span>
+              <span class="brand-monogram">dmh</span><span class="brand-domain">.dev</span>&nbsp;<span class="brand-project">Kaleidoscope</span>
             </span>
           </a>
         </div>
@@ -212,22 +212,24 @@
                   aria-controls="projects-flyout-panel"
                   (click)="toggleProjectsMenu($event)"
                 >
-                  <span>Projects</span>
-                  <svg
-                    class="flyout-chevron"
-                    [class.chevron-open]="projectsMenuOpen()"
-                    aria-hidden="true"
-                    viewBox="0 0 16 16"
-                    width="14"
-                    height="14"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.8"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path d="m4 6 4 4 4-4" />
-                  </svg>
+                  <span class="projects-trigger-inner">
+                    <span>Projects</span>
+                    <svg
+                      class="flyout-chevron"
+                      [class.chevron-open]="projectsMenuOpen()"
+                      aria-hidden="true"
+                      viewBox="0 0 16 16"
+                      width="14"
+                      height="14"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="m4 6.5 4 4 4-4" />
+                    </svg>
+                  </span>
                 </button>
 
                 @if (projectsMenuOpen()) {

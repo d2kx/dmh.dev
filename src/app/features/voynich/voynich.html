@@ -1,214 +1,244 @@
-@if (activeSection() === 'overview') {
-  <section class="hero-card" aria-labelledby="voynich-hero-heading">
-    <div class="hero-top">
-      <div>
-        <span class="eyebrow">Beinecke MS 408 · Interactive Research Hub</span>
-        <h1 id="voynich-hero-heading">Understand the Voynich Manuscript in Plain English</h1>
-        <p class="hero-lead">
-          An interactive visual guide, 3-step word decoder, 227-folio EVA corpus, and complete
-          research archive exploring the Voynich Manuscript as a 15th-century illustrated herbal,
-          astronomical almanac, and balneological recipe compendium.
-        </p>
-      </div>
-    </div>
-
-    <div class="stat-strip" role="list" aria-label="Corpus metrics">
-      <div class="stat-card" role="listitem">
-        <span class="stat-val">{{ voynich.version.stats.transcribedFolios }}</span>
-        <span class="stat-lbl">Transcribed Folios</span>
-      </div>
-      <div class="stat-card" role="listitem">
-        <span class="stat-val">38,949</span>
-        <span class="stat-lbl">EVA Corpus Words</span>
-      </div>
-      <div class="stat-card" role="listitem">
-        <span class="stat-val">{{ voynich.version.stats.flagshipSpecimens }}</span>
-        <span class="stat-lbl">Visual Specimen Cribs</span>
-      </div>
-      <div class="stat-card" role="listitem">
-        <span class="stat-val">8-Case</span>
-        <span class="stat-lbl">Agglutinative Paradigm</span>
-      </div>
-      <div class="stat-card" role="listitem">
-        <span class="stat-val">
-          {{ voynich.version.stats.markdownGuides }} Guides · {{ voynich.version.stats.dataFiles }} Datasets
-        </span>
-        <span class="stat-lbl">Full Research Archive</span>
-      </div>
-    </div>
-  </section>
-}
-
-<!-- Persistent 3-Step Morphological Word Analyzer -->
-<section class="decoder-dock" aria-label="Interactive Voynich Word Analyzer">
-  <div class="decoder-top">
-    <div>
-      <h2>The 3-Step Word Analyzer</h2>
-      <p class="decoder-sub">
-        Every Voynich word snaps together from 3 parts:
-        <strong>1. Prefix</strong> (action/role) + <strong>2. Root Stem</strong> (ingredient/star/vessel)
-        + <strong>3. Suffix</strong> (case/dose). Click any word across the app or type below:
-      </p>
-    </div>
-
-    <div class="decoder-input-wrap">
-      <label for="voynichWordInput" class="sr-only">Enter EVA word to decode</label>
-      <input
-        id="voynichWordInput"
-        type="text"
-        class="decoder-input"
-        [value]="voynich.activeWord()"
-        (input)="onWordInput($event)"
-        placeholder="e.g. qokeedy, oror, doaro..."
-        autocomplete="off"
-        spellcheck="false"
-      />
-    </div>
-  </div>
-
-  <div class="quick-chips" role="group" aria-label="Sample Voynich words">
-    @for (chip of quickChips; track chip.word) {
-      <button
-        type="button"
-        class="chip-btn"
-        [class.chip-active]="voynich.activeWord().toLowerCase() === chip.word"
-        (click)="setWord(chip.word)"
-      >
-        <code>{{ chip.word }}</code>
-        <span>{{ chip.hint }}</span>
-      </button>
-    }
-  </div>
-
-  @if (parsedWord(); as p) {
-    <div class="morph-strip">
-      <div class="morph-segment">
-        <span class="morph-step">1. Prefix (Action / Role)</span>
-        <strong class="morph-token">{{ p.prefix }}</strong>
-        <span class="morph-desc">{{ p.prefixDesc }}</span>
-      </div>
-      <div class="morph-segment">
-        <span class="morph-step">2. Root Stem (Core Noun / Verb)</span>
-        <strong class="morph-token">{{ p.stem }}</strong>
-        <span class="morph-desc">{{ p.stemDesc }}</span>
-      </div>
-      <div class="morph-segment">
-        <span class="morph-step">3. Suffix (Case / Dose / State)</span>
-        <strong class="morph-token">{{ p.suffix }}</strong>
-        <span class="morph-desc">{{ p.suffixDesc }}</span>
-      </div>
-      <div class="morph-segment morph-segment-result">
-        <span class="morph-step">Plain-English Reading</span>
-        <strong class="morph-gloss">{{ p.gloss }}</strong>
-        <span class="morph-desc">
-          @if (activeWordConcordance(); as conc) {
-            <strong>{{ conc.c }}×</strong> in corpus · e.g.
-            @for (fid of conc.f; track fid) {
-              <button type="button" class="folio-jump-chip" (click)="jumpToCorpusFolio(fid)">
-                {{ fid }}
-              </button>
-            }
-          } @else {
-            Rule-derived morphological breakdown
-          }
-        </span>
-      </div>
-    </div>
-  }
-</section>
-
-<!-- Main Section Views -->
 @switch (activeSection()) {
   @case ('overview') {
-    <section aria-labelledby="hub-sections-heading" class="hub-section">
-      <div class="section-head">
-        <div>
-          <h2 id="hub-sections-heading">Explore the Research</h2>
-          <p class="section-sub">
-            Jump directly into any section of the interactive edition or read the plain-english
-            visual guide below.
-          </p>
-        </div>
-      </div>
-
-      <div class="hub-grid">
-        <a routerLink="/voynich/walkthroughs" class="hub-card">
-          <span class="hub-kicker">Interactive Reader</span>
-          <span class="hub-title">
-            Page Walkthroughs ({{ voynich.version.stats.walkthroughFolios }})
-          </span>
-          <span class="hub-desc">
-            Step-by-step annotated readings of key manuscript pages with high-resolution scans,
-            margin labels, and clickable line-by-line translations.
-          </span>
-          <span class="hub-cta">Open Walkthroughs →</span>
+    <section class="voynich-hero" aria-labelledby="voynich-hero-heading">
+      <span class="sakura-pill">Beinecke MS 408 · Interactive Research</span>
+      <h1 id="voynich-hero-heading">Voynich Manuscript Explorer</h1>
+      <p class="hero-lead">
+        An interactive companion to my ongoing research into Yale’s Beinecke MS 408, examining the
+        15th-century Voynich Manuscript as a practical illustrated herbal, astronomical almanac, and
+        balneological recipe compendium.
+      </p>
+      <p class="hero-lead hero-lead-secondary">
+        Explore the 227-folio EVA transcription (38,949 words), 30 botanical and celestial specimen
+        identifications, and {{ voynich.version.stats.markdownGuides }} plain-English and technical
+        research guides.
+      </p>
+      <div class="hero-actions">
+        <a
+          routerLink="/voynich/library"
+          [queryParams]="{ subtab: 'docs', doc: 'plain-english-visual-readers-guide' }"
+          class="btn-primary"
+        >
+          Read Plain-English Guide →
         </a>
-
-        <a routerLink="/voynich/identifications" class="hub-card">
-          <span class="hub-kicker">Visual Cribs</span>
-          <span class="hub-title">
-            Botanical &amp; Astro Identifications ({{ voynich.version.stats.flagshipSpecimens }})
-          </span>
-          <span class="hub-desc">
-            Illustrated plants, roots, and star clusters matched against historical herbals, pigment
-            cues, and pharmaceutical cross-references.
-          </span>
-          <span class="hub-cta">Browse Identifications →</span>
-        </a>
-
-        <a routerLink="/voynich/folios" class="hub-card">
-          <span class="hub-kicker">Complete Transcription</span>
-          <span class="hub-title">
-            All {{ voynich.version.stats.transcribedFolios }} Folios Corpus
-          </span>
-          <span class="hub-desc">
-            Search and filter every transcribed page of Beinecke MS 408 by section, scribal hand, or
-            Currier language with interlinear stem glosses.
-          </span>
-          <span class="hub-cta">Explore 227 Folios →</span>
-        </a>
-
-        <a routerLink="/voynich/grammar" class="hub-card">
-          <span class="hub-kicker">Linguistic System</span>
-          <span class="hub-title">Grammar, Lexicon &amp; Atlases</span>
-          <span class="hub-desc">
-            Inspect the root stem lexicon, the 8-case suffix paradigm matrix, the 12 Zodiac wheels,
-            and the 20 Balneological hydrotherapy pages.
-          </span>
-          <span class="hub-cta">View Grammar &amp; Tables →</span>
-        </a>
-
-        <a routerLink="/voynich/library" [queryParams]="{ subtab: 'docs' }" class="hub-card">
-          <span class="hub-kicker">Research Archive</span>
-          <span class="hub-title">
-            {{ voynich.version.stats.markdownGuides }} Guides &amp;
-            {{ voynich.version.stats.dataFiles }} Datasets
-          </span>
-          <span class="hub-desc">
-            Read all {{ voynich.version.stats.markdownGuides }} plain-english and technical research
-            dossiers, or inspect the {{ voynich.version.stats.dataFiles }} statistical JSON attack
-            verification files.
-          </span>
-          <span class="hub-cta">Open Research Library →</span>
-        </a>
-
-        <a routerLink="/voynich/library" [queryParams]="{ subtab: 'scans' }" class="hub-card">
-          <span class="hub-kicker">High-Resolution Facsimiles</span>
-          <span class="hub-title">
-            {{ voynich.version.stats.highResScans }} Scans &amp; Full PDFs
-          </span>
-          <span class="hub-desc">
-            Browse all {{ voynich.version.stats.highResScans }} Yale Beinecke manuscript page scans
-            or download the full 214-page high-resolution PDF editions.
-          </span>
-          <span class="hub-cta">Browse Scans &amp; PDFs →</span>
+        <a routerLink="/voynich/walkthroughs" class="btn-outline">
+          Browse {{ voynich.version.stats.walkthroughFolios }} Folio Walkthroughs →
         </a>
       </div>
     </section>
 
-    <article class="editorial-card">
-      <div class="markdown-body" [innerHTML]="safeReadersGuideHtml()"></div>
-    </article>
+    <section class="overview-section" aria-labelledby="decoder-heading">
+      <div class="section-divider-label" aria-hidden="true">
+        <span class="section-dot"></span>
+        <span class="section-title">Interactive Decoder</span>
+        <span class="section-line"></span>
+      </div>
+
+      <div class="section-intro">
+        <h2 id="decoder-heading">3-Step Word Analyzer</h2>
+        <p class="section-sub">
+          Every Voynich word combines three parts: a <strong>prefix</strong> (action or role), a
+          <strong>root stem</strong> (ingredient, star, or vessel), and a <strong>suffix</strong>
+          (grammatical case or dose).
+        </p>
+      </div>
+
+      <div class="decoder-card">
+        <div class="decoder-controls">
+          <div class="search-field decoder-search-field">
+            <svg
+              class="search-field-icon"
+              aria-hidden="true"
+              viewBox="0 0 20 20"
+              width="16"
+              height="16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="9" cy="9" r="6" />
+              <path d="m13.5 13.5 4 4" />
+            </svg>
+            <label for="voynichWordInput" class="sr-only">Enter EVA word to decode</label>
+            <input
+              id="voynichWordInput"
+              type="search"
+              class="search-field-input"
+              [value]="voynich.activeWord()"
+              (input)="onWordInput($event)"
+              placeholder="Search or type any Voynich word (e.g. qokeedy, oror, doaro)..."
+              autocomplete="off"
+              spellcheck="false"
+            />
+          </div>
+
+          <div class="quick-chips" role="group" aria-label="Sample Voynich words">
+            <span class="chips-label">Try:</span>
+            @for (chip of quickChips; track chip.word) {
+              <button
+                type="button"
+                class="chip-btn"
+                [class.chip-active]="voynich.activeWord().toLowerCase() === chip.word"
+                (click)="setWord(chip.word)"
+              >
+                <code>{{ chip.word }}</code>
+              </button>
+            }
+          </div>
+        </div>
+
+        @if (parsedWord(); as p) {
+          <div class="morph-strip">
+            <div class="morph-segment">
+              <span class="morph-step">1. Prefix</span>
+              <strong class="morph-token">{{ p.prefix }}</strong>
+              <span class="morph-desc">{{ p.prefixDesc }}</span>
+            </div>
+            <div class="morph-segment">
+              <span class="morph-step">2. Root Stem</span>
+              <strong class="morph-token">{{ p.stem }}</strong>
+              <span class="morph-desc">{{ p.stemDesc }}</span>
+            </div>
+            <div class="morph-segment">
+              <span class="morph-step">3. Suffix</span>
+              <strong class="morph-token">{{ p.suffix }}</strong>
+              <span class="morph-desc">{{ p.suffixDesc }}</span>
+            </div>
+            <div class="morph-segment morph-segment-result">
+              <span class="morph-step">Plain-English Reading</span>
+              <strong class="morph-gloss">{{ p.gloss }}</strong>
+              <span class="morph-desc">
+                @if (activeWordConcordance(); as conc) {
+                  <strong>{{ conc.c }}×</strong> in corpus · e.g.
+                  @for (fid of conc.f.slice(0, 4); track fid) {
+                    <button type="button" class="folio-jump-chip" (click)="jumpToCorpusFolio(fid)">
+                      {{ fid }}
+                    </button>
+                  }
+                } @else {
+                  Rule-derived morphological breakdown
+                }
+              </span>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+
+    <section aria-labelledby="hub-sections-heading" class="overview-section">
+      <div class="section-divider-label" aria-hidden="true">
+        <span class="section-dot"></span>
+        <span class="section-title">Explore the Sections</span>
+        <span class="section-line"></span>
+      </div>
+
+      <div class="section-intro">
+        <h2 id="hub-sections-heading">Inside the Research</h2>
+        <p class="section-sub">
+          Jump into the annotated folio walkthroughs, visual identifications, full manuscript
+          transcription, or the research library.
+        </p>
+      </div>
+
+      <div class="hub-grid">
+        <a routerLink="/voynich/walkthroughs" class="hub-card">
+          <div class="hub-card-top">
+            <span class="hub-title">Page Walkthroughs</span>
+            <span class="hub-badge">{{ voynich.version.stats.walkthroughFolios }} Folios →</span>
+          </div>
+          <p class="hub-desc">
+            Step-by-step annotated readings of key manuscript pages with high-resolution scans,
+            object labels, and line-by-line translations.
+          </p>
+          <div class="hub-examples">
+            <span class="example-pill">f1r Master Preface</span>
+            <span class="example-pill">f68r3 Pleiades Map</span>
+            <span class="example-pill">f75r Balneology</span>
+          </div>
+        </a>
+
+        <a routerLink="/voynich/identifications" class="hub-card">
+          <div class="hub-card-top">
+            <span class="hub-title">Botanical &amp; Astro Identifications</span>
+            <span class="hub-badge">{{ voynich.version.stats.flagshipSpecimens }} Specimens →</span>
+          </div>
+          <p class="hub-desc">
+            Illustrated plants, roots, and star clusters matched against historical herbals, pigment
+            notes, and pharmaceutical jars.
+          </p>
+          <div class="hub-examples">
+            <span class="example-pill">f2v Morning Glory</span>
+            <span class="example-pill">f9r Greater Celandine</span>
+            <span class="example-pill">f17r Alkanet</span>
+          </div>
+        </a>
+
+        <a routerLink="/voynich/folios" class="hub-card">
+          <div class="hub-card-top">
+            <span class="hub-title">All 227 Folios Corpus</span>
+            <span class="hub-badge">38,949 Words →</span>
+          </div>
+          <p class="hub-desc">
+            Search and filter every transcribed page of Beinecke MS 408 by section, scribal hand, or
+            Currier dialect with interlinear stem glosses.
+          </p>
+          <div class="hub-examples">
+            <span class="example-pill">Herbal (H)</span>
+            <span class="example-pill">Balneological (B)</span>
+            <span class="example-pill">Starred Recipes (S)</span>
+          </div>
+        </a>
+
+        <a routerLink="/voynich/grammar" class="hub-card">
+          <div class="hub-card-top">
+            <span class="hub-title">Grammar, Lexicon &amp; Atlases</span>
+            <span class="hub-badge">8-Case Matrix →</span>
+          </div>
+          <p class="hub-desc">
+            Browse the decoded root stem dictionary, the 8-case suffix paradigm table, the 12 Zodiac
+            wheels, and the 20 hydrotherapy pages.
+          </p>
+          <div class="hub-examples">
+            <span class="example-pill">qok- (boil/process)</span>
+            <span class="example-pill">oror (alkanet)</span>
+            <span class="example-pill">12 Zodiac Wheels</span>
+          </div>
+        </a>
+
+        <a routerLink="/voynich/library" [queryParams]="{ subtab: 'docs' }" class="hub-card">
+          <div class="hub-card-top">
+            <span class="hub-title">Research Guides &amp; Datasets</span>
+            <span class="hub-badge">{{ voynich.version.stats.markdownGuides }} Guides →</span>
+          </div>
+          <p class="hub-desc">
+            Read the Plain-English Visual Reader’s Guide and technical dossiers, or inspect all
+            {{ voynich.version.stats.dataFiles }} raw JSON and TXT verification datasets.
+          </p>
+          <div class="hub-examples">
+            <span class="example-pill">Visual Reader’s Guide</span>
+            <span class="example-pill">Research Log</span>
+            <span class="example-pill">190 JSON Datasets</span>
+          </div>
+        </a>
+
+        <a routerLink="/voynich/library" [queryParams]="{ subtab: 'scans' }" class="hub-card">
+          <div class="hub-card-top">
+            <span class="hub-title">High-Resolution Scans &amp; PDFs</span>
+            <span class="hub-badge">{{ voynich.version.stats.highResScans }} Scans →</span>
+          </div>
+          <p class="hub-desc">
+            Browse all {{ voynich.version.stats.highResScans }} Yale Beinecke manuscript page scans
+            in the zoomable gallery or download the full 214-page PDF editions.
+          </p>
+          <div class="hub-examples">
+            <span class="example-pill">208 Folio PNGs</span>
+            <span class="example-pill">2 Full PDF Books</span>
+          </div>
+        </a>
+      </div>
+    </section>
   }
 
   @case ('walkthroughs') {
@@ -217,8 +247,7 @@
         <h1>Annotated Folio Walkthroughs</h1>
         <p class="section-sub">
           Select a manuscript folio on the left to inspect its high-resolution Yale Beinecke scan,
-          object labels, and line-by-line plain-English translation. Click any Voynich word to send
-          it to the 3-step word analyzer above.
+          object labels, and line-by-line plain-English translation.
         </p>
       </div>
     </div>
@@ -419,15 +448,32 @@
     <div class="split-layout">
       <aside class="sidebar-list" aria-label="227 Folio Corpus Filter">
         <div class="filter-stack">
-          <label for="corpusSearchInput" class="sr-only">Search folio or label</label>
-          <input
-            id="corpusSearchInput"
-            type="search"
-            class="search-input"
-            placeholder="Filter folio (e.g. f78r, f102v2)..."
-            [value]="corpusSearch()"
-            (input)="corpusSearch.set($any($event.target).value)"
-          />
+          <div class="search-field">
+            <svg
+              class="search-field-icon"
+              aria-hidden="true"
+              viewBox="0 0 20 20"
+              width="15"
+              height="15"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="9" cy="9" r="6" />
+              <path d="m13.5 13.5 4 4" />
+            </svg>
+            <label for="corpusSearchInput" class="sr-only">Search folio or label</label>
+            <input
+              id="corpusSearchInput"
+              type="search"
+              class="search-field-input"
+              placeholder="Search folio (e.g. f78r, f102v2)..."
+              [value]="corpusSearch()"
+              (input)="corpusSearch.set($any($event.target).value)"
+            />
+          </div>
           <div class="filter-row">
             <label for="corpusSectionFilter" class="sr-only">Filter by section</label>
             <select
@@ -769,8 +815,8 @@
       <div>
         <h1>Research Library, Markdown Dossiers &amp; Hard Data</h1>
         <p class="section-sub">
-          Complete access to all {{ voynich.version.stats.markdownGuides }} research guides,
-          {{ voynich.version.stats.dataFiles }} raw JSON/TXT datasets,
+          Browse all {{ voynich.version.stats.markdownGuides }} research guides,
+          {{ voynich.version.stats.dataFiles }} raw JSON and TXT datasets,
           {{ voynich.version.stats.highResScans }} high-resolution folio scans, and the 2 full
           manuscript PDF books.
         </p>
@@ -785,7 +831,7 @@
         [attr.aria-selected]="librarySubtab() === 'docs'"
         (click)="librarySubtab.set('docs')"
       >
-        Research Guides &amp; Notes ({{ voynich.version.stats.markdownGuides }})
+        Research Guides ({{ voynich.version.stats.markdownGuides }})
       </button>
       <button
         type="button"
@@ -794,7 +840,7 @@
         [attr.aria-selected]="librarySubtab() === 'datasets'"
         (click)="librarySubtab.set('datasets')"
       >
-        Hard Data &amp; Attack JSONs ({{ voynich.version.stats.dataFiles }})
+        Datasets ({{ voynich.version.stats.dataFiles }})
       </button>
       <button
         type="button"
@@ -803,7 +849,7 @@
         [attr.aria-selected]="librarySubtab() === 'scans'"
         (click)="librarySubtab.set('scans')"
       >
-        Scan Gallery &amp; PDF Books ({{ voynich.version.stats.highResScans }})
+        Scans &amp; PDF Books ({{ voynich.version.stats.highResScans }})
       </button>
     </div>
 
@@ -812,15 +858,32 @@
         <div class="split-layout">
           <aside class="sidebar-list" aria-label="Research Markdown Guides">
             <div class="filter-stack">
-              <label for="docSearchInput" class="sr-only">Filter research guides</label>
-              <input
-                id="docSearchInput"
-                type="search"
-                class="search-input"
-                placeholder="Filter 44 research guides..."
-                [value]="docSearch()"
-                (input)="docSearch.set($any($event.target).value)"
-              />
+              <div class="search-field">
+                <svg
+                  class="search-field-icon"
+                  aria-hidden="true"
+                  viewBox="0 0 20 20"
+                  width="15"
+                  height="15"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="9" cy="9" r="6" />
+                  <path d="m13.5 13.5 4 4" />
+                </svg>
+                <label for="docSearchInput" class="sr-only">Search research guides</label>
+                <input
+                  id="docSearchInput"
+                  type="search"
+                  class="search-field-input"
+                  placeholder="Search 44 research guides..."
+                  [value]="docSearch()"
+                  (input)="docSearch.set($any($event.target).value)"
+                />
+              </div>
             </div>
 
             <div class="folio-btn-list">
@@ -829,14 +892,12 @@
                 @for (d of group.docs; track d.slug) {
                   <button
                     type="button"
-                    class="list-item-btn"
+                    class="list-item-btn doc-list-btn"
                     [class.active-list-item]="activeDocSlug() === d.slug"
+                    [attr.title]="d.title"
                     (click)="selectDoc(d.slug)"
                   >
-                    <div class="item-top">
-                      <strong>{{ d.title }}</strong>
-                    </div>
-                    <div class="item-sub">{{ d.sourcePath }} · {{ d.sizeKB }} KB</div>
+                    <span class="doc-list-title">{{ shortDocTitle(d) }}</span>
                   </button>
                 }
               }
@@ -861,30 +922,47 @@
         <div class="split-layout">
           <aside class="sidebar-list" aria-label="Raw Data Files">
             <div class="filter-stack">
-              <label for="dataSearchInput" class="sr-only">Search datasets</label>
-              <input
-                id="dataSearchInput"
-                type="search"
-                class="search-input"
-                placeholder="Search 190 JSON/TXT datasets..."
-                [value]="dataSearch()"
-                (input)="dataSearch.set($any($event.target).value)"
-              />
+              <div class="search-field">
+                <svg
+                  class="search-field-icon"
+                  aria-hidden="true"
+                  viewBox="0 0 20 20"
+                  width="15"
+                  height="15"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="9" cy="9" r="6" />
+                  <path d="m13.5 13.5 4 4" />
+                </svg>
+                <label for="dataSearchInput" class="sr-only">Search datasets</label>
+                <input
+                  id="dataSearchInput"
+                  type="search"
+                  class="search-field-input"
+                  placeholder="Search 190 JSON/TXT datasets..."
+                  [value]="dataSearch()"
+                  (input)="dataSearch.set($any($event.target).value)"
+                />
+              </div>
             </div>
 
             <div class="folio-btn-list">
               @for (df of filteredDataFiles(); track df.file) {
                 <button
                   type="button"
-                  class="list-item-btn"
+                  class="list-item-btn doc-list-btn"
                   [class.active-list-item]="activeDataFile() === df.file"
+                  [attr.title]="'data/' + df.file"
                   (click)="inspectDataFile(df.file, df.url, df.sizeKB)"
                 >
                   <div class="item-top">
-                    <strong>{{ df.label }}</strong>
+                    <span class="doc-list-title">{{ df.label }}</span>
                     <span class="badge">{{ df.sizeKB }} KB</span>
                   </div>
-                  <div class="item-sub"><code>data/{{ df.file }}</code></div>
                 </button>
               }
             </div>
@@ -961,15 +1039,32 @@
               </p>
             </div>
             <div>
-              <label for="scanGallerySearch" class="sr-only">Filter scans by folio</label>
-              <input
-                id="scanGallerySearch"
-                type="search"
-                class="search-input"
-                placeholder="Filter scan (e.g. f78r, f102v)..."
-                [value]="scanSearch()"
-                (input)="scanSearch.set($any($event.target).value)"
-              />
+              <div class="search-field">
+                <svg
+                  class="search-field-icon"
+                  aria-hidden="true"
+                  viewBox="0 0 20 20"
+                  width="15"
+                  height="15"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="9" cy="9" r="6" />
+                  <path d="m13.5 13.5 4 4" />
+                </svg>
+                <label for="scanGallerySearch" class="sr-only">Filter scans by folio</label>
+                <input
+                  id="scanGallerySearch"
+                  type="search"
+                  class="search-field-input"
+                  placeholder="Search scan (e.g. f78r, f102v)..."
+                  [value]="scanSearch()"
+                  (input)="scanSearch.set($any($event.target).value)"
+                />
+              </div>
             </div>
           </div>
 

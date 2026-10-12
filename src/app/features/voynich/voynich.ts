@@ -66,10 +66,6 @@ export class Voynich {
     { word: 'daiin', hint: 'take 1 dose' },
     { word: 'olkol', hint: 'pipe conduit' },
     { word: 'okoldy', hint: 'infused in jar' },
-    { word: 'poldchody', hint: 'begin steeping' },
-    { word: 'darary', hint: 'main taproot' },
-    { word: 'fachys', hint: 'f1r opener' },
-    { word: 'otam', hint: 'final seal' },
   ];
 
   protected readonly parsedWord = computed<ParsedVoynichWord | null>(() =>
@@ -223,6 +219,40 @@ export class Voynich {
 
   protected setWord(word: string): void {
     this.voynich.activeWord.set(word);
+    if (this.activeSection() !== 'overview') {
+      void this.router.navigate(['/voynich']);
+    }
+  }
+
+  protected shortDocTitle(doc: DocMeta): string {
+    const overrides: Record<string, string> = {
+      'plain-english-visual-readers-guide': "Plain-English Visual Reader's Guide",
+      'visual-botanical-and-astro-identifications': 'Botanical & Astro Identification Dossier',
+      readme: 'Project Overview (README)',
+      'notes-master-research-log': 'Master Research Log & Findings',
+      'drawing-intrusions-right-titles-and-25paragraph-reader':
+        'Drawing Intrusions & 25-Paragraph Reader',
+    };
+    if (overrides[doc.slug]) {
+      return overrides[doc.slug];
+    }
+    let s = doc.title
+      .replace(/\s*\((?:Wave|Attack|Phase|Discover|\d|\{)[^)]*\)/gi, '')
+      .replace(/^(?:The\s+)?(?:Complete\s+)?(?:Voynich\s+Manuscript\s+|Voynich\s+)?/i, '')
+      .replace(/\s+(?:to|of)\s+the\s+Voynich\s+Manuscript/gi, '')
+      .replace(/:\s+Complete\s+Morphological.*$/i, '')
+      .replace(/\s+&\s+100\.00%-Accountability.*$/i, '')
+      .replace(/\s+&\s+Multi-Paragraph\s+Monograph\s+Edition$/i, '')
+      .replace(/\s+&\s+Circular\s+Ring\s+Decoder\s+Edition$/i, '')
+      .replace(/\s+&\s+Decoded\s+Parallel\s+Clause\s+Corpus$/i, '')
+      .replace(/\s+&\s+46-Core\s+Generative\s+Decoder$/i, '')
+      .replace(/\s+&\s+Complete\s+.*$/i, '')
+      .replace(/\s+&\s+Multi-Modal\s+.*$/i, '')
+      .trim();
+    if (s.length > 52 && /(?<!\d),\s+/.test(s)) {
+      s = s.split(/(?<!\d),\s+/)[0].trim();
+    }
+    return s;
   }
 
   protected onWordInput(event: Event): void {
