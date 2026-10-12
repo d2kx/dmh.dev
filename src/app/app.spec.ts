@@ -75,6 +75,9 @@ describe('App', () => {
     expect(doc.querySelector<HTMLLinkElement>('link[rel="canonical"]')?.href).toBe(
       'https://www.dmh.dev/blog',
     );
+    expect(
+      doc.querySelector<HTMLLinkElement>('link[rel="icon"][type="image/svg+xml"]')?.getAttribute('href'),
+    ).toBe('/favicon.svg');
 
     await router.navigateByUrl('/voynich');
     await fixture.whenStable();
@@ -82,6 +85,12 @@ describe('App', () => {
     expect(meta.getTag('property="og:title"')?.content).toBe('Voynich | dmh.dev');
     expect(meta.getTag('property="og:image"')?.content).toBe('https://www.dmh.dev/og-voynich.png');
     expect(meta.getTag('name="twitter:image"')?.content).toBe('https://www.dmh.dev/og-voynich.png');
+    expect(
+      doc.querySelector<HTMLLinkElement>('link[rel="icon"][type="image/svg+xml"]')?.getAttribute('href'),
+    ).toBe('/favicon-voynich.svg');
+    expect(
+      doc.querySelector<HTMLLinkElement>('link[rel="icon"][type="image/x-icon"]')?.getAttribute('href'),
+    ).toBe('/favicon-voynich.ico');
 
     await router.navigateByUrl('/voynich/walkthroughs');
     await fixture.whenStable();
@@ -99,5 +108,11 @@ describe('App', () => {
     expect(meta.getTag('name="twitter:image"')?.content).toBe(
       'https://www.dmh.dev/og-kaleidoscope.png',
     );
+    expect(
+      doc.querySelector<HTMLLinkElement>('link[rel="icon"][type="image/svg+xml"]')?.getAttribute('href'),
+    ).toBe('/favicon-kaleidoscope.svg');
+    expect(
+      doc.querySelector<HTMLLinkElement>('link[rel="icon"][type="image/x-icon"]')?.getAttribute('href'),
+    ).toBe('/favicon-kaleidoscope.ico');
   });
 });

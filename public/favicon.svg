@@ -1,18 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-  <style>
-    .petal { fill: #b81d5c; }
-    .center { fill: #fde8f0; }
-    @media (prefers-color-scheme: dark) {
-      .petal { fill: #ff8ab5; }
-      .center { fill: #3b1225; }
-    }
-  </style>
-  <g class="petal">
-    <path d="M 12 10.5 C 9.1 8.7 7.7 5.2 9.5 2.5 C 10.2 1.5 11.3 1.9 12 3.3 C 12.7 1.9 13.8 1.5 14.5 2.5 C 16.3 5.2 14.9 8.7 12 10.5 Z" />
-    <path d="M 12 10.5 C 9.1 8.7 7.7 5.2 9.5 2.5 C 10.2 1.5 11.3 1.9 12 3.3 C 12.7 1.9 13.8 1.5 14.5 2.5 C 16.3 5.2 14.9 8.7 12 10.5 Z" transform="rotate(72 12 12)" />
-    <path d="M 12 10.5 C 9.1 8.7 7.7 5.2 9.5 2.5 C 10.2 1.5 11.3 1.9 12 3.3 C 12.7 1.9 13.8 1.5 14.5 2.5 C 16.3 5.2 14.9 8.7 12 10.5 Z" transform="rotate(144 12 12)" />
-    <path d="M 12 10.5 C 9.1 8.7 7.7 5.2 9.5 2.5 C 10.2 1.5 11.3 1.9 12 3.3 C 12.7 1.9 13.8 1.5 14.5 2.5 C 16.3 5.2 14.9 8.7 12 10.5 Z" transform="rotate(216 12 12)" />
-    <path d="M 12 10.5 C 9.1 8.7 7.7 5.2 9.5 2.5 C 10.2 1.5 11.3 1.9 12 3.3 C 12.7 1.9 13.8 1.5 14.5 2.5 C 16.3 5.2 14.9 8.7 12 10.5 Z" transform="rotate(288 12 12)" />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <rect x="4" y="4" width="56" height="56" rx="16" fill="#140d1e" stroke="#f43f85" stroke-width="2.5" />
+  <g transform="translate(32 32) scale(1.75)" fill="#ff8ab5">
+    <path d="M 0 -1.6 C -3.8 -5.5 -5.2 -10.8 -2.1 -13.4 L 0 -11.0 L 2.1 -13.4 C 5.2 -10.8 3.8 -5.5 0 -1.6 Z" />
+    <path d="M 0 -1.6 C -3.8 -5.5 -5.2 -10.8 -2.1 -13.4 L 0 -11.0 L 2.1 -13.4 C 5.2 -10.8 3.8 -5.5 0 -1.6 Z" transform="rotate(72)" />
+    <path d="M 0 -1.6 C -3.8 -5.5 -5.2 -10.8 -2.1 -13.4 L 0 -11.0 L 2.1 -13.4 C 5.2 -10.8 3.8 -5.5 0 -1.6 Z" transform="rotate(144)" />
+    <path d="M 0 -1.6 C -3.8 -5.5 -5.2 -10.8 -2.1 -13.4 L 0 -11.0 L 2.1 -13.4 C 5.2 -10.8 3.8 -5.5 0 -1.6 Z" transform="rotate(216)" />
+    <path d="M 0 -1.6 C -3.8 -5.5 -5.2 -10.8 -2.1 -13.4 L 0 -11.0 L 2.1 -13.4 C 5.2 -10.8 3.8 -5.5 0 -1.6 Z" transform="rotate(288)" />
   </g>
-  <circle class="center" cx="12" cy="12" r="1.75" />
+  <circle cx="32" cy="32" r="3.6" fill="#fde8f0" />
 </svg>

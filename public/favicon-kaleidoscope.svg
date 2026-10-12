@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <polygon points="32,3 52.5,11.5 61,32 52.5,52.5 32,61 11.5,52.5 3,32 11.5,11.5" fill="#13091c" stroke="#f43f85" stroke-width="2.5" />
+  <g opacity="0.92">
+    <polygon points="32,32 32,5 50.5,13.5" fill="#f43f85" opacity="0.88" />
+    <polygon points="32,32 50.5,13.5 59,32" fill="#8b5cf6" opacity="0.88" />
+    <polygon points="32,32 59,32 50.5,50.5" fill="#22d3ee" opacity="0.78" />
+    <polygon points="32,32 50.5,50.5 32,59" fill="#f43f85" opacity="0.88" />
+    <polygon points="32,32 32,59 13.5,50.5" fill="#8b5cf6" opacity="0.88" />
+    <polygon points="32,32 13.5,50.5 5,32" fill="#22d3ee" opacity="0.78" />
+    <polygon points="32,32 5,32 13.5,13.5" fill="#f43f85" opacity="0.88" />
+    <polygon points="32,32 13.5,13.5 32,5" fill="#8b5cf6" opacity="0.88" />
+  </g>
+  <polygon points="32,11 46.8,17.2 53,32 46.8,46.8 32,53 17.2,46.8 11,32 17.2,17.2" fill="#190b28" fill-opacity="0.62" stroke="#ffffff" stroke-opacity="0.4" stroke-width="1.2" />
+  <g transform="translate(32 32)">
+    <path d="M 0 -2 C -4.5 -8 -6.5 -15 -2.6 -18.5 L 0 -15.2 L 2.6 -18.5 C 6.5 -15 4.5 -8 0 -2 Z" fill="#ffd6e7" />
+    <path d="M 0 -2 C -4.5 -8 -6.5 -15 -2.6 -18.5 L 0 -15.2 L 2.6 -18.5 C 6.5 -15 4.5 -8 0 -2 Z" fill="#ffb3d1" transform="rotate(72)" />
+    <path d="M 0 -2 C -4.5 -8 -6.5 -15 -2.6 -18.5 L 0 -15.2 L 2.6 -18.5 C 6.5 -15 4.5 -8 0 -2 Z" fill="#ffd6e7" transform="rotate(144)" />
+    <path d="M 0 -2 C -4.5 -8 -6.5 -15 -2.6 -18.5 L 0 -15.2 L 2.6 -18.5 C 6.5 -15 4.5 -8 0 -2 Z" fill="#ffb3d1" transform="rotate(216)" />
+    <path d="M 0 -2 C -4.5 -8 -6.5 -15 -2.6 -18.5 L 0 -15.2 L 2.6 -18.5 C 6.5 -15 4.5 -8 0 -2 Z" fill="#ffd6e7" transform="rotate(288)" />
+  </g>
+  <circle cx="32" cy="32" r="3.2" fill="#fffbeb" />
+</svg>

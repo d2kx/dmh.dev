@@ -27,6 +27,8 @@ export const routes: Routes = [
             ogType: 'website',
             ogImage: 'https://www.dmh.dev/og-voynich.png',
             ogImageAlt: 'dmh.dev Voynich · 15th-Century Illustrated Codex Explorer',
+            faviconSvg: '/favicon-voynich.svg',
+            faviconIco: '/favicon-voynich.ico',
           } satisfies RouteSeoData,
         },
         loadComponent: () => import('./features/voynich/voynich').then((m) => m.Voynich),
@@ -41,6 +43,8 @@ export const routes: Routes = [
             ogType: 'website',
             ogImage: 'https://www.dmh.dev/og-voynich.png',
             ogImageAlt: 'dmh.dev Voynich · 15th-Century Illustrated Codex Explorer',
+            faviconSvg: '/favicon-voynich.svg',
+            faviconIco: '/favicon-voynich.ico',
             sectionSeo: {
               walkthroughs: {
                 title: 'Voynich Walkthroughs | dmh.dev',
@@ -84,6 +88,8 @@ export const routes: Routes = [
         ogType: 'website',
         ogImage: 'https://www.dmh.dev/og-kaleidoscope.png',
         ogImageAlt: 'dmh.dev Kaleidoscope · Generative Fractal & Sakura Kaleidoscope',
+        faviconSvg: '/favicon-kaleidoscope.svg',
+        faviconIco: '/favicon-kaleidoscope.ico',
       } satisfies RouteSeoData,
     },
     loadComponent: () =>

@@ -13,6 +13,8 @@ export interface RouteSeoData {
   readonly ogType?: 'website' | 'article' | 'profile';
   readonly ogImage?: string;
   readonly ogImageAlt?: string;
+  readonly faviconSvg?: string;
+  readonly faviconIco?: string;
   readonly locale?: string;
   readonly robots?: string;
   readonly sectionSeo?: Readonly<Record<string, RouteSectionSeo>>;
@@ -29,6 +31,8 @@ const DEFAULT_DESCRIPTION =
   'Personal website, software engineering projects, and technical blog of Dennis Martin Herbers (dmh.dev).';
 const DEFAULT_OG_IMAGE = `${SITE_ORIGIN}/og-image.png`;
 const DEFAULT_OG_IMAGE_ALT = 'dmh.dev | Dennis Martin Herbers';
+const DEFAULT_FAVICON_SVG = '/favicon.svg';
+const DEFAULT_FAVICON_ICO = '/favicon.ico';
 
 @Injectable({ providedIn: 'root' })
 export class SeoService {
@@ -70,6 +74,8 @@ export class SeoService {
           ogType: seoData?.ogType ?? 'website',
           ogImage: seoData?.ogImage,
           ogImageAlt: seoData?.ogImageAlt,
+          faviconSvg: seoData?.faviconSvg,
+          faviconIco: seoData?.faviconIco,
           locale: seoData?.locale ?? 'en_US',
           robots: seoData?.robots ?? 'index, follow',
         });
@@ -81,6 +87,8 @@ export class SeoService {
       options.path === '/' ? `${SITE_ORIGIN}/` : `${SITE_ORIGIN}${options.path}`;
     const ogImage = options.ogImage ?? DEFAULT_OG_IMAGE;
     const ogImageAlt = options.ogImageAlt ?? DEFAULT_OG_IMAGE_ALT;
+    const faviconSvg = options.faviconSvg ?? DEFAULT_FAVICON_SVG;
+    const faviconIco = options.faviconIco ?? DEFAULT_FAVICON_ICO;
 
     this.meta.updateTag({ name: 'description', content: options.description });
     this.meta.updateTag({ name: 'robots', content: options.robots ?? 'index, follow' });
@@ -108,6 +116,7 @@ export class SeoService {
     this.meta.updateTag({ name: 'twitter:image:alt', content: ogImageAlt });
 
     this.updateCanonicalLink(canonicalUrl);
+    this.updateFaviconLinks(faviconSvg, faviconIco);
   }
 
   private updateCanonicalLink(url: string): void {
@@ -118,6 +127,32 @@ export class SeoService {
       this.document.head.appendChild(link);
     }
     link.setAttribute('href', url);
+  }
+
+  private updateFaviconLinks(svgHref: string, icoHref: string): void {
+    let icoLink = this.document.querySelector<HTMLLinkElement>(
+      'link[rel="icon"][type="image/x-icon"]',
+    );
+    if (!icoLink) {
+      icoLink = this.document.createElement('link');
+      icoLink.setAttribute('rel', 'icon');
+      icoLink.setAttribute('type', 'image/x-icon');
+      icoLink.setAttribute('sizes', '48x48 32x32');
+      this.document.head.appendChild(icoLink);
+    }
+    icoLink.setAttribute('href', icoHref);
+
+    let svgLink = this.document.querySelector<HTMLLinkElement>(
+      'link[rel="icon"][type="image/svg+xml"]',
+    );
+    if (!svgLink) {
+      svgLink = this.document.createElement('link');
+      svgLink.setAttribute('rel', 'icon');
+      svgLink.setAttribute('type', 'image/svg+xml');
+      svgLink.setAttribute('sizes', 'any');
+      this.document.head.appendChild(svgLink);
+    }
+    svgLink.setAttribute('href', svgHref);
   }
 
   private getLeafRoute(route: ActivatedRouteSnapshot): ActivatedRouteSnapshot {
