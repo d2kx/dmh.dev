@@ -126,12 +126,33 @@ export class Voynich {
     return exp.wordConcordance[w] ?? null;
   });
 
-  // Walkthroughs master-detail state
-  protected readonly selectedWalkthroughIdx = signal<number>(0);
-  protected readonly activeWalkthrough = computed<WalkthroughFolio | null>(() => {
+  // Walkthroughs search & master-detail state
+  protected readonly walkthroughSearch = signal<string>('');
+  protected readonly selectedWalkthroughFolio = signal<string>('f1r');
+
+  protected readonly filteredWalkthroughFolios = computed<readonly WalkthroughFolio[]>(() => {
     const folios = this.voynich.explorerData()?.folios ?? [];
-    return folios[this.selectedWalkthroughIdx()] ?? folios[0] ?? null;
+    const q = this.walkthroughSearch().trim().toLowerCase();
+    if (!q) return folios;
+    return folios.filter(
+      (f) =>
+        f.folio.toLowerCase().includes(q) ||
+        f.title.toLowerCase().includes(q) ||
+        f.section.toLowerCase().includes(q) ||
+        f.summary.toLowerCase().includes(q) ||
+        (f.labels ?? []).some((l) => l.toLowerCase().includes(q)) ||
+        f.clauses.some(
+          (c) => c.eva.toLowerCase().includes(q) || c.english.toLowerCase().includes(q),
+        ),
+    );
   });
+
+  protected readonly activeWalkthrough = computed<WalkthroughFolio | null>(() => {
+    const filtered = this.filteredWalkthroughFolios();
+    const selected = this.selectedWalkthroughFolio();
+    return filtered.find((f) => f.folio === selected) ?? filtered[0] ?? null;
+  });
+
   protected readonly activeWalkthroughList = computed<readonly WalkthroughFolio[]>(() => {
     const w = this.activeWalkthrough();
     return w ? [w] : [];
@@ -209,27 +230,30 @@ export class Voynich {
     return corpus.folios.find((f) => f.folio === id) ?? corpus.folios[0] ?? null;
   });
 
-  // Library state (Markdown Guides, Datasets, Scans)
+  // Library state (Markdown Guides, Scans & PDF Books, Datasets)
   protected readonly docSearch = signal<string>('');
-  protected readonly activeDocSlug = signal<string>('plain-english-visual-readers-guide');
-  protected readonly activeDocTitle = signal<string>("Plain-English Visual Reader's Guide");
-  protected readonly activeDocMeta = signal<string>(
-    'notes/PLAIN_ENGLISH_VISUAL_READERS_GUIDE.md · 1. Start Here: Plain-English & Visual Guides',
-  );
+  protected readonly activeDocSlug = signal<string | null>(null);
+  protected readonly activeDocTitle = signal<string>('');
+  protected readonly activeDocMeta = signal<string>('');
   protected readonly activeDocHtml = signal<SafeHtml>('');
+
+  protected readonly filteredDocs = computed<readonly DocMeta[]>(() => {
+    const cat = this.voynich.catalogData();
+    if (!cat) return [];
+    const q = this.docSearch().trim().toLowerCase();
+    if (!q) return cat.docs;
+    return cat.docs.filter(
+      (d) =>
+        d.title.toLowerCase().includes(q) ||
+        d.summary.toLowerCase().includes(q) ||
+        d.slug.includes(q) ||
+        d.category.toLowerCase().includes(q),
+    );
+  });
 
   protected readonly groupedDocs = computed<readonly { category: string; docs: DocMeta[] }[]>(
     () => {
-      const cat = this.voynich.catalogData();
-      if (!cat) return [];
-      const q = this.docSearch().trim().toLowerCase();
-      const filtered = cat.docs.filter(
-        (d) =>
-          !q ||
-          d.title.toLowerCase().includes(q) ||
-          d.slug.includes(q) ||
-          d.category.toLowerCase().includes(q),
-      );
+      const filtered = this.filteredDocs();
       const map = new Map<string, DocMeta[]>();
       for (const d of filtered) {
         const list = map.get(d.category) ?? [];
@@ -242,13 +266,15 @@ export class Voynich {
     },
   );
 
+  // Datasets directory & full-width inspector state
   protected readonly dataSearch = signal<string>('');
+  protected readonly dataPageIndex = signal<number>(0);
+  protected readonly dataPageSize = signal<number>(36);
+  protected readonly dataPageSizeOptions: readonly number[] = [18, 36, 72];
   protected readonly activeDataFile = signal<string>('');
   protected readonly activeDataMeta = signal<string>('');
   protected readonly activeDataRawUrl = signal<string>('');
-  protected readonly activeDataPreview = signal<string>(
-    'Click any dataset on the left to inspect its contents.',
-  );
+  protected readonly activeDataPreview = signal<string>('');
 
   protected readonly filteredDataFiles = computed(() => {
     const cat = this.voynich.catalogData();
@@ -259,7 +285,19 @@ export class Voynich {
     );
   });
 
+  protected readonly pagedDataFiles = computed(() => {
+    const all = this.filteredDataFiles();
+    const size = this.dataPageSize();
+    const start = this.dataPageIndex() * size;
+    return all.slice(start, start + size);
+  });
+
+  // Scans & PDF Books gallery state
   protected readonly scanSearch = signal<string>('');
+  protected readonly scanPageIndex = signal<number>(0);
+  protected readonly scanPageSize = signal<number>(24);
+  protected readonly scanPageSizeOptions: readonly number[] = [12, 24, 48];
+
   protected readonly filteredScans = computed(() => {
     const cat = this.voynich.catalogData();
     if (!cat) return [];
@@ -267,6 +305,13 @@ export class Voynich {
     return cat.pages.filter(
       (p) => !q || p.file.toLowerCase().includes(q) || p.folio.toLowerCase().includes(q),
     );
+  });
+
+  protected readonly pagedScans = computed(() => {
+    const all = this.filteredScans();
+    const size = this.scanPageSize();
+    const start = this.scanPageIndex() * size;
+    return all.slice(start, start + size);
   });
 
   constructor() {
@@ -280,9 +325,6 @@ export class Voynich {
       if (section === 'folios') {
         void this.voynich.ensureCorpusLoaded();
       }
-      if (section === 'library' && !this.activeDocHtml()) {
-        void this.selectDoc(this.activeDocSlug());
-      }
     });
 
     this.route.queryParamMap.subscribe((qParams) => {
@@ -293,6 +335,8 @@ export class Voynich {
       const docSlug = qParams.get('doc');
       if (docSlug) {
         void this.selectDoc(docSlug);
+      } else if (this.activeDocSlug()) {
+        this.activeDocSlug.set(null);
       }
       const folio = qParams.get('folio');
       if (folio) {
@@ -312,8 +356,9 @@ export class Voynich {
           if (wt) {
             this.selectWalkthroughByFolio(wt);
           }
-          if (this.activeSection() === 'library' && !this.activeDocHtml()) {
-            void this.selectDoc(this.activeDocSlug());
+          const docSlug = this.route.snapshot.queryParamMap.get('doc');
+          if (docSlug && !this.activeDocHtml()) {
+            void this.selectDoc(docSlug);
           }
         });
       };
@@ -344,12 +389,23 @@ export class Voynich {
     });
   }
 
-  private selectWalkthroughByFolio(folioId: string): void {
+  protected selectWalkthroughByFolio(folioId: string): void {
     const folios = this.voynich.explorerData()?.folios ?? [];
-    const idx = folios.findIndex((f) => f.folio === folioId || f.folio.startsWith(folioId));
-    if (idx >= 0) {
-      this.selectedWalkthroughIdx.set(idx);
-    }
+    const match = folios.find((f) => f.folio === folioId || f.folio.startsWith(folioId));
+    this.selectedWalkthroughFolio.set(match ? match.folio : folioId);
+  }
+
+  protected onWalkthroughSearch(value: string): void {
+    this.walkthroughSearch.set(value);
+  }
+
+  protected setLibrarySubtab(subtab: LibrarySubtab): void {
+    this.librarySubtab.set(subtab);
+    this.activeDocSlug.set(null);
+    this.activeDataFile.set('');
+    void this.router.navigate(['/voynich/library'], {
+      queryParams: { subtab },
+    });
   }
 
   protected shortDocTitle(doc: DocMeta): string {
@@ -365,6 +421,7 @@ export class Voynich {
       return overrides[doc.slug];
     }
     let s = doc.title
+      .replace(/^Wave\s*\d+\s*Master\s*Compendium:\s*/i, '')
       .replace(/\s*\((?:Wave|Attack|Phase|Discover|\d|\{)[^)]*\)/gi, '')
       .replace(/^(?:The\s+)?(?:Complete\s+)?(?:Voynich\s+Manuscript\s+|Voynich\s+)?/i, '')
       .replace(/\s+(?:to|of)\s+the\s+Voynich\s+Manuscript/gi, '')
@@ -377,7 +434,7 @@ export class Voynich {
       .replace(/\s+&\s+Complete\s+.*$/i, '')
       .replace(/\s+&\s+Multi-Modal\s+.*$/i, '')
       .trim();
-    if (s.length > 52 && /(?<!\d),\s+/.test(s)) {
+    if (s.length > 62 && /(?<!\d),\s+/.test(s)) {
       s = s.split(/(?<!\d),\s+/)[0].trim();
     }
     return s;
@@ -429,6 +486,22 @@ export class Voynich {
     void this.router.navigate(['/voynich/folios'], { queryParams: { folio: primaryId } });
   }
 
+  protected openDoc(slug: string): void {
+    void this.router.navigate(['/voynich/library'], {
+      queryParams: { subtab: 'docs', doc: slug },
+    });
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  protected closeDocReader(): void {
+    this.activeDocSlug.set(null);
+    void this.router.navigate(['/voynich/library'], {
+      queryParams: { subtab: 'docs' },
+    });
+  }
+
   protected async selectDoc(slug: string): Promise<void> {
     this.activeDocSlug.set(slug);
     this.librarySubtab.set('docs');
@@ -438,7 +511,9 @@ export class Voynich {
       this.activeDocMeta.set(`${doc.sourcePath} · ${doc.category} · ${doc.sizeKB} KB`);
       this.activeDocHtml.set(this.sanitizer.bypassSecurityTrustHtml(html));
     } catch {
-      // Ignore missing doc slug
+      if (typeof window !== 'undefined') {
+        this.activeDocSlug.set(null);
+      }
     }
   }
 
@@ -447,6 +522,9 @@ export class Voynich {
     this.activeDataMeta.set(`${sizeKB} KB · /data/${file}`);
     this.activeDataRawUrl.set(url);
     this.activeDataPreview.set(`Loading /data/${file}…`);
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
     try {
       const text = await this.voynich.loadDataFileText(url);
       this.activeDataPreview.set(
@@ -456,6 +534,36 @@ export class Voynich {
       );
     } catch {
       this.activeDataPreview.set(`Could not load /data/${file}`);
+    }
+  }
+
+  protected closeDataInspector(): void {
+    this.activeDataFile.set('');
+  }
+
+  protected onDataSearch(value: string): void {
+    this.dataSearch.set(value);
+    this.dataPageIndex.set(0);
+  }
+
+  protected onDataPage(event: PageEvent): void {
+    this.dataPageIndex.set(event.pageIndex);
+    this.dataPageSize.set(event.pageSize);
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  protected onScanSearch(value: string): void {
+    this.scanSearch.set(value);
+    this.scanPageIndex.set(0);
+  }
+
+  protected onScanPage(event: PageEvent): void {
+    this.scanPageIndex.set(event.pageIndex);
+    this.scanPageSize.set(event.pageSize);
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
@@ -496,9 +604,7 @@ export class Voynich {
     if (docEl?.dataset['docSlug']) {
       event.preventDefault();
       const slug = docEl.dataset['docSlug'];
-      void this.router.navigate(['/voynich/library'], {
-        queryParams: { subtab: 'docs', doc: slug },
-      });
+      this.openDoc(slug);
     }
   }
 }

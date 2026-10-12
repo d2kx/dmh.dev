@@ -28,7 +28,7 @@ export class VoynichService {
   private readonly docCache = new Map<string, CachedDocResult>();
   private readonly dataTextCache = new Map<string, string>();
 
-  private readonly cacheQuery = `?v=${VOYNICH_VERSION.shortSha}-4`;
+  private readonly cacheQuery = `?v=${VOYNICH_VERSION.shortSha}-5`;
 
   ensureInitialized(): Promise<void> {
     if (this.initPromise) {

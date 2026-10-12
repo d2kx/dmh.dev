@@ -7,7 +7,7 @@ export const VOYNICH_VERSION = {
   "commitDate": "2026-10-12",
   "commitIso": "2026-10-12 17:20:14 +0200",
   "commitSubject": "Complete Wave 46 (Attacks 193-196, Discoveries 210-213): Zodiac @Cc-@Lz Syntactic Split, f80r/f82r Balneo Galleries & Rare -g Label Stop, Quire 20 32.12-Word Star-Unit Invariant (2.36x SD Collapse) & v12.0 Explorer",
-  "syncedAt": "2026-10-12T16:23:04.488Z",
+  "syncedAt": "2026-10-12T17:02:01.921Z",
   "stats": {
     "transcribedFolios": 227,
     "totalWords": 38949,

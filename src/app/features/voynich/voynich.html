@@ -152,20 +152,31 @@
           </p>
         </a>
 
+        <a routerLink="/voynich/grammar" class="hub-link-item">
+          <div class="hub-card-top">
+            <span class="hub-title">3. Grammar, Lexicon &amp; Atlases</span>
+            <span class="hub-badge">8-Case Matrix →</span>
+          </div>
+          <p class="hub-desc">
+            Reference tables for recurring root stems, the 8-case morphological matrix, the 12
+            Zodiac wheels, and the 20 hydrotherapy pages.
+          </p>
+        </a>
+
         <a routerLink="/voynich/library" [queryParams]="{ subtab: 'docs' }" class="hub-link-item">
           <div class="hub-card-top">
-            <span class="hub-title">3. Research Library &amp; Guides</span>
+            <span class="hub-title">4. Research Library &amp; Guides</span>
             <span class="hub-badge">{{ voynich.version.stats.markdownGuides }} Guides →</span>
           </div>
           <p class="hub-desc">
-            Read the Plain-English Visual Reader’s Guide and thematic notes, or inspect all
+            Read the Plain-English Visual Reader’s Guide and thematic monographs, or inspect all
             {{ voynich.version.stats.dataFiles }} raw JSON and TXT verification datasets.
           </p>
         </a>
 
         <a routerLink="/voynich/library" [queryParams]="{ subtab: 'scans' }" class="hub-link-item">
           <div class="hub-card-top">
-            <span class="hub-title">4. High-Resolution Scans &amp; PDFs</span>
+            <span class="hub-title">5. High-Resolution Scans &amp; PDFs</span>
             <span class="hub-badge">{{ voynich.version.stats.highResScans }} Scans →</span>
           </div>
           <p class="hub-desc">
@@ -176,23 +187,12 @@
 
         <a routerLink="/voynich/folios" class="hub-link-item">
           <div class="hub-card-top">
-            <span class="hub-title">5. All 227 Folios Corpus</span>
+            <span class="hub-title">6. All 227 Folios Corpus</span>
             <span class="hub-badge">38,949 Words →</span>
           </div>
           <p class="hub-desc">
             Search and filter every transcribed page of Beinecke MS 408 by section, scribal hand, or
             Currier dialect with interlinear stem glosses.
-          </p>
-        </a>
-
-        <a routerLink="/voynich/grammar" class="hub-link-item">
-          <div class="hub-card-top">
-            <span class="hub-title">6. Grammar, Lexicon &amp; Atlases</span>
-            <span class="hub-badge">8-Case Matrix →</span>
-          </div>
-          <p class="hub-desc">
-            Reference tables for recurring root stems, the 8-case morphological matrix, the 12
-            Zodiac wheels, and the 20 hydrotherapy pages.
           </p>
         </a>
       </div>
@@ -297,26 +297,62 @@
   }
 
   @case ('walkthroughs') {
-    <div class="section-head">
+    <div class="section-head specimen-section-head">
       <div class="editorial-prose">
         <h1>Annotated Folio Walkthroughs</h1>
         <p>
-          Select a manuscript folio on the left to inspect its high-resolution Yale Beinecke scan,
-          object labels, and clause-by-clause plain-English reading. Click any scan to zoom full
-          resolution.
+          Select or search a manuscript folio below to inspect its high-resolution Yale Beinecke
+          scan, object labels, and clause-by-clause plain-English reading. Click any scan to zoom
+          full resolution.
         </p>
+      </div>
+
+      <div class="specimen-toolbar">
+        <div class="search-field specimen-search-field">
+          <svg
+            class="search-field-icon"
+            aria-hidden="true"
+            viewBox="0 0 20 20"
+            width="15"
+            height="15"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="9" cy="9" r="6" />
+            <path d="m13.5 13.5 4 4" />
+          </svg>
+          <label for="walkthroughSearchInput" class="sr-only">
+            Filter walkthroughs by folio, plant, label, or clause word
+          </label>
+          <input
+            id="walkthroughSearchInput"
+            type="search"
+            class="search-field-input"
+            placeholder="Search by folio, plant, label, or word (e.g. f78r, Viola, oror, boil)..."
+            [value]="walkthroughSearch()"
+            (input)="onWalkthroughSearch($any($event.target).value)"
+          />
+        </div>
+        <div class="count-label">
+          Showing {{ filteredWalkthroughFolios().length }} of
+          {{ voynich.explorerData()?.folios?.length ?? voynich.version.stats.walkthroughFolios }}
+          folios
+        </div>
       </div>
     </div>
 
     <div class="split-layout">
-      <aside class="sidebar-list" aria-label="Walkthrough folios">
+      <aside class="sidebar-list walkthrough-sidebar" aria-label="Walkthrough folios">
         <div class="folio-btn-list">
-          @for (f of voynich.explorerData()?.folios ?? []; track f.folio + '-' + $index; let i = $index) {
+          @for (f of filteredWalkthroughFolios(); track f.folio + '-' + $index) {
             <button
               type="button"
               class="list-item-btn"
-              [class.active-list-item]="selectedWalkthroughIdx() === i"
-              (click)="selectedWalkthroughIdx.set(i)"
+              [class.active-list-item]="activeWalkthrough()?.folio === f.folio"
+              (click)="selectedWalkthroughFolio.set(f.folio)"
             >
               <div class="item-top">
                 <strong>{{ f.folio }}</strong>
@@ -324,6 +360,8 @@
               </div>
               <div class="item-sub">{{ f.title }}</div>
             </button>
+          } @empty {
+            <div class="muted-cell">No folios match "{{ walkthroughSearch() }}".</div>
           }
         </div>
       </aside>
@@ -411,7 +449,11 @@
             </div>
           </div>
         } @empty {
-          <p>Loading folio walkthroughs…</p>
+          @if (walkthroughSearch()) {
+            <p class="muted-cell">No walkthrough folios match "{{ walkthroughSearch() }}".</p>
+          } @else {
+            <p>Loading folio walkthroughs…</p>
+          }
         }
       </div>
     </div>
@@ -1054,12 +1096,12 @@
   @case ('library') {
     <div class="section-head">
       <div class="editorial-prose">
-        <h1>Research Library, Guides &amp; Datasets</h1>
+        <h1>Research Library, Scans &amp; Datasets</h1>
         <p>
           Browse all {{ voynich.version.stats.markdownGuides }} research guides,
-          {{ voynich.version.stats.dataFiles }} raw JSON and TXT datasets,
-          {{ voynich.version.stats.highResScans }} high-resolution folio scans, and the 2 full
-          Public Domain manuscript PDF books.
+          {{ voynich.version.stats.highResScans }} high-resolution folio scans, the 2 full Public
+          Domain manuscript PDF books, and {{ voynich.version.stats.dataFiles }} raw JSON and TXT
+          verification datasets.
         </p>
       </div>
     </div>
@@ -1070,7 +1112,7 @@
         class="subtab-btn"
         role="tab"
         [attr.aria-selected]="librarySubtab() === 'docs'"
-        (click)="librarySubtab.set('docs')"
+        (click)="setLibrarySubtab('docs')"
       >
         Research Guides ({{ voynich.version.stats.markdownGuides }})
       </button>
@@ -1078,157 +1120,92 @@
         type="button"
         class="subtab-btn"
         role="tab"
-        [attr.aria-selected]="librarySubtab() === 'datasets'"
-        (click)="librarySubtab.set('datasets')"
+        [attr.aria-selected]="librarySubtab() === 'scans'"
+        (click)="setLibrarySubtab('scans')"
       >
-        Datasets ({{ voynich.version.stats.dataFiles }})
+        Scans &amp; PDF Books ({{ voynich.version.stats.highResScans }})
       </button>
       <button
         type="button"
         class="subtab-btn"
         role="tab"
-        [attr.aria-selected]="librarySubtab() === 'scans'"
-        (click)="librarySubtab.set('scans')"
+        [attr.aria-selected]="librarySubtab() === 'datasets'"
+        (click)="setLibrarySubtab('datasets')"
       >
-        Scans &amp; PDF Books ({{ voynich.version.stats.highResScans }})
+        Datasets ({{ voynich.version.stats.dataFiles }})
       </button>
     </div>
 
     @switch (librarySubtab()) {
       @case ('docs') {
-        <div class="split-layout">
-          <aside class="sidebar-list" aria-label="Research Markdown Guides">
-            <div class="filter-stack">
-              <div class="search-field">
-                <svg
-                  class="search-field-icon"
-                  aria-hidden="true"
-                  viewBox="0 0 20 20"
-                  width="15"
-                  height="15"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <circle cx="9" cy="9" r="6" />
-                  <path d="m13.5 13.5 4 4" />
-                </svg>
-                <label for="docSearchInput" class="sr-only">Search research guides</label>
-                <input
-                  id="docSearchInput"
-                  type="search"
-                  class="search-field-input"
-                  placeholder="Search research guides..."
-                  [value]="docSearch()"
-                  (input)="docSearch.set($any($event.target).value)"
-                />
-              </div>
-            </div>
+        @if (activeDocSlug()) {
+          <div class="reader-nav-bar">
+            <button type="button" class="btn-outline back-dir-btn" (click)="closeDocReader()">
+              ← Back to Research Guides
+            </button>
+            <span class="item-meta">{{ activeDocMeta() }}</span>
+          </div>
 
-            <div class="folio-btn-list">
-              @for (group of groupedDocs(); track group.category) {
-                <div class="group-header">{{ group.category }}</div>
-                @for (d of group.docs; track d.slug) {
-                  <button
-                    type="button"
-                    class="list-item-btn doc-list-btn"
-                    [class.active-list-item]="activeDocSlug() === d.slug"
-                    [attr.title]="d.title"
-                    (click)="selectDoc(d.slug)"
-                  >
-                    <span class="doc-list-title">{{ shortDocTitle(d) }}</span>
-                  </button>
-                }
-              }
-            </div>
-          </aside>
-
-          <article class="reading-pane">
+          <article class="doc-reader-pane">
             <h2 class="doc-main-title">{{ activeDocTitle() }}</h2>
             <div class="markdown-body doc-markdown" [innerHTML]="activeDocHtml()"></div>
           </article>
-        </div>
-      }
-
-      @case ('datasets') {
-        <div class="split-layout">
-          <aside class="sidebar-list" aria-label="Raw Data Files">
-            <div class="filter-stack">
-              <div class="search-field">
-                <svg
-                  class="search-field-icon"
-                  aria-hidden="true"
-                  viewBox="0 0 20 20"
-                  width="15"
-                  height="15"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <circle cx="9" cy="9" r="6" />
-                  <path d="m13.5 13.5 4 4" />
-                </svg>
-                <label for="dataSearchInput" class="sr-only">Search datasets</label>
-                <input
-                  id="dataSearchInput"
-                  type="search"
-                  class="search-field-input"
-                  placeholder="Search JSON/TXT datasets..."
-                  [value]="dataSearch()"
-                  (input)="dataSearch.set($any($event.target).value)"
-                />
-              </div>
+        } @else {
+          <div class="specimen-toolbar library-toolbar">
+            <div class="search-field specimen-search-field">
+              <svg
+                class="search-field-icon"
+                aria-hidden="true"
+                viewBox="0 0 20 20"
+                width="15"
+                height="15"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="9" cy="9" r="6" />
+                <path d="m13.5 13.5 4 4" />
+              </svg>
+              <label for="docSearchInput" class="sr-only">Search research guides</label>
+              <input
+                id="docSearchInput"
+                type="search"
+                class="search-field-input"
+                placeholder="Search research guides by title, topic, or folio (e.g. Reader's Guide, Zodiac, Herbal)..."
+                [value]="docSearch()"
+                (input)="docSearch.set($any($event.target).value)"
+              />
             </div>
-
-            <div class="folio-btn-list">
-              @for (df of filteredDataFiles(); track df.file) {
-                <button
-                  type="button"
-                  class="list-item-btn doc-list-btn"
-                  [class.active-list-item]="activeDataFile() === df.file"
-                  [attr.title]="'data/' + df.file"
-                  (click)="inspectDataFile(df.file, df.url, df.sizeKB)"
-                >
-                  <div class="item-top">
-                    <span class="doc-list-title">{{ df.label }}</span>
-                    <span class="item-meta">{{ df.sizeKB }} KB</span>
-                  </div>
-                </button>
-              }
+            <div class="count-label">
+              Showing {{ filteredDocs().length }} of {{ voynich.version.stats.markdownGuides }}
+              research guides
             </div>
-          </aside>
-
-          <div class="reading-pane">
-            <div class="walkthrough-head">
-              <div>
-                <h2 class="walkthrough-title">
-                  {{ activeDataFile() || 'Select a Dataset to Inspect' }}
-                </h2>
-                <div class="muted-cell">
-                  {{
-                    activeDataMeta() ||
-                      'Statistical verification and corpus files from voynich-research/data/'
-                  }}
-                </div>
-              </div>
-              @if (activeDataRawUrl()) {
-                <a
-                  [href]="activeDataRawUrl()"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="btn-outline"
-                >
-                  Open Raw File ↗
-                </a>
-              }
-            </div>
-            <pre class="data-preview-pre"><code>{{ activeDataPreview() }}</code></pre>
           </div>
-        </div>
+
+          <div class="guide-directory">
+            @for (group of groupedDocs(); track group.category) {
+              <section class="guide-category-block">
+                <h2 class="guide-category-title">{{ group.category }}</h2>
+                <div class="guide-directory-grid">
+                  @for (d of group.docs; track d.slug) {
+                    <button type="button" class="guide-card" (click)="openDoc(d.slug)">
+                      <div class="guide-card-top">
+                        <span class="guide-card-title">{{ shortDocTitle(d) }}</span>
+                        <span class="guide-card-badge">Read →</span>
+                      </div>
+                      <p class="guide-card-summary">{{ d.summary }}</p>
+                      <div class="guide-card-meta">Markdown Guide · {{ d.sizeKB }} KB</div>
+                    </button>
+                  }
+                </div>
+              </section>
+            } @empty {
+              <p class="muted-cell">No research guides match "{{ docSearch() }}".</p>
+            }
+          </div>
+        }
       }
 
       @case ('scans') {
@@ -1284,48 +1261,50 @@
         </div>
 
         <section class="scans-gallery-section">
-          <div class="walkthrough-head">
-            <div class="editorial-prose">
-              <h2>
-                High-Resolution Folio Scan Gallery ({{ voynich.version.stats.highResScans }} PNGs)
-              </h2>
-              <p>
-                Public Domain digital surrogates courtesy of Yale University’s Beinecke Rare Book
-                and Manuscript Library (MS 408). Click any scan to open it in full resolution.
-              </p>
+          <div class="editorial-prose">
+            <h2>
+              High-Resolution Folio Scan Gallery ({{ voynich.version.stats.highResScans }} PNGs)
+            </h2>
+            <p>
+              Public Domain digital surrogates courtesy of Yale University’s Beinecke Rare Book and
+              Manuscript Library (MS 408). Click any scan to open it in full resolution.
+            </p>
+          </div>
+
+          <div class="specimen-toolbar library-toolbar">
+            <div class="search-field specimen-search-field">
+              <svg
+                class="search-field-icon"
+                aria-hidden="true"
+                viewBox="0 0 20 20"
+                width="15"
+                height="15"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="9" cy="9" r="6" />
+                <path d="m13.5 13.5 4 4" />
+              </svg>
+              <label for="scanGallerySearch" class="sr-only">Filter scans by folio</label>
+              <input
+                id="scanGallerySearch"
+                type="search"
+                class="search-field-input"
+                placeholder="Search scan by folio or filename (e.g. f78r, f102v, rosette)..."
+                [value]="scanSearch()"
+                (input)="onScanSearch($any($event.target).value)"
+              />
             </div>
-            <div class="gallery-search-box">
-              <div class="search-field">
-                <svg
-                  class="search-field-icon"
-                  aria-hidden="true"
-                  viewBox="0 0 20 20"
-                  width="15"
-                  height="15"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <circle cx="9" cy="9" r="6" />
-                  <path d="m13.5 13.5 4 4" />
-                </svg>
-                <label for="scanGallerySearch" class="sr-only">Filter scans by folio</label>
-                <input
-                  id="scanGallerySearch"
-                  type="search"
-                  class="search-field-input"
-                  placeholder="Search scan (e.g. f78r, f102v)..."
-                  [value]="scanSearch()"
-                  (input)="scanSearch.set($any($event.target).value)"
-                />
-              </div>
+            <div class="count-label">
+              Showing {{ pagedScans().length }} of {{ filteredScans().length }} scans
             </div>
           </div>
 
           <div class="scans-grid">
-            @for (p of filteredScans(); track p.file; let i = $index) {
+            @for (p of pagedScans(); track p.file; let i = $index) {
               <div class="scan-card">
                 <img
                   [ngSrc]="p.url"
@@ -1343,7 +1322,116 @@
               </div>
             }
           </div>
+
+          @if (filteredScans().length > 0) {
+            <div class="paginator-bar">
+              <mat-paginator
+                [length]="filteredScans().length"
+                [pageSize]="scanPageSize()"
+                [pageIndex]="scanPageIndex()"
+                [pageSizeOptions]="scanPageSizeOptions"
+                showFirstLastButtons
+                (page)="onScanPage($event)"
+                aria-label="Select page of high-resolution manuscript scans"
+              />
+            </div>
+          }
         </section>
+      }
+
+      @case ('datasets') {
+        @if (activeDataFile()) {
+          <div class="reader-nav-bar">
+            <button type="button" class="btn-outline back-dir-btn" (click)="closeDataInspector()">
+              ← Back to All Datasets
+            </button>
+            <div class="reader-nav-actions">
+              <span class="item-meta">{{ activeDataMeta() }}</span>
+              @if (activeDataRawUrl()) {
+                <a
+                  [href]="activeDataRawUrl()"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="btn-outline"
+                >
+                  Open Raw File ↗
+                </a>
+              }
+            </div>
+          </div>
+
+          <div class="dataset-inspector-pane">
+            <h2 class="doc-main-title">{{ activeDataFile() }}</h2>
+            <pre class="data-preview-pre"><code>{{ activeDataPreview() }}</code></pre>
+          </div>
+        } @else {
+          <div class="specimen-toolbar library-toolbar">
+            <div class="search-field specimen-search-field">
+              <svg
+                class="search-field-icon"
+                aria-hidden="true"
+                viewBox="0 0 20 20"
+                width="15"
+                height="15"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="9" cy="9" r="6" />
+                <path d="m13.5 13.5 4 4" />
+              </svg>
+              <label for="dataSearchInput" class="sr-only">Search datasets</label>
+              <input
+                id="dataSearchInput"
+                type="search"
+                class="search-field-input"
+                placeholder="Search JSON or TXT datasets (e.g. zodiac, balneo, lexicon, corpus)..."
+                [value]="dataSearch()"
+                (input)="onDataSearch($any($event.target).value)"
+              />
+            </div>
+            <div class="count-label">
+              Showing {{ pagedDataFiles().length }} of {{ filteredDataFiles().length }} datasets
+            </div>
+          </div>
+
+          <div class="dataset-directory-grid">
+            @for (df of pagedDataFiles(); track df.file) {
+              <button
+                type="button"
+                class="dataset-card"
+                (click)="inspectDataFile(df.file, df.url, df.sizeKB)"
+              >
+                <div class="dataset-card-top">
+                  <span class="dataset-card-title">{{ df.label }}</span>
+                  <span class="guide-card-badge">Inspect →</span>
+                </div>
+                <div class="dataset-card-file">
+                  <span>{{ df.file.endsWith('.txt') ? 'EVA Corpus TXT' : 'Verification JSON' }}</span>
+                  <span class="item-meta">{{ df.sizeKB }} KB</span>
+                </div>
+              </button>
+            } @empty {
+              <p class="muted-cell">No datasets match "{{ dataSearch() }}".</p>
+            }
+          </div>
+
+          @if (filteredDataFiles().length > 0) {
+            <div class="paginator-bar">
+              <mat-paginator
+                [length]="filteredDataFiles().length"
+                [pageSize]="dataPageSize()"
+                [pageIndex]="dataPageIndex()"
+                [pageSizeOptions]="dataPageSizeOptions"
+                showFirstLastButtons
+                (page)="onDataPage($event)"
+                aria-label="Select page of research datasets"
+              />
+            </div>
+          }
+        }
       }
     }
   }

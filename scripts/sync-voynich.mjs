@@ -537,6 +537,18 @@ function categorizeDoc(slug, filename) {
   return '5. Master Research Log & Attack Syntheses';
 }
 
+function cleanDocHeading(raw) {
+  let s = String(raw || '')
+    .replace(/\s*\([^)]*(?:Wave|Attack|Phase|Discover)[^)]*\)/gi, '')
+    .replace(/^#*\s*Wave\s*\d+\s*Master\s*Compendium:\s*/i, '');
+  s = cleanStructuredText(s)
+    .replace(/^Wave\s*\d+\s*Master\s*Compendium:\s*/i, '')
+    .replace(/\s*\([^)]*(?:Wave|Attack|Phase|Discover)[^)]*\)/gi, '')
+    .replace(/\s*\(z\s*=\s*[^)]*\)/gi, '')
+    .trim();
+  return s;
+}
+
 function extractTitleAndSummary(md, fallbackTitle) {
   const lines = md.split(/\r?\n/);
   let title = fallbackTitle;
@@ -544,13 +556,22 @@ function extractTitleAndSummary(md, fallbackTitle) {
   for (const line of lines) {
     const h1 = line.match(/^#\s+(.+)$/);
     if (h1 && title === fallbackTitle) {
-      title = h1[1].replace(/`/g, '').trim();
+      title = cleanDocHeading(h1[1]);
       continue;
     }
-    const clean = line
+    let clean = line
       .replace(/^>\s*/, '')
-      .replace(/\*\*/g, '')
-      .replace(/`/g, '')
+      .replace(/^[-*]\s+/, '')
+      .replace(/^\d+\.\s+/, '')
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+      .replace(/\s*\([^)]*(?:Wave|Attack|Phase|Discover)[^)]*\)/gi, '')
+      .replace(/^Discovery\s*\d+\s*[:·-]?\s*/i, '');
+    clean = cleanStructuredText(clean)
+      .replace(/^[-*]\s+/, '')
+      .replace(/^(?:Who this guide is for|Purpose of this Dossier):\s*/i, '')
+      .replace(/\b(?:Autonomous\s+)?Wave\s*\d+/gi, 'this study')
+      .replace(/\s*\(\s*·\s*/g, '(')
+      .replace(/\s+([,.;:!?])/g, '$1')
       .trim();
     if (
       clean &&
@@ -558,11 +579,19 @@ function extractTitleAndSummary(md, fallbackTitle) {
       !clean.startsWith('|') &&
       !clean.startsWith('!') &&
       !clean.startsWith('---') &&
-      clean.length > 35
+      !/^(?:Repository-Relative|Primary Scripts|Scripts|Data|Visual Scans|Executive Summary|Date|Scope|Verification|Author)/i.test(
+        clean,
+      ) &&
+      !clean.includes('.py') &&
+      !clean.includes('.json') &&
+      clean.length > 42
     ) {
-      summary = clean.slice(0, 220) + (clean.length > 220 ? '…' : '');
+      summary = clean.slice(0, 190) + (clean.length > 190 ? '…' : '');
       break;
     }
+  }
+  if (!summary) {
+    summary = `Detailed visual, paleographic, and statistical research guide for ${title}.`;
   }
   return { title, summary };
 }
