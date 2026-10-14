@@ -93,9 +93,11 @@ function getPngDimensions(filePath) {
 function cleanStructuredText(raw) {
   if (!raw) return '';
   let s = String(raw);
-  // 0. Strip Markdown bold/italic/backticks first (preserving literal (*) as (★)) so subsequent regexes match cleanly
+  // 0. Strip Markdown bold/italic/backticks first (preserving literal (*), (.), (,) tokens) so subsequent regexes match cleanly
   s = s
     .replace(/\(\s*`?\*`?\s*\)/g, '(★)')
+    .replace(/\(\s*`\.`\s*\)/g, '(".")')
+    .replace(/\(\s*`,`\s*\)/g, '(",")')
     .replace(/\*+/g, '')
     .replace(/`/g, '');
   // 1. Specific inline filename phrases
@@ -143,6 +145,7 @@ function cleanStructuredText(raw) {
   s = s.replace(/\$[IQLH]=[A-Z0-9]+\s*,?\s*/g, '');
   s = s.replace(/\[(Quire \d+)\]/g, '$1');
   // 9. Clean internal "Attack N / Discovery N" experiment numbers
+  s = s.replace(/\s*\([A-Za-z0-9_-]+\.(?:md|py|json)\)/g, '');
   s = s.replace(
     /In Attacks?\s*\d+(?:\s*(?:&|and|–|-)\s*\d+)?(?:\s*\(Discovery\s*\d+\))?,\s*we\s+(?:proved|found)\s+that\s+/gi,
     'Across the corpus, ',
@@ -154,6 +157,10 @@ function cleanStructuredText(raw) {
   s = s.replace(
     /In Attacks?\s*\d+(?:\s*(?:&|and|–|-)\s*\d+)?(?:\s*\(Discovery\s*\d+\))?,\s*/gi,
     '',
+  );
+  s = s.replace(
+    /\bAttacks?\s*\d+(?:\s*(?:&|and|–|-)\s*\d+)?(?:\s*\(Discovery\s*\d+\))?\s+(?=(?:tests|examines|investigates|audits|evaluates|analyzes|proves|demonstrates|establishes)\b)/gi,
+    'This study ',
   );
   s = s.replace(
     /\s*\(\s*Attacks?\s*\d+(?:\s*(?:&|and|–|-)\s*\d+)?(?:\s*\(Discovery\s*\d+\))?\s*\)/gi,
@@ -181,6 +188,7 @@ function cleanStructuredText(raw) {
   s = s
     .replace(/\\chi\^2/g, 'χ²')
     .replace(/\\to/g, '→')
+    .replace(/(\d)\s*\\times\s*(\d)/g, '$1×$2')
     .replace(/\\times/g, '×')
     .replace(/\\le/g, '≤')
     .replace(/\\ge/g, '≥');
@@ -540,11 +548,14 @@ function categorizeDoc(slug, filename) {
 function cleanDocHeading(raw) {
   let s = String(raw || '')
     .replace(/\s*\([^)]*(?:Wave|Attack|Phase|Discover)[^)]*\)/gi, '')
+    .replace(/\s*\((?:\.\.\/)?notes\/[^)]+\)/gi, '')
     .replace(/^#*\s*Wave\s*\d+\s*Master\s*Compendium:\s*/i, '');
   s = cleanStructuredText(s)
     .replace(/^Wave\s*\d+\s*Master\s*Compendium:\s*/i, '')
     .replace(/\s*\([^)]*(?:Wave|Attack|Phase|Discover)[^)]*\)/gi, '')
+    .replace(/\s*\((?:\.\.\/)?notes\/[^)]+\)/gi, '')
     .replace(/\s*\(z\s*=\s*[^)]*\)/gi, '')
+    .replace(/^[:·\-–—\s]+/, '')
     .trim();
   return s;
 }
@@ -559,16 +570,28 @@ function extractTitleAndSummary(md, fallbackTitle) {
       title = cleanDocHeading(h1[1]);
       continue;
     }
+    const rawTrimmed = line.trim();
+    if (
+      !rawTrimmed ||
+      rawTrimmed.startsWith('#') ||
+      rawTrimmed.startsWith('|') ||
+      rawTrimmed.startsWith('!') ||
+      rawTrimmed.startsWith('---') ||
+      /^[-*]\s+\[[^\]]*\.(?:png|jpg|jpeg|webp|pdf|py|json)/i.test(rawTrimmed)
+    ) {
+      continue;
+    }
     let clean = line
       .replace(/^>\s*/, '')
-      .replace(/^[-*]\s+/, '')
-      .replace(/^\d+\.\s+/, '')
+      .replace(/^\s*[-*]\s+/, '')
+      .replace(/^\s*\d+\.\s+/, '')
       .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
       .replace(/\s*\([^)]*(?:Wave|Attack|Phase|Discover)[^)]*\)/gi, '')
       .replace(/^Discovery\s*\d+\s*[:·-]?\s*/i, '');
     clean = cleanStructuredText(clean)
       .replace(/^[-*]\s+/, '')
       .replace(/^(?:Who this guide is for|Purpose of this Dossier):\s*/i, '')
+      .replace(/\s+via\s+[a-z0-9_/-]+\.py\b/gi, '')
       .replace(/\b(?:Autonomous\s+)?Wave\s*\d+/gi, 'this study')
       .replace(/\s*\(\s*·\s*/g, '(')
       .replace(/\s+([,.;:!?])/g, '$1')
@@ -579,7 +602,8 @@ function extractTitleAndSummary(md, fallbackTitle) {
       !clean.startsWith('|') &&
       !clean.startsWith('!') &&
       !clean.startsWith('---') &&
-      !/^(?:Repository-Relative|Primary Scripts|Scripts|Data|Visual Scans|Executive Summary|Date|Scope|Verification|Author)/i.test(
+      !/^T\d+\s*[·:—-]/i.test(clean) &&
+      !/^(?:Repository-Relative|Primary Scripts|Primary Scans|Summary Plot|Structured Data|Transliteration|Scripts|Script|Data|Corpus|Visual Scans|Executive Summary|Date|Scope|Verification|Author)/i.test(
         clean,
       ) &&
       !clean.includes('.py') &&

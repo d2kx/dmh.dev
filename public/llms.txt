@@ -11,7 +11,7 @@
 
 ## Apps & Projects
 
-- [Voynich](https://www.dmh.dev/voynich): Exploratory visual, linguistic, and computational research into the Voynich Manuscript (Beinecke MS 408) with a 3-step word decoder, 39 folio walkthroughs, 40 specimen cribs, 227-folio corpus, and 47 research guides.
+- [Voynich](https://www.dmh.dev/voynich): Exploratory visual, linguistic, and computational research into the Voynich Manuscript (Beinecke MS 408) with a 4-segment morphological word analyzer, 98 folio walkthroughs, 115 specimen identifications, 227-folio corpus, 68 research guides, 520 high-resolution scans, and 265 structured datasets.
   - [Walkthroughs](https://www.dmh.dev/voynich/walkthroughs)
   - [Identifications](https://www.dmh.dev/voynich/identifications)
   - [Research Library](https://www.dmh.dev/voynich/library)

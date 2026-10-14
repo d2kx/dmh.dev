@@ -2,12 +2,12 @@
 export const VOYNICH_VERSION = {
   "repo": "d2kx/voynich-research",
   "repoUrl": "https://github.com/d2kx/voynich-research",
-  "commitSha": "ae1c99fdf362b69f8ec0605e60ad540b19d3896f",
-  "shortSha": "ae1c99f",
+  "commitSha": "7489d4fdc2371fa391b2ccb527a7bde9d1445d9c",
+  "shortSha": "7489d4f",
   "commitDate": "2026-10-14",
-  "commitIso": "2026-10-14 02:54:26 +0200",
-  "commitSubject": "feat(wave57): Attacks 237-240 & Discoveries 254-257 (Claims Audit of Waves 54-56, Line-Break Functional Unit & Cross-Line Sandhi Reset, Self-Citation/Autocopy Test, Multi-Scale Vocabulary Dynamics)",
-  "syncedAt": "2026-10-14T00:55:16.869Z",
+  "commitIso": "2026-10-14 04:17:42 +0200",
+  "commitSubject": "Wave 58 (Attacks 241-243 / Discoveries 258-260): within-line sandhi & spaces, intra-word DAG grammar & Scribe 3 A/B shift, and L/C/R vs P 4-tier audit",
+  "syncedAt": "2026-10-14T02:27:09.566Z",
   "stats": {
     "transcribedFolios": 227,
     "totalWords": 38949,
@@ -15,9 +15,9 @@ export const VOYNICH_VERSION = {
     "totalDrawingIntrusions": 758,
     "walkthroughFolios": 98,
     "flagshipSpecimens": 115,
-    "highResScans": 504,
-    "markdownGuides": 65,
-    "dataFiles": 262
+    "highResScans": 520,
+    "markdownGuides": 68,
+    "dataFiles": 265
   },
   "books": [
     {
@@ -31,8 +31,8 @@ export const VOYNICH_VERSION = {
       "sourceName": "Yale University Beinecke Rare Book & Manuscript Library (MS 408)",
       "sourceUrl": "https://collections.library.yale.edu/catalog/2002046",
       "license": "Public Domain (CC0 1.0 · Yale University Library Digital Collections)",
-      "downloadUrl": "https://media.githubusercontent.com/media/d2kx/voynich-research/ae1c99fdf362b69f8ec0605e60ad540b19d3896f/books/voynich-yale-beinecke-2026-highres-214p.pdf",
-      "githubBlobUrl": "https://github.com/d2kx/voynich-research/blob/ae1c99fdf362b69f8ec0605e60ad540b19d3896f/books/voynich-yale-beinecke-2026-highres-214p.pdf"
+      "downloadUrl": "https://media.githubusercontent.com/media/d2kx/voynich-research/7489d4fdc2371fa391b2ccb527a7bde9d1445d9c/books/voynich-yale-beinecke-2026-highres-214p.pdf",
+      "githubBlobUrl": "https://github.com/d2kx/voynich-research/blob/7489d4fdc2371fa391b2ccb527a7bde9d1445d9c/books/voynich-yale-beinecke-2026-highres-214p.pdf"
     },
     {
       "id": "tcpdf-2014",
@@ -45,8 +45,8 @@ export const VOYNICH_VERSION = {
       "sourceName": "Internet Archive (TheVoynichManuscript · Yale Beinecke MS 408 scans)",
       "sourceUrl": "https://archive.org/details/TheVoynichManuscript",
       "license": "Public Domain (Underlying 15th-century manuscript MS 408 & Beinecke scans)",
-      "downloadUrl": "https://media.githubusercontent.com/media/d2kx/voynich-research/ae1c99fdf362b69f8ec0605e60ad540b19d3896f/books/voynich-tcpdf-2014-bookmarked-210p.pdf",
-      "githubBlobUrl": "https://github.com/d2kx/voynich-research/blob/ae1c99fdf362b69f8ec0605e60ad540b19d3896f/books/voynich-tcpdf-2014-bookmarked-210p.pdf"
+      "downloadUrl": "https://media.githubusercontent.com/media/d2kx/voynich-research/7489d4fdc2371fa391b2ccb527a7bde9d1445d9c/books/voynich-tcpdf-2014-bookmarked-210p.pdf",
+      "githubBlobUrl": "https://github.com/d2kx/voynich-research/blob/7489d4fdc2371fa391b2ccb527a7bde9d1445d9c/books/voynich-tcpdf-2014-bookmarked-210p.pdf"
     }
   ]
 } as const;
